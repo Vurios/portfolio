@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Tooling (none required today, kept in case it gets added)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.vercel/
+
+# Impeccable local overrides
+.impeccable/config.local.json
+.impeccable/live/
+
+# Claude Code local settings + downloaded impeccable engine binary
+.claude/settings.local.json
+.claude/skills/impeccable/scripts/bin/

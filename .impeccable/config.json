@@ -1,0 +1,49 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-09-14T19:40:31.585Z",
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (Geist body font)"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-09-14T19:40:31.782Z",
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (Geist Mono labels)"
+      },
+      {
+        "rule": "gpt-thin-border-wide-shadow",
+        "value": "*",
+        "files": [
+          "css/styles.css",
+          "index.html"
+        ],
+        "createdAt": "2026-09-14T19:40:31.962Z",
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (hairline border + 8px/22px/-14px soft shadow card recipe)"
+      },
+      {
+        "rule": "pulsing-dot",
+        "value": "*",
+        "files": [
+          "css/styles.css",
+          "index.html"
+        ],
+        "createdAt": "2026-09-14T19:40:32.162Z",
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (status dot pulses opacity on 1.8s loop)"
+      },
+      {
+        "rule": "em-dash-overuse",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-14T19:40:32.343Z",
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (numbered section header convention '01 — about')"
+      }
+    ]
+  }
+}
