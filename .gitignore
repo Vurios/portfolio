@@ -26,3 +26,6 @@ yarn-error.log*
 
 # Source photo (the web-ready cut-out lives in assets/profile/)
 DeGuzman_Photo.jpg
+
+.vercel
+.env*

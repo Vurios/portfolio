@@ -2,6 +2,8 @@
 
 Personal portfolio of Adrian Kim P. De Guzman, Information Technology student and full-stack developer based in Ligao City, Albay, Philippines.
 
+Live at <https://kim-deguzman-portfolio.vercel.app>
+
 Single-page static site: plain HTML, CSS, and JavaScript. No framework, no build step.
 
 ## Preview locally
