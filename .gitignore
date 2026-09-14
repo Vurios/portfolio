@@ -22,3 +22,7 @@ yarn-error.log*
 # Claude Code local settings + downloaded impeccable engine binary
 .claude/settings.local.json
 .claude/skills/impeccable/scripts/bin/
+.impeccable/review/
+
+# Source photo (the web-ready cut-out lives in assets/profile/)
+DeGuzman_Photo.jpg

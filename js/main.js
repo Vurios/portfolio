@@ -1,5 +1,5 @@
 /* Kim De Guzman — portfolio
-   Theme toggle, overlay menu, active-section nav, scroll reveal, footer year.
+   Theme toggle, overlay menu, active-section nav, footer year.
    No dependencies. The page is fully usable without this file. */
 (function () {
   "use strict";
@@ -157,34 +157,6 @@
       { rootMargin: "-35% 0px -55% 0px", threshold: [0, 0.01] }
     );
     for (var s = 0; s < sections.length; s++) spy.observe(sections[s]);
-  }
-
-  /* ------------------------------------------------------------ scroll reveal */
-  var reveals = document.querySelectorAll(".reveal");
-  if (reveals.length) {
-    if (reduceMotion.matches || !("IntersectionObserver" in window)) {
-      for (var r = 0; r < reveals.length; r++) reveals[r].classList.add("is-visible");
-    } else {
-      var io = new IntersectionObserver(
-        function (entries, obs) {
-          for (var i = 0; i < entries.length; i++) {
-            if (entries[i].isIntersecting) {
-              entries[i].target.classList.add("is-visible");
-              obs.unobserve(entries[i].target);
-            }
-          }
-        },
-        { rootMargin: "0px 0px -10% 0px", threshold: 0.05 }
-      );
-      for (var q = 0; q < reveals.length; q++) io.observe(reveals[q]);
-      // Anything already on screen at load shows immediately
-      window.requestAnimationFrame(function () {
-        for (var k = 0; k < reveals.length; k++) {
-          var rect = reveals[k].getBoundingClientRect();
-          if (rect.top < window.innerHeight) reveals[k].classList.add("is-visible");
-        }
-      });
-    }
   }
 
   /* -------------------------------------------------------------- footer year */

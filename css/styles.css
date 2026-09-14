@@ -549,7 +549,7 @@ a.ext:hover::after {
 }
 .prose {
   color: rgb(var(--gray-600));
-  max-width: 62ch;
+  max-width: 56ch;
 }
 :root[data-theme="dark"] .prose {
   color: rgb(var(--gray-600));
@@ -560,60 +560,84 @@ a.ext:hover::after {
    -------------------------------------------------------------------------- */
 .hero {
   position: relative;
-  padding-top: 4rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  padding-top: 3rem;
   padding-bottom: 0.5rem;
-  isolation: isolate;
+}
+@media (min-width: 640px) {
+  .hero {
+    grid-template-columns: 1fr 11rem;
+    align-items: start;
+    gap: 2.5rem;
+    padding-top: 4rem;
+  }
+  .hero__portrait {
+    order: 2;
+  }
 }
 @media (min-width: 1024px) {
   .hero {
+    grid-template-columns: 1fr 12rem;
     padding-top: 6rem;
   }
 }
 
-/* The one halftone flourish on the page: dissolves out of the top-right */
-.hero__dots {
+/* Portrait: the page's one halftone flourish. The cut-out photo sits on a
+   gray-50 surface and dissolves into dots along its bottom edge. */
+.hero__portrait {
+  width: 7.5rem;
+}
+@media (min-width: 640px) {
+  .hero__portrait {
+    width: 100%;
+  }
+}
+.portrait {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgb(var(--gray-100)) 0%, rgb(var(--gray-50)) 100%);
+  border: 1px solid rgb(var(--gray-200));
+  box-shadow: var(--shadow-rest);
+  overflow: hidden;
+}
+.portrait img {
   position: absolute;
-  z-index: -1;
-  top: -1rem;
-  right: -1rem;
-  width: min(60vw, 22rem);
-  height: 15rem;
-  pointer-events: none;
-  -webkit-mask-image: radial-gradient(
-    ellipse at 100% 0%,
-    rgb(0 0 0 / 0.85) 0%,
-    rgb(0 0 0 / 0.35) 40%,
-    transparent 75%
-  );
-  mask-image: radial-gradient(
-    ellipse at 100% 0%,
-    rgb(0 0 0 / 0.85) 0%,
-    rgb(0 0 0 / 0.35) 40%,
-    transparent 75%
-  );
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  width: 96%;
+  height: auto;
+  transform: translateX(-50%);
+  -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent 98%);
+  mask-image: linear-gradient(180deg, #000 68%, transparent 98%);
+}
+.portrait__dots {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42%;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 85%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 85%);
+  --dot-alpha: 0.38;
+}
+:root[data-theme="dark"] .portrait__dots {
+  --dot-alpha: 0.26;
 }
 
 .hero__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-bottom: 1.25rem;
   font-family: var(--font-mono);
   font-size: 12px;
+  letter-spacing: 0.2px;
   color: rgb(var(--gray-500));
-}
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgb(var(--ink));
-  animation: pulse 1.8s ease-in-out infinite;
 }
 
 .hero__name {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.1rem, 8vw, 3rem);
+  font-size: clamp(2rem, 8vw, 3rem);
   line-height: 1;
   text-transform: lowercase;
   letter-spacing: 0;
@@ -629,7 +653,7 @@ a.ext:hover::after {
 
 .hero__intro {
   margin-top: 1.25rem;
-  max-width: 58ch;
+  max-width: 52ch;
   color: rgb(var(--gray-600));
 }
 
@@ -912,6 +936,8 @@ a.ext:hover::after {
   overflow: hidden;
 }
 .thumb img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -920,11 +946,13 @@ a.ext:hover::after {
 .card:hover .thumb img {
   transform: scale(1.04);
 }
+/* Placeholder sits under the image: visible until a real file loads on top,
+   and permanently when the file is missing (see .thumb--missing). */
 .thumb__ph {
   --dot-alpha: 0.32;
   position: absolute;
   inset: 0;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 100%);
@@ -943,12 +971,9 @@ a.ext:hover::after {
   letter-spacing: 0.05em;
   color: rgb(var(--ink));
 }
-/* Missing image: hide the broken <img>, reveal the halftone + initials */
+/* Missing image: hide the broken <img> so the halftone + initials stay */
 .thumb--missing img {
   display: none;
-}
-.thumb--missing .thumb__ph {
-  display: flex;
 }
 
 /* --------------------------------------------------------------------------
@@ -1113,15 +1138,6 @@ a.ext:hover::after {
     transform: translateY(0);
   }
 }
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.25;
-  }
-}
 
 /* Page entrance: only applied when JS is running (html.js) so the page is
    complete without it. Stagger via --d (0..4), capped at ~330ms. */
@@ -1131,16 +1147,6 @@ html.js .fade-up {
   animation-delay: calc(50ms + var(--d, 0) * 70ms);
 }
 
-/* Below-the-fold sections reveal once when scrolled into view */
-html.js .reveal {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
-}
-html.js .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -1153,13 +1159,9 @@ html.js .reveal.is-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  html.js .fade-up,
-  html.js .reveal {
+  html.js .fade-up {
     opacity: 1;
     transform: none;
-    animation: none;
-  }
-  .status-dot {
     animation: none;
   }
 }

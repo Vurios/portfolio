@@ -26,23 +26,13 @@
         "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (hairline border + 8px/22px/-14px soft shadow card recipe)"
       },
       {
-        "rule": "pulsing-dot",
-        "value": "*",
-        "files": [
-          "css/styles.css",
-          "index.html"
-        ],
-        "createdAt": "2026-09-14T19:40:32.162Z",
-        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (status dot pulses opacity on 1.8s loop)"
-      },
-      {
         "rule": "em-dash-overuse",
         "value": "*",
         "files": [
           "index.html"
         ],
         "createdAt": "2026-09-14T19:40:32.343Z",
-        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (numbered section header convention '01 — about')"
+        "reason": "Agent: TASK.md pins the bryl-minimal-design skill, which specifies this (numbered section header convention '01 \u2014 about')"
       }
     ]
   }

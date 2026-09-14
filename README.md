@@ -28,7 +28,7 @@ assets/
   fonts/              # Geist Pixel (self-hosted, SIL OFL)
   images/projects/    # project screenshots (drop files here)
   images/certifications/  # certificate / badge images (drop files here)
-  profile/            # profile photo (reserved)
+  profile/            # kim.png, the hero portrait (transparent PNG)
 ```
 
 ## Adding images
@@ -48,9 +48,11 @@ Each project and certification card already points at a file path. Drop an image
 
 Project images are shown at 16:9, certification images at 4:3.
 
+To replace the hero portrait, overwrite `assets/profile/kim.png` with another transparent PNG (roughly square, subject centered); the frame and halftone dissolve adapt automatically.
+
 ## Deployment
 
-Deploys on Vercel as a static site with zero configuration: import the GitHub repository, leave the framework preset as "Other", and deploy.
+Live on Vercel as a static site with zero configuration. Every push to `main` redeploys.
 
 ## Design
 
