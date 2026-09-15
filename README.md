@@ -26,7 +26,7 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/kuro.js            # Kuro, the cat: oneko.js engine (MIT) confined to the content column, plus drag, speech bubble, favicon
+js/kuro.js            # Kuro, the cat: oneko.js sprites/idle logic (MIT) with smooth movement, wander + click-to-follow, petting, drag, speech bubble, favicon
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
@@ -38,7 +38,7 @@ assets/
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
-Kuro, the black cat, runs on [oneko.js](https://github.com/adryd325/oneko.js) by adryd (MIT, license kept in `js/kuro.js`), adapted to stay inside the content column. His sprite sheet is `assets/kuro/jess.png`; swap that file for another 256x128 oneko-layout sheet to change his look. The favicon is his face, cropped from the same sheet at runtime; there is no committed favicon file.
+Kuro, the black cat, is built on [oneko.js](https://github.com/adryd325/oneko.js) by adryd (MIT, license kept in `js/kuro.js`). He wanders the whole window on his own; click him to have him follow your cursor, click again to let him roam. Rest the cursor on him to pet him, or drag him by the scruff. He remembers where he was between visits. His sprite sheet is `assets/kuro/jess.png`; swap that file for another 256x128 oneko-layout sheet to change his look. The favicon is his face, cropped from the same sheet at runtime; there is no committed favicon file.
 
 ## Adding images
 

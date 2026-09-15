@@ -1641,18 +1641,14 @@ a.ext:hover::after {
 }
 
 /* --------------------------------------------------------------------------
-   Kuro (js/kuro.js): the oneko black cat + speech bubble, inside the
-   content column.
+   Kuro (js/kuro.js): the oneko black cat, free to roam the whole window,
+   plus his speech bubble and petting hearts.
    -------------------------------------------------------------------------- */
-.content {
-  position: relative;
-  overflow-x: clip; /* never let the cat cause sideways scrolling */
-}
 .kuro {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 20;
+  z-index: 38; /* above the sidebar, below the mobile top bar and menu */
   pointer-events: none; /* hit-testing happens in kuro.js against the sprite's pixels */
   will-change: transform;
 }
@@ -1668,10 +1664,10 @@ a.ext:hover::after {
   opacity: 1;
 }
 .kuro-bubble {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 21;
+  z-index: 39;
   max-width: 15rem;
   padding: 0.35rem 0.6rem;
   background: rgb(var(--ink));
@@ -1708,9 +1704,34 @@ a.ext:hover::after {
   border-top: 0;
   border-bottom: 8px solid rgb(var(--ink));
 }
+/* Pixel hearts that float up while Kuro is petted */
+.kuro-heart {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 39;
+  width: 10px;
+  height: 10px;
+  background: rgb(var(--ink));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath d='M1 0h1v1H1zM3 0h1v1H3zM0 1h5v2H0zM1 3h3v1H1zM2 4h1v1H2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5' shape-rendering='crispEdges'%3E%3Cpath d='M1 0h1v1H1zM3 0h1v1H3zM0 1h5v2H0zM1 3h3v1H1zM2 4h1v1H2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+  animation: kuro-heart 1100ms ease-out forwards;
+}
+@keyframes kuro-heart {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 -30px;
+  }
+}
 @media print {
   .kuro,
-  .kuro-bubble {
+  .kuro-bubble,
+  .kuro-heart {
     display: none;
   }
 }
