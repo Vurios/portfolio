@@ -26,19 +26,19 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/kuro-render.js     # Kuro's pixel maps (32x32 frames), colors, two-canvas mount, hit-test, favicon
-js/kuro-state.js      # Kuro's state machine and behaviour (roam, wash, scratch, nap, hunt, knead, purr, peek, drag)
+js/kuro.js            # Kuro, the cat: oneko.js engine (MIT) confined to the content column, plus drag, speech bubble, favicon
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
   images/internships/   # internship completion certificates (single image each)
   images/certificates/  # certificate scans (single image each)
   profile/              # portrait (kim.png), Open Graph card
+  kuro/jess.png         # Kuro's sprite sheet: 256x128, 8x4 cells of 32x32, oneko layout
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
-Kuro (the pixel cat) is an original black cat in the spirit of the classic Neko desktop pet, drawn entirely on `<canvas>` at runtime from hand-authored 32x32 pixel maps in `js/kuro-render.js` — no image or sprite-sheet assets. The favicon is also Kuro's face, rendered procedurally and installed via `<link>` tags added by `js/kuro-render.js`; there is no committed favicon file.
+Kuro, the black cat, runs on [oneko.js](https://github.com/adryd325/oneko.js) by adryd (MIT, license kept in `js/kuro.js`), adapted to stay inside the content column. His sprite sheet is `assets/kuro/jess.png`; swap that file for another 256x128 oneko-layout sheet to change his look. The favicon is his face, cropped from the same sheet at runtime; there is no committed favicon file.
 
 ## Adding images
 

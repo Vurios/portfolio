@@ -1641,44 +1641,37 @@ a.ext:hover::after {
 }
 
 /* --------------------------------------------------------------------------
-   Kuro (js/kuro-render.js + js/kuro-state.js): two stacked pixel-cat
-   canvases (body, then eyes on top) plus a speech bubble, inside the
+   Kuro (js/kuro.js): the oneko black cat + speech bubble, inside the
    content column.
    -------------------------------------------------------------------------- */
 .content {
   position: relative;
-  /* Kuro's canvases carry transparent padding for stretch/hop room; clip
-     it at the column edge so it never causes sideways scrolling (this also
-     tucks him half out of sight in peek mode) */
-  overflow-x: clip;
+  overflow-x: clip; /* never let the cat cause sideways scrolling */
 }
-.kuro-body,
-.kuro-eyes {
+.kuro {
   position: absolute;
   top: 0;
   left: 0;
-  pointer-events: none; /* hit-testing happens in kuro-state.js against drawn pixels */
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  opacity: 0;
-  transition: opacity 600ms ease;
+  z-index: 20;
+  pointer-events: none; /* hit-testing happens in kuro.js against the sprite's pixels */
   will-change: transform;
 }
-.kuro-body {
-  z-index: 20;
+.kuro__sprite {
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform-origin: 50% 0; /* held by the scruff: stretch hangs downward */
+  opacity: 0;
+  transition: opacity 400ms ease;
 }
-.kuro-eyes {
-  z-index: 21; /* eyes redraw independently every frame, layered above the body */
-}
-.kuro-body.is-ready,
-.kuro-eyes.is-ready {
+.kuro.is-ready .kuro__sprite {
   opacity: 1;
 }
 .kuro-bubble {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 22;
+  z-index: 21;
   max-width: 15rem;
   padding: 0.35rem 0.6rem;
   background: rgb(var(--ink));
@@ -1715,43 +1708,9 @@ a.ext:hover::after {
   border-top: 0;
   border-bottom: 8px solid rgb(var(--ink));
 }
-/* Scroll paper: unrolls under Kuro while he kneads along with the scroll */
-.kuro-paper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 22;
-  padding: 0.3rem 0.55rem;
-  background: rgb(var(--bg));
-  color: rgb(var(--ink));
-  border: 2px solid rgb(var(--ink));
-  box-shadow: 0 0 0 2px rgb(var(--bg)), 3px 3px 0 0 rgb(var(--ink));
-  font-family: var(--font-mono);
-  font-size: 11px;
-  line-height: 1.4;
-  white-space: nowrap;
-  pointer-events: none;
-  transform-origin: 50% 0;
-  opacity: 0;
-  transition: opacity 160ms ease;
-}
-.kuro-paper.is-open {
-  opacity: 1;
-  animation: kuro-unroll 320ms var(--ease-out);
-}
-@keyframes kuro-unroll {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
 @media print {
-  .kuro-body,
-  .kuro-eyes,
-  .kuro-bubble,
-  .kuro-paper {
+  .kuro,
+  .kuro-bubble {
     display: none;
   }
 }

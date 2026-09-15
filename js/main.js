@@ -49,13 +49,6 @@ var IMAGES = {
 (function () {
   "use strict";
 
-  // Favicon is Kuro's face, rendered procedurally by js/kuro-render.js
-  // (script order guarantees it has run by the time this file's deferred
-  // script executes). No committed favicon image asset.
-  if (window.KuroRender && window.KuroRender.installFavicon) {
-    window.KuroRender.installFavicon();
-  }
-
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
