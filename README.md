@@ -46,8 +46,15 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | ARGUSPH | `projects.argusph` | `assets/images/projects/argusph-1.jpg` … `argusph-3.jpg` |
 | SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack-1.jpg` … `safetrack-3.jpg` |
 | Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant-1.jpg` … `-3.jpg` |
-| Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg`, plus `ibalong-cert.jpg` |
-| AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg`, plus `ai4ai-cert.jpg` |
+| Ibalong Hackathon 2026 (event photos) | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
+| AI4AI Fair 2026 (event photos) | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
+
+**Award certificates** (cards under Achievements) are single images referenced directly in `index.html`:
+
+| Card | Path |
+|---|---|
+| 3rd Place Certificate, Ibalong Hackathon | `assets/images/achievements/ibalong-cert.jpg` |
+| 1st Runner-Up Certificate, AI4AI Fair | `assets/images/achievements/ai4ai-cert.jpg` |
 
 **Internship certificates** are single images referenced directly in `index.html`:
 

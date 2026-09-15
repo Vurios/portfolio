@@ -36,14 +36,12 @@ var IMAGES = {
     "ibalong-2026": [
       { src: "assets/images/achievements/ibalong-2026-1.jpg", caption: "Event photo · 2026" },
       { src: "assets/images/achievements/ibalong-2026-2.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ibalong-2026-3.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ibalong-cert.jpg", caption: "3rd Place Certificate · 2026" }
+      { src: "assets/images/achievements/ibalong-2026-3.jpg", caption: "Event photo · 2026" }
     ],
     "ai4ai-2026": [
       { src: "assets/images/achievements/ai4ai-2026-1.jpg", caption: "Event photo · 2026" },
       { src: "assets/images/achievements/ai4ai-2026-2.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ai4ai-2026-3.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ai4ai-cert.jpg", caption: "1st Runner-Up Certificate · 2026" }
+      { src: "assets/images/achievements/ai4ai-2026-3.jpg", caption: "Event photo · 2026" }
     ]
   }
 };

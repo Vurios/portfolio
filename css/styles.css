@@ -1195,50 +1195,12 @@ a.ext:hover::after {
 .card:hover {
   border-color: rgb(var(--gray-400));
 }
-/* Card hover: the halftone field zooms like a photo would, the initials chip
-   inverts, the category label turns ink, and the tag pills light up one after
-   another from left to right */
-.card .thumb__ph {
-  transition: transform 600ms var(--ease-out);
-  transform-origin: center;
-}
-.card:hover .thumb__ph {
-  transform: scale(1.06);
-}
-.card .thumb__ph::after {
-  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
-}
-.card:hover .thumb__ph::after {
-  background: rgb(var(--ink));
-  color: rgb(var(--bg));
-  border-color: rgb(var(--ink));
-}
+/* Card hover: the border firms up and the category label turns ink */
 .card:hover .meta {
   color: rgb(var(--ink));
 }
 .meta {
   transition: color 250ms ease;
-}
-.card .pills .pill {
-  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease;
-}
-.card:hover .pills .pill {
-  color: rgb(var(--ink));
-  border-color: rgb(var(--ink) / 0.6);
-}
-.card:hover .pills .pill:nth-child(1) { transition-delay: 0ms; }
-.card:hover .pills .pill:nth-child(2) { transition-delay: 45ms; }
-.card:hover .pills .pill:nth-child(3) { transition-delay: 90ms; }
-.card:hover .pills .pill:nth-child(4) { transition-delay: 135ms; }
-.card:hover .pills .pill:nth-child(5) { transition-delay: 180ms; }
-.card:hover .pills .pill:nth-child(6) { transition-delay: 225ms; }
-.card:hover .pills .pill:nth-child(7) { transition-delay: 270ms; }
-.card:hover .pills .pill:nth-child(8) { transition-delay: 315ms; }
-.card .achievement__place {
-  transition: letter-spacing 400ms var(--ease-out);
-}
-.card:hover .achievement__place {
-  letter-spacing: 0.04em;
 }
 
 .thumb {
@@ -1495,6 +1457,40 @@ a.ext:hover::after {
 }
 .achievement .meta {
   margin-top: 0.4rem;
+}
+
+/* Award certificate cards under the achievements: same card, quieter body */
+.award-certs {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+@media (min-width: 720px) {
+  .award-certs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.award-cert .thumb {
+  aspect-ratio: 16 / 10;
+  border-bottom: 1px solid rgb(var(--gray-200));
+}
+.award-cert__body {
+  padding: 1rem 1.25rem 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+.award-cert__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+.award-cert__issuer {
+  font-size: 13px;
+  color: rgb(var(--gray-500));
+}
+.award-cert .meta {
+  margin-top: 0.3rem;
 }
 
 .certs {
