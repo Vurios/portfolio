@@ -37,8 +37,9 @@
   --gray-900: 23 23 23;
 
   --dot-alpha: 0.9;
-  --shadow-rest: 0 8px 22px -14px rgb(0 0 0 / 0.25);
-  --shadow-hover: 0 18px 36px -20px rgb(0 0 0 / 0.4);
+  --ph-dot-alpha: 0.26;
+  --shadow-rest: 0 8px 22px -14px rgb(0 0 0 / 0.18);
+  --shadow-hover: 0 18px 36px -20px rgb(0 0 0 / 0.28);
 
   --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -67,6 +68,7 @@
   --gray-900: 236 236 238;
 
   --dot-alpha: 0.42;
+  --ph-dot-alpha: 0.34;
   --shadow-rest: 0 8px 22px -14px rgb(0 0 0 / 0.5);
   --shadow-hover: 0 18px 36px -20px rgb(0 0 0 / 0.6);
 }
@@ -625,6 +627,11 @@ a.ext:hover::after {
   margin-top: 3.5rem;
   border-top: 1px solid rgb(var(--gray-200));
 }
+@media (min-width: 1024px) {
+  .section:last-of-type {
+    min-height: calc(100vh - 5rem);
+  }
+}
 .section__head {
   display: flex;
   align-items: baseline;
@@ -715,11 +722,17 @@ a.ext:hover::after {
 .hero__links {
   margin-top: 2rem;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+.hero__contact {
+  display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 1.25rem;
 }
-.hero__links a,
-.hero__links span {
+.hero__contact a,
+.hero__contact span {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -730,23 +743,50 @@ a.ext:hover::after {
   padding: 0.25rem 0;
   transition: color 200ms ease;
 }
-.hero__links a:hover {
+.hero__contact a:hover {
   color: rgb(var(--ink));
 }
-.hero__links .icon {
+.hero__contact .icon {
   width: 0.95rem;
   height: 0.95rem;
 }
-.hero__links .primary {
+.hero__contact .primary {
   color: rgb(var(--ink));
   text-decoration: underline;
   text-decoration-color: rgb(var(--ink) / 0.25);
   text-underline-offset: 3px;
 }
-.hero__links .primary:hover {
+.hero__contact .primary:hover {
   text-decoration-color: rgb(var(--ink));
 }
-
+.hero__social {
+  display: flex;
+  gap: 0.4rem;
+}
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 1.9rem;
+  padding: 0 0.7rem;
+  border: 1px solid rgb(var(--gray-300));
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2px;
+  color: rgb(var(--gray-500));
+  text-decoration: none;
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+.social-btn:hover {
+  color: rgb(var(--ink));
+  border-color: rgb(var(--ink));
+  background: rgb(var(--gray-50));
+}
+.social-btn .icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
 /* Portrait: the cut-out photo at full opacity on a halftone field */
 .hero__portrait {
   width: 8.5rem;
@@ -768,14 +808,25 @@ a.ext:hover::after {
   overflow: hidden;
 }
 .portrait__dots {
-  --dot-alpha: 0.55;
   position: absolute;
   inset: 0;
-  -webkit-mask-image: radial-gradient(ellipse at 50% 35%, #000 20%, transparent 78%);
-  mask-image: radial-gradient(ellipse at 50% 35%, #000 20%, transparent 78%);
+  pointer-events: none;
 }
-:root[data-theme="dark"] .portrait__dots {
-  --dot-alpha: 0.3;
+.portrait__dots--fine {
+  --dot-alpha: 0.5;
+  -webkit-mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+}
+.portrait__dots--coarse {
+  --dot-alpha: 0.28;
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
+}
+:root[data-theme="dark"] .portrait__dots--fine {
+  --dot-alpha: 0.32;
+}
+:root[data-theme="dark"] .portrait__dots--coarse {
+  --dot-alpha: 0.18;
 }
 .portrait img {
   position: relative;
@@ -930,6 +981,55 @@ a.ext:hover::after {
     padding-top: 0.2rem;
   }
 }
+/* Internship entries carry a certificate slot beside the bullets */
+.tl__body--with-cert {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem 2rem;
+}
+.thumb.thumb--cert-lg {
+  position: relative;
+  width: 100%;
+  max-width: 14rem;
+  aspect-ratio: auto;
+  background: none;
+  overflow: visible;
+}
+/* Spacer that defines the 4:3 image area; image and placeholder sit inside it */
+.thumb.thumb--cert-lg::before {
+  content: "";
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  border: 1px solid rgb(var(--gray-200));
+  background: rgb(var(--gray-100));
+}
+.thumb.thumb--cert-lg img,
+.thumb.thumb--cert-lg .thumb__ph {
+  position: absolute;
+  inset: 0 0 auto 0;
+  aspect-ratio: 4 / 3;
+  height: auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.thumb.thumb--cert-lg img {
+  z-index: 1;
+  object-fit: cover;
+}
+.thumb.thumb--cert-lg .thumb__ph::after {
+  font-size: 0.95rem;
+}
+.thumb.thumb--cert-lg figcaption {
+  margin-top: 0.5rem;
+}
+@media (min-width: 900px) {
+  .tl__body--with-cert {
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    align-items: start;
+  }
+}
+
 /* Education has room to spare: two entries side by side on wide screens */
 @media (min-width: 1100px) {
   #education .timeline {
@@ -1011,7 +1111,7 @@ a.ext:hover::after {
 /* Placeholder sits under the image: visible until a real file loads on top,
    permanently when the file is missing (see .thumb--missing) */
 .thumb__ph {
-  --dot-alpha: 0.32;
+  --dot-alpha: var(--ph-dot-alpha);
   position: absolute;
   inset: 0;
   display: flex;

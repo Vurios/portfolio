@@ -29,6 +29,7 @@ js/main.js            # image config, carousels, theme, mobile menu, active nav 
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
+  images/internships/   # internship completion certificates (single image each)
   images/certificates/  # certificate scans (single image each)
   profile/              # portrait (kim.png), favicons, Open Graph card
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
@@ -48,11 +49,18 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
 | AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
 
+**Internship certificates** are single images referenced directly in `index.html`:
+
+| Entry | Path |
+|---|---|
+| NRG Info-Tech / TESDA (Programming NC III) | `assets/images/internships/tesda.jpg` |
+| Ollopa Corporation | `assets/images/internships/ollopa.jpg` |
+| Knowles Training Institute | `assets/images/internships/knowles.jpg` |
+
 **Certificates** are single images referenced directly in `index.html`:
 
 | Certificate | Path |
 |---|---|
-| Programming (Java) NC III | `assets/images/certificates/tesda-java-nc3.jpg` |
 | Practical Applications of AI for Daily Use | `assets/images/certificates/albay-ai-practical-applications.jpg` |
 | Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` |
 | Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` |

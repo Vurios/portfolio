@@ -349,26 +349,40 @@ var IMAGES = {
     }
   }
 
-  if (sections.length && "IntersectionObserver" in window) {
-    var visible = {};
-    var spy = new IntersectionObserver(
-      function (entries) {
-        for (var i = 0; i < entries.length; i++) {
-          visible[entries[i].target.id] = entries[i].isIntersecting;
+  // Position-based spy: the active section is the last one whose top has
+  // passed a line near the top of the viewport (25%, at most 160px). At the very bottom of the page the
+  // last section wins even if it is shorter than the viewport.
+  if (sections.length) {
+    var spyTicking = false;
+    function updateActive() {
+      spyTicking = false;
+      var doc = document.documentElement;
+      var atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
+      var line = window.scrollY + Math.min(window.innerHeight * 0.25, 160);
+      var current = "";
+      if (atBottom) {
+        current = sections[sections.length - 1].id;
+      } else {
+        for (var i = 0; i < sections.length; i++) {
+          var top = sections[i].getBoundingClientRect().top + window.scrollY;
+          if (top <= line) current = sections[i].id;
         }
-        var best = null;
-        for (var s = 0; s < sections.length; s++) {
-          if (visible[sections[s].id]) {
-            best = sections[s].id;
-            break;
-          }
+      }
+      setActive(current);
+    }
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!spyTicking) {
+          spyTicking = true;
+          window.requestAnimationFrame(updateActive);
         }
-        if (best) setActive(best);
-        else if (window.scrollY < 200) setActive("");
       },
-      { rootMargin: "-30% 0px -60% 0px", threshold: [0, 0.01] }
+      { passive: true }
     );
-    for (var q = 0; q < sections.length; q++) spy.observe(sections[q]);
+    window.addEventListener("resize", updateActive);
+    window.addEventListener("load", updateActive);
+    updateActive();
   }
 
   /* -------------------------------------------------------------- footer year */

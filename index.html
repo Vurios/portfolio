@@ -159,7 +159,7 @@
             <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
             <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
             <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
-            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
+            <li><a class="nav-link" href="#internships"><span class="nav-link__num">04</span>internships</a></li>
             <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
             <li><a class="nav-link" href="#achievements"><span class="nav-link__num">06</span>achievements</a></li>
             <li><a class="nav-link" href="#certificates"><span class="nav-link__num">07</span>certificates</a></li>
@@ -205,7 +205,7 @@
             <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
             <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
             <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
-            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
+            <li><a class="nav-link" href="#internships"><span class="nav-link__num">04</span>internships</a></li>
             <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
             <li><a class="nav-link" href="#achievements"><span class="nav-link__num">06</span>achievements</a></li>
             <li><a class="nav-link" href="#certificates"><span class="nav-link__num">07</span>certificates</a></li>
@@ -254,42 +254,47 @@
                 AI-integrated platforms end to end, from the database to the interface, across web, mobile, and civic
                 tech.
               </p>
-              <ul class="hero__links fade-up" style="--d: 4" aria-label="Contact and social links">
-                <li>
-                  <a class="primary" href="mailto:deguzmanadriankim@gmail.com">
-                    <svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg>
-                    deguzmanadriankim@gmail.com
-                  </a>
-                </li>
-                <li>
-                  <span>
-                    <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
-                    +63 994 996 1074
-                  </span>
-                </li>
-                <li>
-                  <a class="ext" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer">
-                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
-                    GitHub<span class="visually-hidden"> (opens in a new tab)</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="ext" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer">
-                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
-                    LinkedIn<span class="visually-hidden"> (opens in a new tab)</span>
-                  </a>
-                </li>
-                <li>
-                  <a class="ext" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer">
-                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
-                    Facebook<span class="visually-hidden"> (opens in a new tab)</span>
-                  </a>
-                </li>
-              </ul>
+              <div class="hero__links fade-up" style="--d: 4">
+                <ul class="hero__contact" aria-label="Contact">
+                  <li>
+                    <a class="primary" href="mailto:deguzmanadriankim@gmail.com">
+                      <svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg>
+                      deguzmanadriankim@gmail.com
+                    </a>
+                  </li>
+                  <li>
+                    <span>
+                      <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
+                      +63 994 996 1074
+                    </span>
+                  </li>
+                </ul>
+                <ul class="hero__social" aria-label="Social links">
+                  <li>
+                    <a class="social-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
+                      <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
+                      <span>GitHub</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="social-btn" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
+                      <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
+                      <span>LinkedIn</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="social-btn" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)">
+                      <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
+                      <span>Facebook</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
             <figure class="hero__portrait fade-up" style="--d: 1">
               <div class="portrait">
-                <span class="portrait__dots halftone" aria-hidden="true"></span>
+                <span class="portrait__dots portrait__dots--fine halftone halftone--dense" aria-hidden="true"></span>
+                <span class="portrait__dots portrait__dots--coarse halftone" aria-hidden="true"></span>
                 <img src="assets/profile/kim.png" alt="Portrait of Kim De Guzman" width="500" height="500" decoding="async" fetchpriority="high" />
               </div>
             </figure>
@@ -303,14 +308,17 @@
             <div class="about">
               <div class="prose">
                 <p>
-                  I'm a BSIT student at Bicol University Polangui Campus and a full-stack developer. I've shipped web
-                  platforms, mobile apps, and civic tech systems for local government, trained under TESDA, interned with
-                  companies in Quezon City and Singapore, and placed in hackathon and coding competitions.
+                  I got into full-stack work by building for problems close to home: a city that routes emergencies through
+                  20+ hotlines, a police station keeping its blotter and crime map on paper, a library that needed its
+                  catalog to answer questions. Each one needed the whole stack, so that is what I learned to ship.
                 </p>
                 <p>
-                  I like owning a product end to end, from the database and backend to the interface people use, and I add
-                  AI where it makes a system more useful.
+                  I start from the data model, build the backend, then the interface, and bring AI in only where it removes
+                  a real step for the person using it: routing a hazard report, pulling metadata from a scan, answering a
+                  question in plain language. Hackathons taught me to do that in days; internships taught me to keep it
+                  maintainable.
                 </p>
+                <p>What I'm looking for next is a team where I can own a product end to end and keep learning from people who have shipped more than I have.</p>
               </div>
               <ul class="highlights" aria-label="Highlights">
                 <li class="highlight">
@@ -336,23 +344,23 @@
           <section class="section" id="education" aria-labelledby="education-title">
             <div class="section__head">
               <h2 class="section__title" id="education-title"><span class="num">02</span> — education</h2>
-              <p class="label section__aside">2021 — 2027</p>
+              <p class="label section__aside">oldest → newest</p>
             </div>
             <ol class="timeline">
-              <li class="tl">
-                <div class="tl__when"><span class="label">2023 — 2027</span><span class="tl__note">expected graduation</span></div>
-                <div class="tl__body">
-                  <h3 class="tl__title">Bicol University Polangui Campus</h3>
-                  <p class="tl__sub">Bachelor of Science in Information Technology</p>
-                  <p class="tl__text">Consistent President's and Dean's List Awardee, A.Y. 2023 to present.</p>
-                </div>
-              </li>
               <li class="tl">
                 <div class="tl__when"><span class="label">2021 — 2023</span></div>
                 <div class="tl__body">
                   <h3 class="tl__title">Ligao National High School</h3>
                   <p class="tl__sub">Senior High School, STEM strand</p>
                   <p class="tl__text">Graduated With Honors.</p>
+                </div>
+              </li>
+              <li class="tl">
+                <div class="tl__when"><span class="label">2023 — 2027</span><span class="tl__note">expected graduation</span></div>
+                <div class="tl__body">
+                  <h3 class="tl__title">Bicol University Polangui Campus</h3>
+                  <p class="tl__sub">Bachelor of Science in Information Technology</p>
+                  <p class="tl__text">Consistent President's and Dean's List Awardee, A.Y. 2023 to present.</p>
                 </div>
               </li>
             </ol>
@@ -426,10 +434,10 @@
             </div>
           </section>
 
-          <!-- ============================================================ Experience -->
-          <section class="section" id="experience" aria-labelledby="experience-title">
+          <!-- ============================================================ Internships -->
+          <section class="section" id="internships" aria-labelledby="internships-title">
             <div class="section__head">
-              <h2 class="section__title" id="experience-title"><span class="num">04</span> — experience</h2>
+              <h2 class="section__title" id="internships-title"><span class="num">04</span> — internships</h2>
               <p class="label section__aside">oldest → newest</p>
             </div>
             <ol class="timeline">
@@ -438,14 +446,21 @@
                   <span class="label">Jun — Aug 2025</span>
                   <span class="tl__note">Ligao City, Albay · Hybrid</span>
                 </div>
-                <div class="tl__body">
-                  <h3 class="tl__title">NRG Info-Tech Institute, Inc.</h3>
-                  <p class="tl__sub">Java Programming NC III Trainee · TESDA Scholarship Program</p>
-                  <ul class="bullets">
-                    <li>Built and deployed Java applications through a full development workflow: planning, coding, testing, and documentation.</li>
-                    <li>Wrote Java programs and mini-projects applying OOP: data handling, control structures, modular design.</li>
-                    <li>Took part in hands-on workshops, skills assessments, and project presentations.</li>
-                  </ul>
+                <div class="tl__body tl__body--with-cert">
+                  <div>
+                    <h3 class="tl__title">NRG Info-Tech Institute, Inc.</h3>
+                    <p class="tl__sub">Java Programming NC III Trainee · TESDA Scholarship Program</p>
+                    <ul class="bullets">
+                      <li>Built and deployed Java applications through a full development workflow: planning, coding, testing, and documentation.</li>
+                      <li>Wrote Java programs and mini-projects applying OOP: data handling, control structures, modular design.</li>
+                      <li>Took part in hands-on workshops, skills assessments, and project presentations.</li>
+                    </ul>
+                  </div>
+                  <figure class="thumb thumb--cert-lg">
+                    <img src="assets/images/internships/tesda.jpg" alt="TESDA Programming (Java) NC III certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                    <span class="thumb__ph halftone halftone--dense" data-initials="NC" aria-hidden="true"></span>
+                    <figcaption class="meta">Programming (Java) NC III · 2025</figcaption>
+                  </figure>
                 </div>
               </li>
               <li class="tl">
@@ -453,14 +468,21 @@
                   <span class="label">Aug — Sep 2025</span>
                   <span class="tl__note">Fairview, Quezon City · Remote</span>
                 </div>
-                <div class="tl__body">
-                  <h3 class="tl__title">Ollopa Corporation</h3>
-                  <p class="tl__sub">Programming Intern</p>
-                  <ul class="bullets">
-                    <li>Applied object-oriented analysis, design, and Java development in an enterprise setting under industry supervision.</li>
-                    <li>Designed and storyboarded game concepts, mechanics, and digital assets in the Game Design and Development track.</li>
-                    <li>Delivered to industry quality standards in a fast-paced, remote team.</li>
-                  </ul>
+                <div class="tl__body tl__body--with-cert">
+                  <div>
+                    <h3 class="tl__title">Ollopa Corporation</h3>
+                    <p class="tl__sub">Programming Intern</p>
+                    <ul class="bullets">
+                      <li>Applied object-oriented analysis, design, and Java development in an enterprise setting under industry supervision.</li>
+                      <li>Designed and storyboarded game concepts, mechanics, and digital assets in the Game Design and Development track.</li>
+                      <li>Delivered to industry quality standards in a fast-paced, remote team.</li>
+                    </ul>
+                  </div>
+                  <figure class="thumb thumb--cert-lg">
+                    <img src="assets/images/internships/ollopa.jpg" alt="Ollopa Corporation internship completion certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                    <span class="thumb__ph halftone halftone--dense" data-initials="OC" aria-hidden="true"></span>
+                    <figcaption class="meta">Completion certificate</figcaption>
+                  </figure>
                 </div>
               </li>
               <li class="tl">
@@ -468,45 +490,21 @@
                   <span class="label">Apr — Jun 2026</span>
                   <span class="tl__note">Singapore · Remote</span>
                 </div>
-                <div class="tl__body">
-                  <h3 class="tl__title">Knowles Training Institute × SSGC Group</h3>
-                  <p class="tl__sub">IT Intern (Team Leader)</p>
-                  <ul class="bullets">
-                    <li>Led the field monitoring team as Team Leader, supervising fellow interns, overseeing documentation and reporting, and coordinating cross-departmental issue resolution in a fully remote, multicultural environment.</li>
-                    <li>Maintained and improved company websites end to end: site security, content updates, layout adjustments, and performance optimization.</li>
-                    <li>Handled general IT support and troubleshooting alongside the monitoring role, resolving technical issues raised across departments.</li>
-                    <li>Designed social media visuals and multimedia content for the organization's international branding.</li>
-                  </ul>
-                </div>
-              </li>
-              <li class="tl tl--event">
-                <div class="tl__when">
-                  <span class="label">Jun 2026</span>
-                  <span class="tl__note">Polangui, Albay · Onsite</span>
-                </div>
-                <div class="tl__body">
-                  <h3 class="tl__title">AI4AI Fair: Vibe Coding Competition</h3>
-                  <p class="tl__sub"><span class="pill pill--inverted">1st Runner-Up</span></p>
-                  <ul class="bullets">
-                    <li>Placed 1st Runner-Up in a single-day AI-assisted vibe coding competition, building an AI-powered solution to a real community problem in Albay.</li>
-                    <li>Collaborated with a 4-member team to ideate, design, and develop the solution within an 8-hour window.</li>
-                    <li>Developed SafeTrack, a zero-hosting-cost web app combining JavaScript, Leaflet mapping, and a dual-access AI chatbot for regional hazard tracking.</li>
-                  </ul>
-                </div>
-              </li>
-              <li class="tl tl--event">
-                <div class="tl__when">
-                  <span class="label">Aug 2026</span>
-                  <span class="tl__note">Legazpi City, Albay · Onsite</span>
-                </div>
-                <div class="tl__body">
-                  <h3 class="tl__title">Ibalong Festival Hackathon: Heroes of Innovation Challenge</h3>
-                  <p class="tl__sub"><span class="pill pill--inverted">3rd Place of 35 teams</span></p>
-                  <ul class="bullets">
-                    <li>Collaborated with a 5-member team across a two-day onsite hackathon (The Forge and Hero's Pitch) to design, build, and pitch SARO, a civic reporting and emergency dispatch platform for Legazpi City.</li>
-                    <li>Conducted problem discovery and solution design under the Bantong (Strategist) Hero Pathway, addressing real gaps in the city's emergency and hazard reporting process.</li>
-                    <li>Presented the final solution at Hero's Pitch, placing 3rd out of 35 competing teams.</li>
-                  </ul>
+                <div class="tl__body tl__body--with-cert">
+                  <div>
+                    <h3 class="tl__title">Knowles Training Institute × SSGC Group</h3>
+                    <p class="tl__sub">IT Intern</p>
+                    <ul class="bullets">
+                      <li>Led the field monitoring team as Team Leader, supervising fellow interns, overseeing documentation and reporting, and coordinating cross-departmental issue resolution in a fully remote, multicultural environment.</li>
+                      <li>Maintained and improved company websites end to end (site security, content updates, layout adjustments, and performance optimization), while handling general IT support and troubleshooting across departments.</li>
+                      <li>Designed social media visuals and multimedia content for the organization's international branding.</li>
+                    </ul>
+                  </div>
+                  <figure class="thumb thumb--cert-lg">
+                    <img src="assets/images/internships/knowles.jpg" alt="Knowles Training Institute internship completion certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                    <span class="thumb__ph halftone halftone--dense" data-initials="KT" aria-hidden="true"></span>
+                    <figcaption class="meta">Completion certificate</figcaption>
+                  </figure>
                 </div>
               </li>
             </ol>
@@ -637,17 +635,6 @@
               <h2 class="section__title" id="certificates-title"><span class="num">07</span> — certificates</h2>
             </div>
             <ul class="certs">
-              <li class="cert">
-                <figure class="thumb thumb--cert">
-                  <img src="assets/images/certificates/tesda-java-nc3.jpg" alt="TESDA Programming (Java) NC III certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="NC" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">Programming (Java) NC III</h3>
-                  <p class="cert__issuer">TESDA Scholarship Program · NRG Info-Tech Institute, Inc.</p>
-                </div>
-                <p class="cert__year label">2025</p>
-              </li>
               <li class="cert">
                 <figure class="thumb thumb--cert">
                   <img src="assets/images/certificates/albay-ai-practical-applications.jpg" alt="Practical Applications of AI for Daily Use certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
