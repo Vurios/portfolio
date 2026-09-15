@@ -1,12 +1,11 @@
 /* Kim De Guzman — portfolio
    Kuro, the black pixel cat that lives inside the content column.
 
-   Original artwork: a procedural pixel rig drawn on a low-resolution canvas
-   and scaled with nearest-neighbour sampling, so every pose is code rather
-   than a sprite sheet. Pupils are a separate layer drawn over the body pose.
-   The waypoint/idle timing follows the oneko.js pattern (adryd325, MIT); the
-   rig-plus-pose structure is in the spirit of rio-desktop-pet (MIT).
-   No dependencies. The page works without it. */
+   Original artwork: a chunky procedural pixel rig (36x30 logical px, drawn
+   on a low-resolution canvas and scaled with nearest-neighbour sampling), so
+   every pose is code rather than a sprite sheet. Pupils are a separate layer
+   drawn over the body pose. The waypoint/idle timing follows the oneko.js
+   pattern (adryd325, MIT). No dependencies. The page works without it. */
 (function () {
   "use strict";
 
@@ -17,12 +16,12 @@
   var small = window.innerWidth < 1024;
   var canDrag = !coarse && !small && !reduceMotion;
 
-  // Logical pixel grid and on-screen scale
-  var W = 48;
-  var H = 58;
-  var SCALE = small ? 1.25 : 2;
-  var CX = 24; // horizontal centre
-  var BY = 55; // baseline: where the paws touch the floor
+  // Logical pixel grid and on-screen scale. Chunky: 4 screen px per pixel.
+  var W = 36;
+  var H = 30;
+  var SCALE = small ? 3 : 4;
+  var CX = 20; // horizontal centre (tail room behind)
+  var BY = 27; // baseline: where the paws touch the floor
 
   /* ============================================================ RIG ==== */
   function ink() {
@@ -73,15 +72,21 @@
     return {
       facing: 1,
       bob: 0,
-      headUp: 0, // + lifts the head, - lowers it (groom)
-      ear: 0, // + perks, - flattens (startle, held)
+      headUp: 0, // + lifts the head block, - lowers it (groom, crouch)
+      ear: 0, // + perks, - flattens
       step: 0, // walk amount
       legPhase: 0,
       tail: 0, // sway -1..1
-      dangle: 0, // paws hang (held / falling)
-      paw: 0, // right front paw raised 0..1
-      pawSwing: 0, // wave/lick offset
-      closed: 0, // eyes closed
+      dangle: 0, // paws hang (held)
+      paw: 0, // front paw raised (wave / groom)
+      pawSwing: 0,
+      knead: 0, // paws pressing alternately
+      kneadPhase: 0,
+      arch: 0, // stretch: back rises, head drops
+      crouch: 0, // hunt: low and forward
+      peek: 0, // only the face and front paws show
+      closed: 0, // eyes shut
+      squint: 0, // relaxed purr eyes
       happy: 0, // ^ ^ eyes
       wide: 0, // startled eyes
       pupilX: 0,
@@ -93,150 +98,163 @@
     };
   }
 
-  // Body silhouette, relative to the paws at (0,0), y negative upward.
-  function drawSilhouette(c, p) {
-    c.fillStyle = "#000";
-    var bob = p.bob;
-    ell(c, 0, -10 + bob, 9.5, 8.5); // body
-    var liftA = p.step * 1.6;
-    var lf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2)) * liftA;
-    var rf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2 + Math.PI)) * liftA;
-    var dangle = p.dangle * 3;
-    ell(c, -5.5, -1.5 - lf + dangle, 3.5, 2); // left paw
-    if (p.paw < 0.05) {
-      ell(c, 5.5, -1.5 - rf + dangle, 3.5, 2); // right paw down
-    } else {
-      // right paw raised: a short arm up beside the head
-      var ax = 7, ay = -8 + bob;
-      var tipX = 11 + p.pawSwing, tipY = -20 * p.paw - 6 + bob + Math.abs(p.pawSwing) * 0.3;
-      cap(c, ax, ay, tipX, tipY, 2.6);
-      ell(c, tipX, tipY, 3, 2.4);
-    }
-    // tail
-    var wag = p.tail;
-    var tx = 9, ty = -9 + bob;
-    var pts = [
-      [tx, ty],
-      [tx + 5, ty - 1 + wag * 0.5],
-      [tx + 8, ty - 6 + wag * 1.5],
-      [tx + 6, ty - 11 + wag * 2.5],
-      [tx + 2, ty - 12 + wag * 3]
-    ];
-    for (var i = 0; i < pts.length - 1; i++) cap(c, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 2);
-    // head
-    var hy = -27 + bob - p.headUp;
-    ell(c, 0, hy, 12, 11);
-    // ears
-    var e = p.ear;
-    tri(c, -10, hy - 4, -12 - e * 0.5, hy - 14 - e, -3, hy - 10);
-    ell(c, -11.5 - e * 0.5, hy - 13 - e, 1.4, 1.4);
-    tri(c, 10, hy - 4, 12 + e * 0.5, hy - 14 - e, 3, hy - 10);
-    ell(c, 11.5 + e * 0.5, hy - 13 - e, 1.4, 1.4);
+  // Inclusive integer rectangle, relative to the paws at (0,0); y is negative upward
+  function R(c, x0, y0, x1, y1) {
+    c.fillRect(Math.round(Math.min(x0, x1)), Math.round(Math.min(y0, y1)), Math.abs(x1 - x0) + 1, Math.abs(y1 - y0) + 1);
   }
 
-  // Face without pupils: eye whites, mouth, whiskers
-  function drawFace(c, p) {
-    var hy = -27 + p.bob - p.headUp;
-    var L = light();
-    var ex = 5, ey = hy + 1;
-    c.fillStyle = L;
-    if (p.closed > 0.5) {
-      for (var s = -1; s <= 1; s += 2) {
-        px(c, s * ex - 2, ey + 1);
-        px(c, s * ex - 1, ey + 2);
-        px(c, s * ex, ey + 2);
-        px(c, s * ex + 1, ey + 2);
-        px(c, s * ex + 2, ey + 1);
-      }
-    } else if (p.happy > 0.5) {
-      for (var h = -1; h <= 1; h += 2) {
-        px(c, h * ex - 2, ey + 1);
-        px(c, h * ex - 1, ey);
-        px(c, h * ex, ey - 1);
-        px(c, h * ex + 1, ey);
-        px(c, h * ex + 2, ey + 1);
-      }
-    } else {
-      var r = p.wide > 0.5 ? 1.25 : 1;
-      ell(c, -ex, ey, 2.6 * r, 3.2 * r);
-      ell(c, ex, ey, 2.6 * r, 3.2 * r);
+  // Body silhouette. Facing right: the head is the front (+x) of one loaf.
+  function drawSilhouette(c, p) {
+    c.fillStyle = "#000";
+    var b = Math.round(p.bob);
+    var hu = Math.round(p.headUp);
+    var arch = Math.round(p.arch * 3);
+    var cr = p.crouch;
+    var top = -13 + b + Math.round(cr * 3); // loaf top
+    var headTop = -16 + b - hu + Math.round(cr * 2);
+    var backX = -9, frontX = 11;
+    if (p.peek > 0.5) backX = 1; // only the face block
+
+    // loaf: rounded by trimming the corners
+    R(c, backX + 1, top, frontX - 1, -2);
+    R(c, backX, top + 1, frontX, -3);
+    // stretch: the back rises into an arch
+    if (arch > 0) {
+      R(c, backX + 1, top - arch, backX + 7, top);
+      R(c, backX + 2, top - arch - 1, backX + 6, top - arch);
     }
-    // mouth
-    px(c, -2, hy + 6);
-    px(c, -1, hy + 7);
-    px(c, 0, hy + 6);
-    px(c, 1, hy + 7);
-    px(c, 2, hy + 6);
-    // whiskers
-    for (var w = 0; w < 2; w++) {
-      var yy = hy + 3 + w * 3;
-      for (var k = 0; k < 4; k++) {
-        px(c, -12 - k, yy + (w ? k * 0.4 : -k * 0.4));
-        px(c, 12 + k, yy + (w ? k * 0.4 : -k * 0.4));
+    // head block (front, taller)
+    R(c, 0, headTop, frontX - 1, top);
+    R(c, 1, headTop - 1, frontX - 2, headTop);
+    // ears: back ear and front ear, flatten with negative ear
+    var e = Math.round(p.ear);
+    var earY = headTop - 1 - e;
+    R(c, 1, earY - 1, 3, earY - 1);
+    R(c, 2, earY - 2, 2, earY - 2 - (e > 0 ? 1 : 0));
+    R(c, 7, earY - 1, 9, earY - 1);
+    R(c, 8, earY - 2, 8, earY - 2 - (e > 0 ? 1 : 0));
+    if (e < -1) {
+      // flattened: wider, lower stubs instead
+      R(c, 0, headTop - 1, 3, headTop - 1);
+      R(c, 7, headTop - 1, 10, headTop - 1);
+    }
+    // feet: two bumps, alternate while walking or kneading
+    var lf = 0, rf = 0, kf = 0, kb = 0;
+    if (p.step > 0.05) {
+      lf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2)) * 1.5 * p.step;
+      rf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2 + Math.PI)) * 1.5 * p.step;
+    }
+    if (p.knead > 0.05) {
+      kf = Math.round(Math.max(0, Math.sin(p.kneadPhase * Math.PI * 2)) * 2 * p.knead);
+      kb = Math.round(Math.max(0, Math.sin(p.kneadPhase * Math.PI * 2 + Math.PI)) * 2 * p.knead);
+    }
+    var dangle = Math.round(p.dangle * 2);
+    if (p.peek < 0.5) R(c, -6 - kb, -2 - Math.round(lf) + dangle, -4 - kb, 0 + dangle);
+    if (p.paw < 0.05) {
+      R(c, 5 + kf, -2 - Math.round(rf) + dangle, 7 + kf, 0 + dangle);
+    } else {
+      // front paw raised beside the face
+      var ty = Math.round(-9 - p.paw * 6 + p.pawSwing);
+      R(c, 12, ty, 14, -2);
+      R(c, 13, ty - 1, 15, ty);
+    }
+    // tail: curls up behind
+    if (p.peek < 0.5) {
+      var wag = Math.round(p.tail * 1.5);
+      var t0y = -8 + b;
+      R(c, backX - 2, t0y, backX, t0y + 1);
+      R(c, backX - 4, t0y - 1 + wag, backX - 2, t0y);
+      R(c, backX - 5, t0y - 4 + wag, backX - 4, t0y - 1 + wag);
+      R(c, backX - 4, t0y - 7 + wag * 2, backX - 3, t0y - 4 + wag);
+    }
+  }
+
+  // Eye whites, inner-ear highlights (no pupils here)
+  function drawFace(c, p) {
+    var b = Math.round(p.bob);
+    var hu = Math.round(p.headUp);
+    var cr = p.crouch;
+    var headTop = -16 + b - hu + Math.round(cr * 2);
+    var L = light();
+    c.fillStyle = L;
+    // inner ear highlights (skip when flattened)
+    if (p.ear > -1) {
+      var e = Math.round(p.ear);
+      var earY = headTop - 1 - e;
+      px(c, 2, earY - 1);
+      px(c, 8, earY - 1);
+    }
+    var ey = headTop + 6; // eye row
+    var exs = [3, 8];
+    for (var i = 0; i < 2; i++) {
+      var x = exs[i];
+      if (p.closed > 0.5) {
+        R(c, x, ey + 2, x + 1, ey + 2);
+      } else if (p.squint > 0.5) {
+        R(c, x, ey + 1, x + 1, ey + 1);
+      } else if (p.happy > 0.5) {
+        px(c, x, ey + 2);
+        px(c, x + 1, ey + 1);
+        px(c, x + 2, ey + 2);
+      } else if (p.wide > 0.5) {
+        R(c, x, ey - 1, x + 1, ey + 3);
+      } else {
+        R(c, x, ey, x + 1, ey + 2);
       }
     }
   }
 
   // Pupils: their own layer over the body pose
   function drawPupils(c, p) {
-    if (p.closed > 0.5 || p.happy > 0.5) return;
-    var hy = -27 + p.bob - p.headUp;
-    var ex = 5, ey = hy + 1;
-    var ox = Math.max(-1.3, Math.min(1.3, p.pupilX));
-    var oy = Math.max(-1.3, Math.min(1.3, p.pupilY));
-    var r = p.wide > 0.5 ? 0.8 : 1;
+    if (p.closed > 0.5 || p.squint > 0.5 || p.happy > 0.5) return;
+    var b = Math.round(p.bob);
+    var hu = Math.round(p.headUp);
+    var cr = p.crouch;
+    var headTop = -16 + b - hu + Math.round(cr * 2);
+    var ey = headTop + 6;
+    var ox = p.pupilX > 0.4 ? 1 : 0; // eyes are 2 px wide: the pupil sits left or right
+    var oy = Math.max(-1, Math.min(1, Math.round(p.pupilY)));
+    if (p.wide > 0.5) oy = Math.max(-1, Math.min(2, oy));
     c.fillStyle = ink();
-    ell(c, -ex + ox, ey + oy, 1.4 * r, 2 * r);
-    ell(c, ex + ox, ey + oy, 1.4 * r, 2 * r);
-    c.fillStyle = light();
-    px(c, -ex + ox - 1, ey + oy - 1);
-    px(c, ex + ox - 1, ey + oy - 1);
+    var exs = [3, 8];
+    for (var i = 0; i < 2; i++) px(c, exs[i] + ox, ey + 1 + oy);
   }
 
-  // Face-only crop for the favicon: head, ears, eyes, whiskers
+  // Face-only crop for the favicon: head block, ears, eyes
   function drawFaceOnly(c, size) {
-    var s = size / 32;
-    c.setTransform(s, 0, 0, s, 16 * s, 19 * s);
-    var p = defaultPose();
-    var m = document.createElement("canvas");
-    m.width = 32;
-    m.height = 32;
-    var mc = m.getContext("2d");
-    mc.setTransform(1, 0, 0, 1, 16, 19);
-    mc.fillStyle = "#000";
-    ell(mc, 0, 0, 12, 11);
-    tri(mc, -10, -4, -12, -14, -3, -10);
-    ell(mc, -11.5, -13, 1.4, 1.4);
-    tri(mc, 10, -4, 12, -14, 3, -10);
-    ell(mc, 11.5, -13, 1.4, 1.4);
-    var o = document.createElement("canvas");
-    o.width = 32;
-    o.height = 32;
-    var oc = o.getContext("2d");
-    for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) if (dx || dy) oc.drawImage(m, dx, dy);
-    oc.globalCompositeOperation = "source-in";
-    oc.fillStyle = "#ffffff";
-    oc.fillRect(0, 0, 32, 32);
-    c.setTransform(s, 0, 0, s, 0, 0);
+    var g = document.createElement("canvas");
+    g.width = 16;
+    g.height = 16;
+    var gc = g.getContext("2d");
+    var rows = [
+      "0000000000000000",
+      "0001000000010000",
+      "0011100000111000",
+      "0012110001121100",
+      "0012221111222100",
+      "0122222222222210",
+      "1222222222222221",
+      "1222222222222221",
+      "1223322222332221",
+      "1223322222332221",
+      "1222222222222221",
+      "1222222222222221",
+      "0122222222222210",
+      "0122222222222210",
+      "0011112222111100",
+      "0000001111100000"
+    ];
+    for (var y = 0; y < 16; y++) {
+      for (var x = 0; x < 16; x++) {
+        var ch = rows[y].charAt(x);
+        if (ch === "0") continue;
+        gc.fillStyle = ch === "2" ? "#0a0a0a" : "#ffffff";
+        gc.fillRect(x, y, 1, 1);
+      }
+    }
+    c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
-    c.drawImage(o, 0, 0);
-    c.drawImage(m, 0, 0);
-    c.setTransform(s, 0, 0, s, 16 * s, 19 * s);
-    c.fillStyle = "#ffffff";
-    ell(c, -5, 1, 2.6, 3.2);
-    ell(c, 5, 1, 2.6, 3.2);
-    c.fillStyle = "#0a0a0a";
-    ell(c, -5, 1, 1.4, 2);
-    ell(c, 5, 1, 1.4, 2);
-    c.fillStyle = "#ffffff";
-    px(c, -6, 0);
-    px(c, 4, 0);
-    px(c, -2, 6);
-    px(c, -1, 7);
-    px(c, 0, 6);
-    px(c, 1, 7);
-    px(c, 2, 6);
-    void p;
+    c.drawImage(g, 0, 0, size, size);
   }
 
   /* ========================================================= CANVASES == */
@@ -310,8 +328,8 @@
 
   /* ========================================================== STATE ==== */
   var pose = defaultPose();
-  var T = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0 };
-  var A = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0 };
+  var T = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0, squint: 0, knead: 0, arch: 0, crouch: 0, peek: 0 };
+  var A = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0, squint: 0, knead: 0, arch: 0, crouch: 0, peek: 0 };
   var S = {
     state: "idle",
     x: 0, // paw centre, container px
@@ -328,6 +346,7 @@
     hoverMs: 0,
     petAt: 0,
     startleAt: 0,
+    huntAt: 0,
     jumpV: 0,
     squash: { sx: 1, sy: 1, vx: 0, vy: 0 },
     shake: { flips: 0, sign: 0, at: 0 },
@@ -336,10 +355,13 @@
     hearts: []
   };
   var pointer = { x: -1, y: -1, vx: 0, vy: 0, at: 0 };
+  var lastActivity = performance.now();
+  var lastScroll = 0;
+  var scrollNote = null;
   var grab = null;
   var SPEED = small ? 48 : 70;
   var halfW = (W * SCALE) / 2;
-  var bodyH = 42 * SCALE;
+  var bodyH = 22 * SCALE;
 
   var MESSAGES = [
     "Hi, I'm Kuro!",
@@ -370,10 +392,10 @@
   function coversText(x, y) {
     var r = hostRect();
     var pts = [
-      [x, y - 8 * SCALE],
-      [x, y - 28 * SCALE],
-      [x - 10 * SCALE, y - 18 * SCALE],
-      [x + 10 * SCALE, y - 18 * SCALE]
+      [x, y - 6 * SCALE],
+      [x, y - 14 * SCALE],
+      [x - 10 * SCALE, y - 8 * SCALE],
+      [x + 10 * SCALE, y - 8 * SCALE]
     ];
     for (var i = 0; i < pts.length; i++) {
       var els = document.elementsFromPoint(r.left + pts[i][0], r.top + pts[i][1]);
@@ -389,9 +411,10 @@
   function pickWaypoint() {
     var b = visibleBox();
     var radius = small ? 150 : 280;
+    var oy = Math.max(b.y0, Math.min(b.y1, S.y)); // origin clamped into view
     for (var i = 0; i < 16; i++) {
       var x = Math.max(b.x0, Math.min(b.x1, S.x + (Math.random() * 2 - 1) * radius));
-      var y = Math.max(b.y0, Math.min(b.y1, S.y + (Math.random() * 2 - 1) * radius));
+      var y = Math.max(b.y0, Math.min(b.y1, oy + (Math.random() * 2 - 1) * radius));
       if (Math.hypot(x - S.x, y - S.y) < 50) continue;
       if (coversText(x, y)) continue;
       return { x: x, y: y };
@@ -414,7 +437,7 @@
   }
 
   function resetTargets() {
-    T.step = T.ear = T.headUp = T.paw = T.dangle = T.closed = T.happy = T.wide = 0;
+    for (var k in T) if (Object.prototype.hasOwnProperty.call(T, k)) T[k] = 0;
   }
   function setState(st, ms) {
     S.state = st;
@@ -443,6 +466,35 @@
       T.wide = 1;
       T.ear = -2.5;
     }
+    if (st === "purr") {
+      T.squint = 1;
+      T.ear = 1;
+    }
+    if (st === "hunt") {
+      T.crouch = 1;
+      T.ear = -1;
+      T.wide = 1;
+      T.headUp = -1;
+    }
+    if (st === "pounce") {
+      T.step = 1;
+      T.wide = 1;
+      T.ear = 1;
+    }
+    if (st === "stretch") {
+      T.arch = 1;
+      T.headUp = -2;
+      T.closed = 1;
+    }
+    if (st === "knead") {
+      T.knead = 1;
+      T.squint = 1;
+      T.headUp = -1;
+    }
+    if (st === "peek") {
+      T.peek = 1;
+      T.ear = 1;
+    }
     if (st === "idle") S.idleSince = performance.now();
   }
   function startIdle(ms) {
@@ -451,6 +503,7 @@
   function walkTo(pt, after) {
     S.tx = pt.x;
     S.ty = pt.y;
+    if (S.state === "peek") T.peek = 0;
     S.after = after || "idle";
     pose.facing = pt.x >= S.x ? 1 : -1;
     setState("walk");
@@ -472,7 +525,7 @@
     var bw = bubble.offsetWidth, bh = bubble.offsetHeight;
     var x = S.x - bw / 2;
     x = Math.max(0, Math.min(r.width - bw, x));
-    var top = S.y - 44 * SCALE - bh - 6;
+    var top = S.y - 20 * SCALE - bh - 6;
     var viewTop = -r.top + 8;
     var below = false;
     if (top < viewTop) {
@@ -507,20 +560,38 @@
 
   function catCenter() {
     var r = hostRect();
-    return { x: r.left + S.x, y: r.top + S.y - 26 * SCALE };
+    return { x: r.left + S.x + 6 * SCALE * pose.facing, y: r.top + S.y - 9 * SCALE };
   }
   function maybeStartle(now) {
-    if (reduceMotion || S.state === "held" || S.state === "startle" || now - S.startleAt < 4000) return;
+    lastActivity = now;
+    if (S.state === "peek") leavePeek();
+    if (reduceMotion || S.state === "held" || S.state === "startle" || S.state === "hunt" || S.state === "pounce") return;
     var speed = Math.hypot(pointer.vx, pointer.vy);
-    if (speed < 42) return;
+    if (speed < 38) return;
     var cc = catCenter();
-    if (Math.hypot(pointer.x - cc.x, pointer.y - cc.y) < 110) {
+    var d = Math.hypot(pointer.x - cc.x, pointer.y - cc.y);
+    if (d < 100 && now - S.startleAt > 4000) {
       S.startleAt = now;
       S.jumpV = -7;
       pose.facing = pointer.x < cc.x ? -1 : 1;
       setState("startle", 700);
       bubble.classList.remove("is-on");
+    } else if (d >= 100 && d < 340 && now - S.huntAt > 9000 && (S.state === "idle" || S.state === "walk")) {
+      // Mouse hunt: crouch, then pounce toward where the cursor was
+      S.huntAt = now;
+      var r = hostRect();
+      var b = visibleBox();
+      S.tx = Math.max(b.x0, Math.min(b.x1, pointer.x - r.left));
+      S.ty = Math.max(b.y0, Math.min(b.y1, pointer.y - r.top + 10 * SCALE));
+      pose.facing = S.tx >= S.x ? 1 : -1;
+      setState("hunt", 520);
+      bubble.classList.remove("is-on");
     }
+  }
+  function leavePeek() {
+    if (S.state !== "peek") return;
+    var b = visibleBox();
+    walkTo({ x: Math.max(b.x0, Math.min(b.x1, S.x + (S.x < hostRect().width / 2 ? 90 : -90))), y: S.y }, "idle");
   }
 
   function hitCat(cx, cy) {
@@ -595,6 +666,52 @@
     }
   }
 
+  /* ---------------------------------------------------- scroll paper --- */
+  var paper = document.createElement("div");
+  paper.className = "kuro-paper";
+  paper.setAttribute("aria-hidden", "true");
+  paper.innerHTML = '<span class="kuro-paper__text"></span>';
+  host.appendChild(paper);
+  var paperText = paper.querySelector(".kuro-paper__text");
+  var PAPER_NOTES = ["scroll log: kneading along...", "still here. keep going!", "projects are further down.", "you scroll, I knead."];
+  var paperIdx = 0;
+  function placePaper() {
+    var r = hostRect();
+    var pw = paper.offsetWidth;
+    var x = Math.max(0, Math.min(r.width - pw, S.x - pw / 2));
+    paper.style.transform = "translate(" + x.toFixed(1) + "px, " + (S.y + 4).toFixed(1) + "px)";
+  }
+  if (!reduceMotion) {
+    window.addEventListener(
+      "scroll",
+      function () {
+        var now = performance.now();
+        lastActivity = now;
+        if (S.state === "peek") leavePeek();
+        var vb = visibleBox();
+        var onScreen = S.y >= vb.y0 - 10 && S.y <= vb.y1 + 10;
+        if (!onScreen) {
+          // He scrolled out of view: come back before doing anything else
+          if (S.state === "idle" || S.state === "knead" || S.state === "curious" || S.state === "groom") {
+            paper.classList.remove("is-open");
+            var wp0 = pickWaypoint();
+            if (wp0) walkTo(wp0, "idle");
+          }
+        } else if (S.state === "idle" || S.state === "knead" || S.state === "curious" || S.state === "groom") {
+          if (S.state !== "knead") {
+            setState("knead", 0);
+            paperText.textContent = PAPER_NOTES[paperIdx++ % PAPER_NOTES.length];
+            paper.classList.add("is-open");
+            bubble.classList.remove("is-on");
+          }
+          S.until = now + 1500;
+        }
+        lastScroll = now;
+      },
+      { passive: true }
+    );
+  }
+
   /* ----------------------------------------------------------- loop ---- */
   var last = performance.now();
   var raf = null;
@@ -605,7 +722,7 @@
   function frame(now) {
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    for (var key in T) if (Object.prototype.hasOwnProperty.call(T, key)) A[key] = ease(A[key], T[key], key === "closed" || key === "happy" || key === "wide" ? 0.5 : 0.18);
+    for (var key in T) if (Object.prototype.hasOwnProperty.call(T, key)) A[key] = ease(A[key], T[key], key === "closed" || key === "happy" || key === "wide" || key === "squint" || key === "peek" ? 0.5 : 0.18);
 
     var st = S.state;
 
@@ -617,10 +734,18 @@
           if (S.state === "idle") T.ear = 0;
         }, 220);
       }
-      if (now > S.until) {
+      if (!reduceMotion && now - lastActivity > 45000 && S.state === "idle") {
+        // Peek mode: nobody is around, tuck against the nearest edge
+        var bb = visibleBox();
+        var edgeX = S.x < hostRect().width / 2 ? bb.x0 - 6 * SCALE : bb.x1 + 6 * SCALE;
+        pose.facing = edgeX < S.x ? -1 : 1;
+        walkTo({ x: edgeX, y: S.y }, "peek");
+        lastActivity = now + 3600000; // until real activity resets it
+      } else if (now > S.until) {
         var roll = Math.random();
-        if (roll < 0.22) setState("groom", 2200 + Math.random() * 1200);
-        else if (roll < 0.34) setState("curious", 1400 + Math.random() * 1000);
+        if (roll < 0.1) setState("stretch", 1300);
+        else if (roll < 0.28) setState("groom", 2200 + Math.random() * 1200);
+        else if (roll < 0.4) setState("curious", 1400 + Math.random() * 1000);
         else if (roll < 0.42 && now - S.cornerAt > 60000) {
           var corner = pickCorner();
           if (corner) {
@@ -653,6 +778,9 @@
         if (S.after === "corner") {
           pose.facing = S.x < hostRect().width / 2 ? 1 : -1; // look back into the page
           startIdle(6000 + Math.random() * 6000);
+        } else if (S.after === "peek") {
+          pose.facing = S.x < hostRect().width / 2 ? 1 : -1; // face into the page
+          setState("peek", 0);
         } else startIdle();
       }
     } else if (st === "groom") {
@@ -667,6 +795,39 @@
       if (now > S.until) startIdle(800);
     } else if (st === "startle") {
       if (now > S.until) startIdle(1200);
+    } else if (st === "hunt") {
+      pose.tail = Math.sin(now / 60) * 0.8; // twitch
+      if (now > S.until) {
+        S.jumpV = -5;
+        setState("pounce", 900);
+      }
+    } else if (st === "pounce") {
+      var pdx = S.tx - S.x, pdy = S.ty - S.y;
+      var pd = Math.hypot(pdx, pdy);
+      var pstep = Math.min(pd, SPEED * 3.2 * dt);
+      if (pd > 0.5) {
+        S.x += (pdx / pd) * pstep;
+        S.y += (pdy / pd) * pstep;
+        S.walked += pstep;
+        pose.legPhase = (S.walked / 16) % 1;
+      }
+      if (pd <= 1 || now > S.until) {
+        kick(1.2, 0.85);
+        startIdle(1400);
+      }
+    } else if (st === "purr") {
+      if (!(pointer.x >= 0 && hitCat(pointer.x, pointer.y))) startIdle(900);
+      if (Math.random() < 0.02) S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -14 - Math.random() * 4, v: 0.3, t: 0, d: 1100 + Math.random() * 400 });
+    } else if (st === "stretch") {
+      if (now > S.until) startIdle(700);
+    } else if (st === "knead") {
+      pose.kneadPhase = (now / 420) % 1;
+      if (now - lastScroll > 1500) {
+        paper.classList.remove("is-open");
+        startIdle(900);
+      }
+    } else if (st === "peek") {
+      // stays tucked until the visitor moves or scrolls
     } else if (st === "held") {
       var vv = Math.hypot(pointer.vx, pointer.vy);
       var stretch = Math.min(0.55, vv / 60 + Math.max(0, (S.y - grab.feet) / 900));
@@ -693,11 +854,14 @@
     // petting: cursor resting on the cat
     if (!reduceMotion && canDrag && st !== "held" && pointer.x >= 0 && hitCat(pointer.x, pointer.y) && Math.hypot(pointer.vx, pointer.vy) < 6) {
       S.hoverMs += dt * 1000;
-      if (S.hoverMs > 1300 && now - S.petAt > 6000 && st !== "happy") {
+      if (S.hoverMs > 1300 && now - S.petAt > 6000 && st !== "happy" && st !== "purr") {
         S.petAt = now;
-        setState("happy", 1700);
+        setState("happy", 900);
+        window.setTimeout(function () {
+          if (S.state === "happy") setState("purr", 0);
+        }, 900);
         kick(1.08, 0.94);
-        for (var hh = 0; hh < 5; hh++) S.hearts.push({ x: (Math.random() - 0.5) * 24, y: -30 - Math.random() * 6, v: 0.35 + Math.random() * 0.3, t: 0, d: 1100 + Math.random() * 500 });
+        for (var hh = 0; hh < 5; hh++) S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -16 - Math.random() * 4, v: 0.35 + Math.random() * 0.3, t: 0, d: 1100 + Math.random() * 500 });
         if (Math.random() < 0.5) say("purr...", 1800);
       }
     } else {
@@ -705,7 +869,7 @@
     }
 
     // blink
-    if (now > S.blinkAt && st !== "groom" && st !== "happy") {
+    if (now > S.blinkAt && st !== "groom" && st !== "happy" && st !== "purr" && st !== "stretch" && st !== "knead") {
       T.closed = 1;
       S.blinkAt = now + 2500 + Math.random() * 4000;
       window.setTimeout(function () {
@@ -740,14 +904,19 @@
     pose.closed = A.closed;
     pose.happy = A.happy;
     pose.wide = A.wide;
+    pose.squint = A.squint;
+    pose.knead = A.knead;
+    pose.arch = A.arch;
+    pose.crouch = A.crouch;
+    pose.peek = A.peek;
 
     // pupils track the cursor; look down at the hand while held
     if (st === "held") {
       pose.pupilX = 0;
-      pose.pupilY = 1.2;
+      pose.pupilY = 1;
     } else if (st === "curious") {
-      pose.pupilX = 1.2 * pose.facing;
-      pose.pupilY = -0.6;
+      pose.pupilX = 1;
+      pose.pupilY = -1;
     } else if (pointer.x >= 0) {
       var cc = catCenter();
       var ddx = pointer.x - cc.x, ddy = pointer.y - cc.y;
@@ -761,6 +930,7 @@
     renderPose(pose);
     drawHearts(now, dt);
 
+    if (paper.classList.contains("is-open")) placePaper();
     if (bubbleUntil > now && st !== "held") placeBubble();
     else if (bubble.classList.contains("is-on")) bubble.classList.remove("is-on");
 

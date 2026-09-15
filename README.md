@@ -26,7 +26,7 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/kuro.js            # Kuro, the pixel cat companion (roams the content column, speech bubble, petting, mochi drag)
+js/kuro.js            # Kuro, the pixel cat (roams the content column; waves, grooms, hunts the cursor, kneads on scroll, purrs when petted, peeks when idle, mochi drag)
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)

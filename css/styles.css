@@ -1702,9 +1702,42 @@ a.ext:hover::after {
   border-top: 0;
   border-bottom: 8px solid rgb(var(--ink));
 }
+/* Scroll paper: unrolls under Kuro while he kneads along with the scroll */
+.kuro-paper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 21;
+  padding: 0.3rem 0.55rem;
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  border: 2px solid rgb(var(--ink));
+  box-shadow: 0 0 0 2px rgb(var(--bg)), 3px 3px 0 0 rgb(var(--ink));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: 50% 0;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.kuro-paper.is-open {
+  opacity: 1;
+  animation: kuro-unroll 320ms var(--ease-out);
+}
+@keyframes kuro-unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
 @media print {
   .kuro,
-  .kuro-bubble {
+  .kuro-bubble,
+  .kuro-paper {
     display: none;
   }
 }
