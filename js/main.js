@@ -51,7 +51,6 @@ var IMAGES = {
 
   var root = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  var systemDark = window.matchMedia("(prefers-color-scheme: dark)");
 
   function el(tag, cls, attrs) {
     var node = document.createElement(tag);
@@ -238,52 +237,38 @@ var IMAGES = {
   }
 
   /* ------------------------------------------------------------------ theme */
-  var PREFS = ["system", "light", "dark"];
+  // Two modes only. First visit follows the OS preference; after that the
+  // choice is stored under "theme".
   var toggles = document.querySelectorAll("[data-theme-toggle]");
 
-  function readPref() {
-    try {
-      var v = localStorage.getItem("theme");
-      return PREFS.indexOf(v) > -1 ? v : "system";
-    } catch (e) {
-      return "system";
-    }
+  function currentTheme() {
+    return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
   }
 
-  function applyTheme(pref, animate) {
-    var dark = pref === "dark" || (pref === "system" && systemDark.matches);
+  function applyTheme(theme, animate) {
     if (animate && !reduceMotion.matches) {
       root.classList.add("theme-transition");
       window.setTimeout(function () {
         root.classList.remove("theme-transition");
       }, 320);
     }
-    root.setAttribute("data-theme", dark ? "dark" : "light");
-    root.setAttribute("data-theme-pref", pref);
-    var next = PREFS[(PREFS.indexOf(pref) + 1) % PREFS.length];
+    root.setAttribute("data-theme", theme);
+    var next = theme === "dark" ? "light" : "dark";
     for (var i = 0; i < toggles.length; i++) {
-      toggles[i].setAttribute("aria-label", "Theme: " + pref + ". Switch to " + next + ".");
+      toggles[i].setAttribute("aria-label", "Switch to " + next + " mode");
     }
   }
 
-  function cyclePref() {
-    var pref = PREFS[(PREFS.indexOf(readPref()) + 1) % PREFS.length];
-    try {
-      localStorage.setItem("theme", pref);
-    } catch (e) {}
-    applyTheme(pref, true);
-  }
-
   for (var t = 0; t < toggles.length; t++) {
-    toggles[t].addEventListener("click", cyclePref);
-  }
-  applyTheme(readPref(), false);
-
-  if (typeof systemDark.addEventListener === "function") {
-    systemDark.addEventListener("change", function () {
-      if (readPref() === "system") applyTheme("system", true);
+    toggles[t].addEventListener("click", function () {
+      var next = currentTheme() === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem("theme", next);
+      } catch (e) {}
+      applyTheme(next, true);
     });
   }
+  applyTheme(currentTheme(), false);
 
   /* ------------------------------------------------------------- overlay menu */
   var menu = document.getElementById("menu");
@@ -394,40 +379,6 @@ var IMAGES = {
     window.addEventListener("resize", updateActive);
     window.addEventListener("load", updateActive);
     updateActive();
-  }
-
-  /* ---------------------------------------------------- portrait halftone */
-  // Drift runs only while the portrait is on screen; on pointer-capable
-  // screens the two dot layers shift a few pixels against the cursor for a
-  // little depth. Everything stays static under prefers-reduced-motion.
-  var portrait = document.querySelector(".portrait");
-  if (portrait && !reduceMotion.matches) {
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(
-        function (entries) {
-          for (var i = 0; i < entries.length; i++) {
-            portrait.classList.toggle("is-in-view", entries[i].isIntersecting);
-          }
-        },
-        { threshold: 0.1 }
-      ).observe(portrait);
-    } else {
-      portrait.classList.add("is-in-view");
-    }
-    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-      var hero = portrait.closest(".hero") || portrait;
-      hero.addEventListener("pointermove", function (e) {
-        var r = portrait.getBoundingClientRect();
-        var px = (e.clientX - (r.left + r.width / 2)) / (r.width * 2);
-        var py = (e.clientY - (r.top + r.height / 2)) / (r.height * 2);
-        portrait.style.setProperty("--px", Math.max(-1, Math.min(1, px)).toFixed(3));
-        portrait.style.setProperty("--py", Math.max(-1, Math.min(1, py)).toFixed(3));
-      });
-      hero.addEventListener("pointerleave", function () {
-        portrait.style.setProperty("--px", "0");
-        portrait.style.setProperty("--py", "0");
-      });
-    }
   }
 
   /* -------------------------------------------------------------- footer year */

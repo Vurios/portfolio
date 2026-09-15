@@ -40,15 +40,14 @@
       (function () {
         var root = document.documentElement;
         root.classList.add("js");
-        var pref = "system";
+        var saved = null;
         try {
-          pref = localStorage.getItem("theme") || "system";
+          saved = localStorage.getItem("theme");
         } catch (e) {}
         var dark =
-          pref === "dark" ||
-          (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          saved === "dark" ||
+          (saved !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
         root.setAttribute("data-theme", dark ? "dark" : "light");
-        root.setAttribute("data-theme-pref", pref);
       })();
     </script>
 
@@ -96,10 +95,6 @@
       <symbol id="i-moon" viewBox="0 0 24 24">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </symbol>
-      <symbol id="i-monitor" viewBox="0 0 24 24">
-        <rect x="2" y="3" width="20" height="14" rx="2" />
-        <path d="M8 21h8M12 17v4" />
-      </symbol>
       <symbol id="i-menu" viewBox="0 0 24 24">
         <path d="M4 7h16M4 12h16M4 17h16" />
       </symbol>
@@ -128,8 +123,7 @@
       <header class="topbar">
         <a class="brand" href="#top">kim de guzman</a>
         <div class="topbar__actions">
-          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
-            <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
+          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
             <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
             <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
           </button>
@@ -231,8 +225,7 @@
               <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
             </a>
           </div>
-          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
-            <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
+          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
             <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
             <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
           </button>
@@ -308,18 +301,16 @@
             <div class="about">
               <div class="prose">
                 <p>
-                  Information Technology student and full-stack developer with hands-on experience across web
-                  development, mobile applications, and civic tech systems, built through multiple IT internships,
-                  hackathon competitions, and independent project work. Comfortable owning a product end to end, from
-                  the data model and backend through to the interface, and brings AI into a system only where it
-                  removes a real step for the person using it: routing a hazard report, pulling metadata from a scanned
-                  image, answering a question in plain language.
+                  Hi, I'm Kim. Most of what I've built started as a problem someone near me actually had: a city routing
+                  emergencies through 20+ hotlines, a police station keeping its blotter on paper, a library that wanted
+                  its catalog to answer questions. Those projects taught me to own the whole stack, and to bring AI in
+                  only where it saves a real step for the person using it.
                 </p>
                 <p>
-                  Trained through a TESDA scholarship program, interned with companies based in Quezon City and
-                  Singapore, and has placed in hackathon and coding competitions across Albay. Combines strong
-                  problem-solving under pressure with effective remote team leadership, backed by a consistent record
-                  as a President's and Dean's List awardee.
+                  Along the way I trained under a TESDA scholarship, interned with teams in Quezon City and Singapore,
+                  led a remote intern team, and placed in hackathons around Albay. I work well under pressure, I've
+                  stayed on the President's and Dean's List throughout my degree, and I'm looking for a team where I can
+                  keep shipping and keep learning.
                 </p>
               </div>
               <ul class="highlights" aria-label="Highlights">

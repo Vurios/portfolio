@@ -322,18 +322,14 @@ a.ext:hover::after {
   border-color: rgb(var(--gray-800));
 }
 
-/* Theme toggle: three visual states driven by data-theme-pref on <html> */
+/* Theme toggle: shows the mode you will switch to */
 .theme-toggle .icon {
   display: none;
 }
-:root[data-theme-pref="system"] .theme-toggle .icon--system,
-:root:not([data-theme-pref]) .theme-toggle .icon--system {
+:root[data-theme="light"] .theme-toggle .icon--dark {
   display: block;
 }
-:root[data-theme-pref="light"] .theme-toggle .icon--light {
-  display: block;
-}
-:root[data-theme-pref="dark"] .theme-toggle .icon--dark {
+:root[data-theme="dark"] .theme-toggle .icon--light {
   display: block;
 }
 
@@ -811,38 +807,18 @@ a.ext:hover::after {
 }
 .portrait__dots {
   position: absolute;
-  inset: -12px;
+  inset: 0;
   pointer-events: none;
-  will-change: transform, background-position;
-  transition: transform 500ms var(--ease-out);
 }
 .portrait__dots--fine {
   --dot-alpha: var(--portrait-fine);
   -webkit-mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
   mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
-  transform: translate(calc(var(--px, 0) * -3px), calc(var(--py, 0) * -3px));
 }
 .portrait__dots--coarse {
   --dot-alpha: var(--portrait-coarse);
   -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
-  transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 6px));
-}
-/* The halftone field drifts slowly, the two layers at different rates so the
-   print texture reads as depth. Runs only while the portrait is on screen. */
-@keyframes dots-drift {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 36px 36px;
-  }
-}
-.portrait.is-in-view .portrait__dots--coarse {
-  animation: dots-drift 48s linear infinite;
-}
-.portrait.is-in-view .portrait__dots--fine {
-  animation: dots-drift 30s linear infinite reverse;
 }
 .portrait img {
   position: relative;
@@ -1519,9 +1495,5 @@ html.js .fade-up {
   }
   .status__dot {
     animation: none;
-  }
-  .portrait__dots {
-    animation: none !important;
-    transform: none !important;
   }
 }
