@@ -1,14 +1,14 @@
 /* Kim De Guzman — portfolio
-   Kuro: a black cat who lives on the page. He roams the whole window on his
-   own; click him and he follows your cursor, click again and he goes back
-   to wandering. Rest the cursor on him to pet him, fling the cursor past
-   him to startle him, or drag him around by the scruff.
+   Kuro: a black cat who lives on the page. He sits on the page itself, so
+   he scrolls with it and stays where he was left. Three modes, one click
+   (or tap) each: wander (strolls to quiet spots on his own, never onto
+   text or links, never toward your cursor), follow (chases the cursor) and
+   stay (sits put). Dropping him after a drag also means "stay here". Rest
+   the cursor on him to pet him, fling it past him to startle him.
 
    The idle / sleep / scratch behaviour and the sprite layout come from
    oneko.js by adryd (https://github.com/adryd325/oneko.js). Movement here
-   is continuous (every animation frame) instead of oneko's 100ms hops, and
-   the extras (wander mode, click-to-follow, petting, startle, drag, speech
-   bubble, favicon, remembering where he was) are written for this site.
+   is continuous (every animation frame) instead of oneko's 100ms hops.
 
    Sprite sheet: assets/kuro/jess.png — 256x128, 8 columns x 4 rows of
    32x32 cells, in oneko's standard layout (see spriteSets below).
@@ -48,10 +48,19 @@
   var mobile = coarse || window.innerWidth < 1024;
   var SCALE = mobile ? 1.5 : 2; // screen px per sprite px (64px cat on desktop)
   var CELL = 32 * SCALE;
-  var canDrag = !mobile && !reduceMotion;
-  var canFollow = !mobile && !reduceMotion;
-  var WANDER_SPEED = mobile ? 70 : 110; // px per second
-  var FOLLOW_SPEED = 240;
+  var HALF = CELL / 2;
+  var canFollow = !mobile && !reduceMotion; // following needs a hovering cursor
+  var WANDER_SPEED = mobile ? 70 : 100; // px per second
+  var FOLLOW_SPEED = 170;
+  var HOLD_MS = 450; // press and hold this long to pick him up without moving
+
+  // A click (tap) moves him on to the next mode
+  var MODES = canFollow ? ["wander", "follow", "stay"] : ["wander", "stay"];
+  var MODE_LINES = {
+    wander: "Off exploring!",
+    follow: "Following! Click to stop.",
+    stay: "I'll stay here."
+  };
 
   /* ------------------------------------------------ oneko sprite map ---- */
   // [x, y] cell offsets, negative, exactly as in oneko.js
@@ -93,6 +102,8 @@
   bubble.setAttribute("aria-hidden", "true");
   document.body.appendChild(bubble);
 
+  var topbar = document.querySelector(".topbar");
+
   /* ---------------------------------------------------------- state ---- */
   var saved = {};
   try {
@@ -101,13 +112,13 @@
     saved = {};
   }
 
-  var pos = { x: 0, y: 0 }; // centre of the cat, viewport px
-  var mode = canFollow && saved.mode === "follow" ? "follow" : "wander";
-  var cursor = { x: null, y: null, vx: 0, vy: 0, at: 0 };
+  var pos = { x: 0, y: 0 }; // centre of the cat, in page (document) px
+  var mode = MODES.indexOf(saved.mode) >= 0 ? saved.mode : "wander";
+  var cursor = { x: null, y: null, vx: 0, vy: 0, at: 0 }; // viewport px
   var moving = false;
   var wanderTarget = null;
   var wanderAt = performance.now() + 7000; // first stroll after saying hello
-  var frameCount = 0;
+  var ticks = 0;
   var idleTime = 0;
   var idleAnimation = null;
   var idleAnimationFrame = 0;
@@ -116,22 +127,45 @@
   var cell = [3, 3]; // current sprite cell (column, row), for hit-testing
   var walkClock = 0;
   var hoverMs = 0;
+  var nearMs = 0;
   var petAt = -Infinity;
   var startleAt = 0;
   var held = null;
   var press = null;
+  var holdTimer = 0;
   var settling = false;
 
-  function bounds() {
-    var half = CELL / 2;
-    return { x0: half, x1: window.innerWidth - half, y0: half, y1: window.innerHeight - half };
+  /* ------------------------------------------------------ geometry ---- */
+  // He lives in page coordinates, so he scrolls with the page and stays
+  // where he was left; only following makes him chase the viewport.
+  var pageW = 0, pageH = 0;
+  function measure() {
+    pageW = document.documentElement.clientWidth;
+    pageH = Math.max(document.body.offsetHeight, window.innerHeight);
   }
-  function clampToBounds(p) {
-    var b = bounds();
+  function topInset() {
+    return topbar ? Math.max(0, topbar.getBoundingClientRect().bottom) : 0;
+  }
+  function pageBounds() {
+    return { x0: HALF, x1: pageW - HALF, y0: HALF, y1: pageH - HALF };
+  }
+  // The part of the page on screen right now
+  function viewBounds() {
+    var sy = window.scrollY;
+    return { x0: HALF, x1: pageW - HALF, y0: sy + topInset() + HALF, y1: sy + window.innerHeight - HALF };
+  }
+  function clampTo(p, b) {
     return { x: Math.max(b.x0, Math.min(b.x1, p.x)), y: Math.max(b.y0, Math.min(b.y1, p.y)) };
   }
+  function inView() {
+    var b = viewBounds();
+    return pos.y > b.y0 - CELL && pos.y < b.y1 + CELL;
+  }
+  function cursorPage() {
+    return { x: cursor.x + window.scrollX, y: cursor.y + window.scrollY };
+  }
   function place() {
-    el.style.transform = "translate3d(" + Math.round(pos.x - CELL / 2) + "px, " + Math.round(pos.y - CELL / 2) + "px, 0)";
+    el.style.transform = "translate3d(" + Math.round(pos.x - HALF) + "px, " + Math.round(pos.y - HALF) + "px, 0)";
   }
   function setSprite(name, frame) {
     var s = spriteSets[name][frame % spriteSets[name].length];
@@ -146,9 +180,44 @@
     try {
       window.localStorage.setItem(
         STORE,
-        JSON.stringify({ fx: pos.x / window.innerWidth, fy: pos.y / window.innerHeight, mode: mode, hinted: !!saved.hinted })
+        JSON.stringify({
+          px: Math.round(pos.x),
+          py: Math.round(pos.y),
+          vx: pos.x / pageW,
+          vy: (pos.y - window.scrollY) / window.innerHeight,
+          mode: mode,
+          hinted: !!saved.hinted
+        })
       );
     } catch (e) {}
+  }
+
+  /* ------------------------------------- what is under a point ---- */
+  var TEXTY = "p, h1, h2, h3, h4, li, a, button, figcaption, span, label, input, textarea, .pill, .label, .meta";
+  var BUSY = TEXTY + ", img, svg, video, canvas, iframe, select";
+  function isKuro(node) {
+    return node === bubble || el.contains(node) || (node.classList && node.classList.contains("kuro-heart"));
+  }
+  function firstUnder(x, y) {
+    var els = document.elementsFromPoint(x, y);
+    for (var i = 0; i < els.length; i++) if (!isKuro(els[i])) return els[i];
+    return null;
+  }
+  function hits(x, y, selector) {
+    var n = firstUnder(x, y);
+    return !!(n && n.closest && n.closest(selector));
+  }
+  // Would he sit on something you might want to read or click?
+  function spotBusy(p) {
+    var cx = p.x - window.scrollX, cy = p.y - window.scrollY;
+    var r = HALF * 0.7;
+    var pts = [[0, 0], [-r, -r], [r, -r], [-r, r], [r, r]];
+    for (var i = 0; i < pts.length; i++) {
+      var x = cx + pts[i][0], y = cy + pts[i][1];
+      if (x < 0 || y < topInset() || x > window.innerWidth || y > window.innerHeight) return true;
+      if (hits(x, y, BUSY)) return true;
+    }
+    return false;
   }
 
   /* ------------------------------------------------ oneko: idle ---- */
@@ -163,7 +232,7 @@
 
     // every ~20 seconds
     if (idleTime > 10 && Math.floor(Math.random() * 200) === 0 && idleAnimation == null) {
-      var b = bounds();
+      var b = viewBounds();
       var available = ["sleeping", "scratchSelf"];
       if (pos.x < b.x0 + 32) available.push("scratchWallW");
       if (pos.y < b.y0 + 32) available.push("scratchWallN");
@@ -186,8 +255,9 @@
       case "scratchWallE":
       case "scratchWallW":
       case "scratchSelf":
-        setSprite(idleAnimation, idleAnimationFrame);
-        if (idleAnimationFrame > 9) resetIdleAnimation();
+        // two ticks per frame: a lazier scratch than oneko's
+        setSprite(idleAnimation, Math.floor(idleAnimationFrame / 2));
+        if (idleAnimationFrame > 19) resetIdleAnimation();
         break;
       default:
         setSprite("idle", 0);
@@ -199,24 +269,52 @@
 
   /* ------------------------------------------------ targets ---- */
   function currentTarget() {
-    if (mode === "follow" && cursor.x !== null) return clampToBounds({ x: cursor.x, y: cursor.y });
-    return wanderTarget;
+    if (mode === "follow" && cursor.x !== null) return clampTo(cursorPage(), pageBounds());
+    if (mode === "wander") return wanderTarget;
+    return null;
   }
-  // A stroll to somewhere else on screen, at least a short hop away
+  // A stroll to a quiet spot on screen: not on text, links or images, and
+  // not near your cursor. Null when there is nowhere good right now.
   function pickWander() {
-    var b = bounds();
-    for (var i = 0; i < 10; i++) {
+    var b = viewBounds();
+    var cp = cursor.x === null ? null : cursorPage();
+    var reach = mobile ? 320 : 600;
+    for (var i = 0; i < 24; i++) {
       var p = { x: b.x0 + Math.random() * (b.x1 - b.x0), y: b.y0 + Math.random() * (b.y1 - b.y0) };
       var d = Math.hypot(p.x - pos.x, p.y - pos.y);
-      if (d > 120 && d < (mobile ? 360 : 700)) return p;
+      if (d < 100 || d > reach) continue;
+      if (cp && Math.hypot(p.x - cp.x, p.y - cp.y) < 180) continue;
+      if (spotBusy(p)) continue;
+      return p;
     }
     return null;
+  }
+  // Sitting on text or a link while your cursor works nearby: after a
+  // moment he gets up and moves somewhere quieter. Heading straight for
+  // him (to click or pet him) is quick enough that he stays.
+  function keepOutOfTheWay() {
+    if (cursor.x === null || petTicks || !inView()) {
+      nearMs = 0;
+      return;
+    }
+    var cp = cursorPage();
+    var near = Math.hypot(cp.x - pos.x, cp.y - pos.y) < 150 && !overKuro(cursor.x, cursor.y);
+    nearMs = near ? nearMs + 500 : 0;
+    if (nearMs < 1500) return;
+    nearMs = 0;
+    if (!spotBusy(pos)) return;
+    var p = pickWander();
+    if (p) {
+      wanderTarget = p;
+      resetIdleAnimation();
+    }
   }
 
   /* ------------------------------------ logic tick (oneko cadence) ---- */
   function tick() {
-    frameCount += 1;
-    if (held || settling) return;
+    ticks += 1;
+    if (ticks % 10 === 0) measure();
+    if (held || settling || press) return;
 
     if (alertTicks > 0) {
       alertTicks -= 1;
@@ -232,16 +330,32 @@
 
     if (!t || dist < arrive) {
       moving = false;
-      if (mode === "wander" && wanderTarget && dist < arrive) {
+      if (wanderTarget) {
         wanderTarget = null;
-        wanderAt = now + 5000 + Math.random() * 9000;
+        wanderAt = now + 8000 + Math.random() * 8000;
       }
       idle();
-      if (mode === "wander" && !wanderTarget && now > wanderAt && idleAnimation == null && petTicks === 0) {
-        wanderTarget = pickWander();
-        wanderAt = now + 8000;
+      if (mode === "wander" && idleAnimation == null && petTicks === 0) {
+        if (now > wanderAt) {
+          wanderAt = now + 4000; // try again later if nowhere is free
+          if (inView()) wanderTarget = pickWander();
+        } else if (ticks % 5 === 0) {
+          keepOutOfTheWay();
+        }
       }
       return;
+    }
+
+    // wandering toward where your cursor now is: pick somewhere else
+    if (mode === "wander" && cursor.x !== null && ticks % 5 === 0) {
+      var cp = cursorPage();
+      if (Math.hypot(cp.x - t.x, cp.y - t.y) < 140) {
+        wanderTarget = pickWander();
+        if (!wanderTarget) {
+          moving = false;
+          return;
+        }
+      }
     }
 
     resetIdleAnimation();
@@ -259,7 +373,7 @@
 
   /* --------------------------------- smooth movement (every frame) ---- */
   function step(dt) {
-    if (!moving || held || settling) return;
+    if (!moving || held || settling || press) return;
     var t = currentTarget();
     if (!t) {
       moving = false;
@@ -288,22 +402,21 @@
   }
 
   /* ------------------------------------------------ speech bubble ---- */
+  // Short lines, so the bubble stays one line on any screen
   var MESSAGES = [
     "Hi, I'm Kuro!",
-    "Welcome to Kim's portfolio!",
-    "Feel free to look around!",
-    "Check out the projects section!",
+    "Welcome in!",
+    "Have a look around.",
+    "Check the projects!",
     "Nice to meet you :)",
-    "Kim builds civic tech. I supervise.",
-    "Pick me up if you like!",
-    "Pet me. I don't bite.",
-    "The certificates are real, I checked."
+    "Kim builds tech.",
+    "Drag me anywhere!",
+    mobile ? "Nice view from here." : "Pet me, I purr.",
+    "Certs? All real."
   ];
-  var TAPS = ["Meow!", "Hi there!", "Mrrp?", "You found me!", "Hehe, that tickles."];
   var msgIndex = 0;
   var bubbleUntil = 0;
-  var nextChatter = performance.now() + 9000;
-  var TEXTY = "p, h1, h2, h3, h4, li, a, button, figcaption, span, label, input, textarea, .pill, .label, .meta";
+  var nextChatter = performance.now() + 12000;
 
   function coversText(x, top, bw, bh) {
     var pts = [
@@ -314,35 +427,33 @@
       [x + bw / 2, top + bh / 2]
     ];
     for (var i = 0; i < pts.length; i++) {
-      var els = document.elementsFromPoint(pts[i][0], pts[i][1]);
-      for (var j = 0; j < els.length; j++) {
-        if (els[j] === bubble || el.contains(els[j])) continue;
-        if (els[j].closest && els[j].closest(TEXTY)) return true;
-        break;
-      }
+      if (hits(pts[i][0], pts[i][1], TEXTY)) return true;
     }
     return false;
   }
 
   var side = { at: 0, below: false, hidden: false };
-  // Above him by default; below him near the top of the window or when the
+  // Above him by default; below him near the top of the screen or when the
   // upper spot would sit on text. If both would, it stays hidden rather
-  // than cover what you are reading. Always kept 6px inside the window so
-  // the border is never cut off.
+  // than cover what you are reading. Always kept 6px inside the page width
+  // so the border is never cut off.
   function placeBubble() {
     var bw = bubble.offsetWidth, bh = bubble.offsetHeight;
     var margin = 6;
-    var x = Math.max(margin, Math.min(window.innerWidth - bw - margin, pos.x - bw / 2));
-    var above = pos.y - CELL / 2 - bh - 10;
-    var below = pos.y + CELL / 2 + 10;
+    var sx = window.scrollX, sy = window.scrollY;
+    var x = Math.max(margin, Math.min(pageW - bw - margin, pos.x - bw / 2));
+    var above = pos.y - HALF - bh - 10;
+    var below = pos.y + HALF + 10;
+    var top = sy + topInset() + margin;
+    var bottom = sy + window.innerHeight - margin;
     var now = performance.now();
     if (now >= side.at) {
       side.at = now + 250;
       side.hidden = false;
-      side.below = above < margin || coversText(x, above, bw, bh);
-      if (side.below && (below + bh > window.innerHeight - margin || coversText(x, below, bw, bh))) {
+      side.below = above < top || coversText(x - sx, above - sy, bw, bh);
+      if (side.below && (below + bh > bottom || coversText(x - sx, below - sy, bw, bh))) {
         // neither side is clear of text: stay above if it fits at all
-        side.below = above < margin;
+        side.below = above < top;
         side.hidden = side.below;
       }
     }
@@ -365,12 +476,12 @@
     bubbleUntil = 0;
     bubble.classList.remove("is-on");
   }
-  // Rotating lines every 7-13s while he sits idle
+  // A new line every 12-20s while he sits idle on screen
   function maybeChatter() {
     var now = performance.now();
-    if (now < nextChatter || bubbleUntil) return;
+    if (now < nextChatter || bubbleUntil || !inView()) return;
     say(MESSAGES[msgIndex++ % MESSAGES.length]);
-    nextChatter = now + 7000 + Math.random() * 6000;
+    nextChatter = now + 12000 + Math.random() * 8000;
   }
 
   /* --------------------------------------- sprite alpha (hit test) ---- */
@@ -402,30 +513,26 @@
   }
 
   /* ------------------------------------------------ cursor tracking ---- */
-  document.addEventListener(
-    "mousemove",
-    function (e) {
-      var now = performance.now();
-      var dt = Math.max(1, now - cursor.at);
-      if (cursor.x !== null) {
-        cursor.vx = cursor.vx * 0.5 + ((e.clientX - cursor.x) / dt) * 16 * 0.5;
-        cursor.vy = cursor.vy * 0.5 + ((e.clientY - cursor.y) / dt) * 16 * 0.5;
-      }
-      cursor.x = e.clientX;
-      cursor.y = e.clientY;
-      cursor.at = now;
-      if (held) dragTo(e.clientX, e.clientY);
-      else maybeStartle(now);
-    },
-    { passive: true }
-  );
+  function trackCursor(e) {
+    var now = performance.now();
+    var dt = Math.max(1, now - cursor.at);
+    if (cursor.x !== null) {
+      cursor.vx = cursor.vx * 0.5 + ((e.clientX - cursor.x) / dt) * 16 * 0.5;
+      cursor.vy = cursor.vy * 0.5 + ((e.clientY - cursor.y) / dt) * 16 * 0.5;
+    }
+    cursor.x = e.clientX;
+    cursor.y = e.clientY;
+    cursor.at = now;
+    if (!held && !press) maybeStartle(now);
+  }
 
-  // Startle: a fast cursor whipping past while he is not following it
+  // A fast flick of the cursor right past him makes him jump
   function maybeStartle(now) {
-    if (reduceMotion || mode === "follow" || moving || now - startleAt < 3000) return;
+    if (mode === "follow" || moving || now - startleAt < 3000) return;
     var speed = Math.hypot(cursor.vx, cursor.vy);
     if (speed < 45) return;
-    if (Math.hypot(cursor.x - pos.x, cursor.y - pos.y) > 130) return;
+    var cp = cursorPage();
+    if (Math.hypot(cp.x - pos.x, cp.y - pos.y) > 130) return;
     startleAt = now;
     resetIdleAnimation();
     petTicks = 0;
@@ -435,7 +542,7 @@
 
   /* ------------------------------------------------- petting ---- */
   function checkPetting(dt) {
-    if (reduceMotion || mobile || held || moving || cursor.x === null) {
+    if (mobile || held || press || moving || cursor.x === null) {
       hoverMs = 0;
       return;
     }
@@ -458,36 +565,37 @@
     var h = document.createElement("span");
     h.className = "kuro-heart";
     h.setAttribute("aria-hidden", "true");
-    h.style.left = Math.round(pos.x - 5 + (Math.random() * 2 - 1) * CELL * 0.35) + "px";
-    h.style.top = Math.round(pos.y - CELL / 2 - 6) + "px";
+    var x = pos.x - 5 + (Math.random() * 2 - 1) * CELL * 0.35;
+    h.style.left = Math.round(Math.max(0, Math.min(pageW - 12, x))) + "px";
+    h.style.top = Math.round(pos.y - HALF - 6) + "px";
     document.body.appendChild(h);
     h.addEventListener("animationend", function () {
       h.remove();
     });
   }
 
-  /* ------------------------------- click to follow / mochi drag ---- */
+  /* ---------------------------- click for modes / mochi drag ---- */
   // The cat element is pointer-events:none, so links under it always work.
   // Document-level listeners react only when a press lands on one of his
-  // opaque pixels: a quick click toggles follow mode, a press-and-move
-  // picks him up.
+  // opaque pixels: a quick click switches mode, press-and-move (or
+  // press-and-hold) picks him up, and wherever you drop him he stays.
   var stretch = { sx: 1, sy: 1, skew: 0, vsx: 0, vsy: 0, vskew: 0 };
   var swallowClick = false;
   function applyStretch() {
     sprite.style.transform = "skewX(" + stretch.skew.toFixed(2) + "deg) scale(" + stretch.sx.toFixed(3) + ", " + stretch.sy.toFixed(3) + ")";
   }
 
+  function setMode(next) {
+    mode = next;
+    wanderTarget = null;
+    wanderAt = performance.now() + 6000;
+    moving = false;
+    saved.hinted = true;
+    save();
+  }
   function onTap() {
-    if (canFollow) {
-      mode = mode === "follow" ? "wander" : "follow";
-      wanderTarget = null;
-      wanderAt = performance.now() + 4000;
-      say(mode === "follow" ? "Okay, I'll follow you!" : "Alright, I'll wander around.", 2600);
-      saved.hinted = true;
-      save();
-    } else {
-      say(TAPS[Math.floor(Math.random() * TAPS.length)], 2200);
-    }
+    setMode(MODES[(MODES.indexOf(mode) + 1) % MODES.length]);
+    say(MODE_LINES[mode], 2600);
     resetIdleAnimation();
     petTicks = 0;
     alertTicks = 4;
@@ -501,10 +609,43 @@
         if ((e.pointerType === "mouse" && e.button !== 0) || !overKuro(e.clientX, e.clientY)) return;
         e.preventDefault();
         swallowClick = true;
-        press = { x: e.clientX, y: e.clientY };
+        press = { x: e.clientX, y: e.clientY, type: e.pointerType };
+        try {
+          // keep the moves coming even when the pointer leaves the window
+          document.documentElement.setPointerCapture(e.pointerId);
+        } catch (err) {}
+        window.clearTimeout(holdTimer);
+        holdTimer = window.setTimeout(function () {
+          if (press && !held) pickUp(press.x, press.y);
+        }, HOLD_MS);
       },
       { capture: true }
     );
+    // A finger that lands on him drags him instead of scrolling the page
+    document.addEventListener(
+      "touchstart",
+      function (e) {
+        var t = e.touches[0];
+        if (e.touches.length === 1 && overKuro(t.clientX, t.clientY)) e.preventDefault();
+      },
+      { capture: true, passive: false }
+    );
+    document.addEventListener(
+      "touchmove",
+      function (e) {
+        if (press || held) e.preventDefault();
+      },
+      { capture: true, passive: false }
+    );
+    ["selectstart", "dragstart"].forEach(function (type) {
+      document.addEventListener(
+        type,
+        function (e) {
+          if (press || held) e.preventDefault();
+        },
+        { capture: true }
+      );
+    });
     document.addEventListener(
       "click",
       function (e) {
@@ -515,31 +656,51 @@
       },
       { capture: true }
     );
-    document.addEventListener("pointermove", function (e) {
-      if (!press || held || !canDrag) return;
-      if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < 6) return;
-      pickUp(press.x, press.y);
-      dragTo(e.clientX, e.clientY);
-    });
+    // Dragging listens to pointermove: once pointerdown is cancelled the
+    // browser stops sending mousemove while the button is down.
+    document.addEventListener(
+      "pointermove",
+      function (e) {
+        if (e.pointerType === "mouse") trackCursor(e);
+        if (held) {
+          dragTo(e.clientX, e.clientY);
+          return;
+        }
+        if (!press) return;
+        if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < (press.type === "mouse" ? 6 : 10)) return;
+        pickUp(press.x, press.y);
+        dragTo(e.clientX, e.clientY);
+      },
+      { passive: true }
+    );
     document.addEventListener("pointerup", function () {
+      window.clearTimeout(holdTimer);
       if (held) drop();
       else if (press) onTap();
       press = null;
+      // a touch whose touchstart was cancelled never sends a click
+      window.setTimeout(function () {
+        swallowClick = false;
+      }, 60);
     });
     document.addEventListener("pointercancel", function () {
+      window.clearTimeout(holdTimer);
       if (held) drop();
       press = null;
+      swallowClick = false;
     });
     window.addEventListener("blur", function () {
+      window.clearTimeout(holdTimer);
       if (held) drop();
       press = null;
     });
   }
 
   function pickUp(px, py) {
+    window.clearTimeout(holdTimer);
     held = {
-      offX: px - pos.x,
-      offY: py - (pos.y - CELL / 2),
+      offX: px - (pos.x - window.scrollX),
+      offY: py - (pos.y - window.scrollY - HALF),
       lastX: px,
       lastY: py,
       lastT: performance.now(),
@@ -578,20 +739,19 @@
         held.flips = 0;
       }
     }
-    var p = clampToBounds({ x: x - held.offX, y: y - held.offY + CELL / 2 });
-    pos.x = p.x;
-    pos.y = p.y;
+    pos = clampTo({ x: x - held.offX + window.scrollX, y: y - held.offY + HALF + window.scrollY }, pageBounds());
     place();
   }
+  // Wherever you put him down, he stays
   function drop() {
     held = null;
     settling = true;
     stretch.vsx = stretch.vsy = stretch.vskew = 0;
-    idleTime = 3; // lands, looks alert for a beat, then carries on
-    wanderTarget = null;
-    wanderAt = performance.now() + 5000;
+    idleTime = 0;
+    alertTicks = 3; // lands, looks up for a beat
     setSprite("alert", 0);
-    save();
+    setMode("stay");
+    say(MODE_LINES.stay, 2200);
     window.requestAnimationFrame(settleLoop);
   }
 
@@ -697,17 +857,37 @@
   }
 
   /* ------------------------------------------------------ start ---- */
-  if (typeof saved.fx === "number" && typeof saved.fy === "number") {
-    pos = clampToBounds({ x: saved.fx * window.innerWidth, y: saved.fy * window.innerHeight });
+  // Somewhere on screen: where he was on screen last time, else bottom right
+  function placeInView() {
+    var v = viewBounds();
+    if (typeof saved.vx === "number" && typeof saved.vy === "number") {
+      pos = clampTo({ x: saved.vx * pageW, y: window.scrollY + saved.vy * window.innerHeight }, v);
+    } else {
+      pos = clampTo({ x: pageW - (mobile ? 44 : 150), y: window.scrollY + window.innerHeight - (mobile ? 96 : 70) }, v);
+    }
+  }
+  measure();
+  if (mode === "stay" && typeof saved.px === "number" && typeof saved.py === "number") {
+    pos = clampTo({ x: saved.px, y: saved.py }, pageBounds()); // parked on the page
   } else {
-    pos = clampToBounds({ x: window.innerWidth - (mobile ? 44 : 150), y: window.innerHeight - (mobile ? 96 : 70) });
+    placeInView();
   }
   setSprite("idle", 0);
   place();
   el.classList.add("is-ready");
 
+  // The browser restores the scroll position around load; if that left him
+  // behind, bring him back into view (unless he was told to stay)
+  window.addEventListener("load", function () {
+    measure();
+    if (mode !== "stay" && !held && !inView()) {
+      placeInView();
+      place();
+    }
+  });
   window.addEventListener("resize", function () {
-    pos = clampToBounds(pos);
+    measure();
+    pos = clampTo(pos, pageBounds());
     place();
   });
   window.addEventListener("pagehide", save);
@@ -723,12 +903,13 @@
 
   // Hello, then (first visit only) how to play with him
   window.setTimeout(function () {
-    say(MESSAGES[msgIndex++], 3000);
+    if (inView()) say(MESSAGES[0], 3000);
+    msgIndex = 1;
   }, 700);
   if (!saved.hinted) {
     window.setTimeout(function () {
-      say(canFollow ? "Click me and I'll follow your cursor." : "Tap me to say hi!", 3400);
-      nextChatter = performance.now() + 9000;
+      if (!held && !press) say(canFollow ? "Click me and I'll follow!" : "Tap me to make me stay.", 3400);
+      nextChatter = performance.now() + 14000;
     }, 4200);
   }
 

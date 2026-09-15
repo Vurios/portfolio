@@ -1641,11 +1641,12 @@ a.ext:hover::after {
 }
 
 /* --------------------------------------------------------------------------
-   Kuro (js/kuro.js): the oneko black cat, free to roam the whole window,
-   plus his speech bubble and petting hearts.
+   Kuro (js/kuro.js): the oneko black cat, plus his speech bubble and
+   petting hearts. All three sit on the page (position: absolute from the
+   document's top left), so they scroll with it and stay where they were left.
    -------------------------------------------------------------------------- */
 .kuro {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 38; /* above the sidebar, below the mobile top bar and menu */
@@ -1664,11 +1665,12 @@ a.ext:hover::after {
   opacity: 1;
 }
 .kuro-bubble {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 39;
-  max-width: 15rem;
+  width: max-content;
+  max-width: min(14rem, calc(100vw - 12px)); /* long lines wrap, never clip */
   padding: 0.35rem 0.6rem;
   background: rgb(var(--ink));
   color: rgb(var(--bg));
@@ -1677,7 +1679,9 @@ a.ext:hover::after {
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.4;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  text-wrap: balance;
   pointer-events: none;
   opacity: 0;
   transition: opacity 180ms ease;
@@ -1706,7 +1710,7 @@ a.ext:hover::after {
 }
 /* Pixel hearts that float up while Kuro is petted */
 .kuro-heart {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 39;
