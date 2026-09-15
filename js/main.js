@@ -256,7 +256,7 @@ var IMAGES = {
       root.classList.add("theme-transition");
       window.setTimeout(function () {
         root.classList.remove("theme-transition");
-      }, 520);
+      }, 320);
     }
     root.setAttribute("data-theme", dark ? "dark" : "light");
     root.setAttribute("data-theme-pref", pref);
@@ -394,6 +394,40 @@ var IMAGES = {
     window.addEventListener("resize", updateActive);
     window.addEventListener("load", updateActive);
     updateActive();
+  }
+
+  /* ---------------------------------------------------- portrait halftone */
+  // Drift runs only while the portrait is on screen; on pointer-capable
+  // screens the two dot layers shift a few pixels against the cursor for a
+  // little depth. Everything stays static under prefers-reduced-motion.
+  var portrait = document.querySelector(".portrait");
+  if (portrait && !reduceMotion.matches) {
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(
+        function (entries) {
+          for (var i = 0; i < entries.length; i++) {
+            portrait.classList.toggle("is-in-view", entries[i].isIntersecting);
+          }
+        },
+        { threshold: 0.1 }
+      ).observe(portrait);
+    } else {
+      portrait.classList.add("is-in-view");
+    }
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      var hero = portrait.closest(".hero") || portrait;
+      hero.addEventListener("pointermove", function (e) {
+        var r = portrait.getBoundingClientRect();
+        var px = (e.clientX - (r.left + r.width / 2)) / (r.width * 2);
+        var py = (e.clientY - (r.top + r.height / 2)) / (r.height * 2);
+        portrait.style.setProperty("--px", Math.max(-1, Math.min(1, px)).toFixed(3));
+        portrait.style.setProperty("--py", Math.max(-1, Math.min(1, py)).toFixed(3));
+      });
+      hero.addEventListener("pointerleave", function () {
+        portrait.style.setProperty("--px", "0");
+        portrait.style.setProperty("--py", "0");
+      });
+    }
   }
 
   /* -------------------------------------------------------------- footer year */

@@ -29,15 +29,17 @@
   --gray-100: 245 245 245;
   --gray-200: 233 233 233;
   --gray-300: 212 212 212;
-  --gray-400: 163 163 163;
-  --gray-500: 115 115 115;
-  --gray-600: 82 82 82;
-  --gray-700: 64 64 64;
-  --gray-800: 38 38 38;
-  --gray-900: 23 23 23;
+  --gray-400: 128 128 128; /* decorative only, 3.9:1 */
+  --gray-500: 94 94 94; /* labels, captions, dates: 6.4:1 on white */
+  --gray-600: 68 68 68; /* muted body: 9.2:1 */
+  --gray-700: 52 52 52;
+  --gray-800: 34 34 34;
+  --gray-900: 20 20 20;
 
   --dot-alpha: 0.9;
-  --ph-dot-alpha: 0.26;
+  --ph-dot-alpha: 0.42;
+  --portrait-fine: 0.8;
+  --portrait-coarse: 0.5;
   --shadow-rest: 0 8px 22px -14px rgb(0 0 0 / 0.18);
   --shadow-hover: 0 18px 36px -20px rgb(0 0 0 / 0.28);
 
@@ -46,7 +48,7 @@
   --font-display: "Geist Pixel", "Geist Mono", ui-monospace, monospace;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --sidebar-w: 14rem;
+  --sidebar-w: 16rem;
   --topbar-h: 3.25rem;
   --measure: 64rem;
 }
@@ -69,6 +71,8 @@
 
   --dot-alpha: 0.42;
   --ph-dot-alpha: 0.34;
+  --portrait-fine: 0.32;
+  --portrait-coarse: 0.18;
   --shadow-rest: 0 8px 22px -14px rgb(0 0 0 / 0.5);
   --shadow-hover: 0 18px 36px -20px rgb(0 0 0 / 0.6);
 }
@@ -88,7 +92,6 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--topbar-h) + 1rem);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -104,17 +107,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Theme crossfade — toggled on <html> for ~500ms by main.js */
+/* Theme crossfade — toggled on <html> for ~300ms by main.js; skipped under
+   prefers-reduced-motion (main.js never adds the class) */
 html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
   transition:
-    background-color 500ms ease,
-    color 500ms ease,
-    border-color 500ms ease,
-    fill 500ms ease,
-    stroke 500ms ease !important;
+    background-color 300ms ease,
+    color 300ms ease,
+    border-color 300ms ease,
+    fill 300ms ease,
+    stroke 300ms ease !important;
 }
 
 ::selection {
@@ -346,7 +350,7 @@ a.ext:hover::after {
   align-items: flex-start;
   gap: 0.5rem;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
   color: rgb(var(--ink));
 }
@@ -364,7 +368,7 @@ a.ext:hover::after {
   align-items: center;
   gap: 0.45rem;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: rgb(var(--gray-500));
 }
 .meta-line .icon {
@@ -516,9 +520,9 @@ a.ext:hover::after {
   display: flex;
   align-items: baseline;
   gap: 0.35rem;
-  padding: 0.4rem 0 0.4rem 1.1rem;
+  padding: 0.45rem 0 0.45rem 1.1rem;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.2px;
   text-decoration: none;
   color: rgb(var(--gray-500));
@@ -595,7 +599,7 @@ a.ext:hover::after {
     width: var(--sidebar-w);
     display: flex;
     flex-direction: column;
-    padding: 1.75rem 1.5rem 1.5rem;
+    padding: 1.75rem 1.75rem 1.5rem;
     border-right: 1px solid rgb(var(--gray-200));
     background: rgb(var(--bg));
     overflow-y: auto;
@@ -607,8 +611,8 @@ a.ext:hover::after {
     margin-left: var(--sidebar-w);
     padding: 0 2.5rem 5rem;
   }
-  html {
-    scroll-padding-top: 1.5rem;
+  .main .section {
+    scroll-margin-top: 1.5rem;
   }
 }
 @media (min-width: 1440px) {
@@ -627,10 +631,8 @@ a.ext:hover::after {
   margin-top: 3.5rem;
   border-top: 1px solid rgb(var(--gray-200));
 }
-@media (min-width: 1024px) {
-  .section:last-of-type {
-    min-height: calc(100vh - 5rem);
-  }
+.section {
+  scroll-margin-top: calc(var(--topbar-h) + 1rem);
 }
 .section__head {
   display: flex;
@@ -809,24 +811,38 @@ a.ext:hover::after {
 }
 .portrait__dots {
   position: absolute;
-  inset: 0;
+  inset: -12px;
   pointer-events: none;
+  will-change: transform, background-position;
+  transition: transform 500ms var(--ease-out);
 }
 .portrait__dots--fine {
-  --dot-alpha: 0.5;
+  --dot-alpha: var(--portrait-fine);
   -webkit-mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
   mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
+  transform: translate(calc(var(--px, 0) * -3px), calc(var(--py, 0) * -3px));
 }
 .portrait__dots--coarse {
-  --dot-alpha: 0.28;
+  --dot-alpha: var(--portrait-coarse);
   -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse 80% 80% at 50% 45%, transparent 25%, #000 60%, transparent 100%);
+  transform: translate(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 6px));
 }
-:root[data-theme="dark"] .portrait__dots--fine {
-  --dot-alpha: 0.32;
+/* The halftone field drifts slowly, the two layers at different rates so the
+   print texture reads as depth. Runs only while the portrait is on screen. */
+@keyframes dots-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 36px 36px;
+  }
 }
-:root[data-theme="dark"] .portrait__dots--coarse {
-  --dot-alpha: 0.18;
+.portrait.is-in-view .portrait__dots--coarse {
+  animation: dots-drift 48s linear infinite;
+}
+.portrait.is-in-view .portrait__dots--fine {
+  animation: dots-drift 30s linear infinite reverse;
 }
 .portrait img {
   position: relative;
@@ -1503,5 +1519,9 @@ html.js .fade-up {
   }
   .status__dot {
     animation: none;
+  }
+  .portrait__dots {
+    animation: none !important;
+    transform: none !important;
   }
 }
