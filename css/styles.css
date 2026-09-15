@@ -302,15 +302,11 @@ a.ext:hover::after {
   font-size: 12px;
   text-decoration: none;
   color: rgb(var(--ink));
-  transition: border-color 200ms ease, background-color 200ms ease, transform 200ms var(--ease-out);
+  transition: border-color 200ms ease, background-color 200ms ease;
 }
 .btn:hover {
   border-color: rgb(var(--ink));
   background: rgb(var(--gray-50));
-  transform: translateY(-1px);
-}
-.btn:active {
-  transform: translateY(0) scale(0.98);
 }
 .btn .icon {
   width: 0.95rem;
@@ -347,16 +343,16 @@ a.ext:hover::after {
 
 .status {
   display: inline-flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.5;
+  white-space: nowrap;
   color: rgb(var(--ink));
 }
 .status__dot {
   flex: none;
-  margin-top: 0.35rem;
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -845,16 +841,12 @@ a.ext:hover::after {
   letter-spacing: 0.2px;
   color: rgb(var(--gray-500));
   text-decoration: none;
-  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease, transform 200ms var(--ease-out);
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
 }
 .social-btn:hover {
   color: rgb(var(--ink));
   border-color: rgb(var(--ink));
   background: rgb(var(--gray-50));
-  transform: translateY(-1px);
-}
-.social-btn:active {
-  transform: translateY(0) scale(0.98);
 }
 .social-btn .icon {
   width: 0.9rem;
@@ -1200,28 +1192,27 @@ a.ext:hover::after {
 .card:focus-within {
   border-color: rgb(var(--gray-300));
 }
-/* Spotlight: a soft light that follows the pointer (position set by main.js) */
-.card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgb(var(--ink) / 0.07), transparent 60%);
-  opacity: 0;
-  transition: opacity 300ms ease;
+.card:hover {
+  border-color: rgb(var(--gray-400));
 }
-.card:hover::after {
-  opacity: 1;
+/* Card titles gain an underline on hover */
+.project__title,
+.achievement__title {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 300ms ease;
 }
-/* Hovering one card lets the others step back */
-.projects:hover .card:not(:hover),
-.achievements:hover .card:not(:hover) {
-  opacity: 0.6;
+.card:hover .project__title,
+.card:hover .achievement__title {
+  text-decoration-color: rgb(var(--ink) / 0.6);
 }
-.card {
-  transition: box-shadow 350ms var(--ease-out), transform 420ms var(--ease-out), border-color 200ms ease, opacity 300ms ease;
+.card:hover .meta {
+  color: rgb(var(--ink));
+}
+.meta {
+  transition: color 250ms ease;
 }
 
 .thumb {
@@ -1740,14 +1731,6 @@ html.js .fade-up {
     animation: none;
   }
   .tl__body::after {
-    display: none;
-  }
-  .card::after,
-  .projects:hover .card:not(:hover),
-  .achievements:hover .card:not(:hover) {
-    opacity: 1;
-  }
-  .card::after {
     display: none;
   }
 }

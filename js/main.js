@@ -1,6 +1,6 @@
 /* Kim De Guzman — portfolio
    Image config, carousels, theme toggle, overlay menu, active nav, scroll
-   reveal, card spotlight, typed name, local clock, copy button, back-to-top.
+   reveal, typed name, copy button, back-to-top.
    No dependencies. The page is usable without this file. */
 
 /* ----------------------------------------------------------------- images
@@ -431,19 +431,6 @@ var IMAGES = {
     });
   }
 
-  /* ---------------------------------------------------------- card spotlight */
-  // A soft light follows the pointer across cards (pointer devices only)
-  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    var cards = document.querySelectorAll(".card");
-    for (var ci = 0; ci < cards.length; ci++) {
-      cards[ci].addEventListener("pointermove", function (e) {
-        var r = this.getBoundingClientRect();
-        this.style.setProperty("--mx", e.clientX - r.left + "px");
-        this.style.setProperty("--my", e.clientY - r.top + "px");
-      });
-    }
-  }
-
   /* -------------------------------------------------------------- typed name */
   var typed = document.querySelector("[data-type]");
   if (typed && !reduceMotion.matches) {
@@ -455,28 +442,14 @@ var IMAGES = {
       n += 1;
       typed.textContent = full.slice(0, n);
       if (n < full.length) {
-        window.setTimeout(tick, 55 + Math.random() * 45);
+        window.setTimeout(tick, 32 + Math.random() * 28);
       } else {
         window.setTimeout(function () {
           typed.classList.remove("is-typing");
-        }, 1400);
+        }, 1100);
       }
     };
-    window.setTimeout(tick, 350);
-  }
-
-  /* ------------------------------------------------------------- local clock */
-  var clock = document.querySelector("[data-clock]");
-  if (clock) {
-    var fmt = null;
-    try {
-      fmt = new Intl.DateTimeFormat("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Manila" });
-    } catch (e) {}
-    var updateClock = function () {
-      clock.textContent = fmt ? fmt.format(new Date()) : "";
-    };
-    updateClock();
-    window.setInterval(updateClock, 15000);
+    window.setTimeout(tick, 250);
   }
 
   /* ------------------------------------------------------------- copy button */
