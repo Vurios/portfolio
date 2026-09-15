@@ -25,7 +25,8 @@ Then visit <http://localhost:8000>.
 ```
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
-js/main.js            # image config, carousels, theme, mobile menu, active nav + progress
+js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
+js/cat.js             # the black cat companion (roams the content column, eye follow, mochi drag)
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)

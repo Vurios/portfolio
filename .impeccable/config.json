@@ -43,6 +43,12 @@
         ],
         "createdAt": "2026-09-15T07:55:24.572Z",
         "reason": "User kept the availability status line; the pinned bryl-minimal-design skill specifies status dots pulse by opacity on a 1.8s loop"
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cat-wobble",
+        "createdAt": "2026-09-15T12:23:56.765Z",
+        "reason": "Agent: user asked for the cat to wobble side to side when shaken; the wobble is the subject"
       }
     ]
   }
