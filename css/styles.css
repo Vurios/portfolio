@@ -1641,31 +1641,40 @@ a.ext:hover::after {
 }
 
 /* --------------------------------------------------------------------------
-   Kuro (js/kuro.js): pixel cat canvas + speech bubble inside the content column
+   Kuro (js/kuro-render.js + js/kuro-state.js): two stacked pixel-cat
+   canvases (body, then eyes on top) plus a speech bubble, inside the
+   content column.
    -------------------------------------------------------------------------- */
 .content {
   position: relative;
 }
-.kuro {
+.kuro-body,
+.kuro-eyes {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 20;
-  pointer-events: none; /* hit-testing happens in kuro.js against drawn pixels */
+  pointer-events: none; /* hit-testing happens in kuro-state.js against drawn pixels */
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   opacity: 0;
   transition: opacity 600ms ease;
   will-change: transform;
 }
-.kuro.is-ready {
+.kuro-body {
+  z-index: 20;
+}
+.kuro-eyes {
+  z-index: 21; /* eyes redraw independently every frame, layered above the body */
+}
+.kuro-body.is-ready,
+.kuro-eyes.is-ready {
   opacity: 1;
 }
 .kuro-bubble {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 21;
+  z-index: 22;
   max-width: 15rem;
   padding: 0.35rem 0.6rem;
   background: rgb(var(--ink));
@@ -1707,7 +1716,7 @@ a.ext:hover::after {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 21;
+  z-index: 22;
   padding: 0.3rem 0.55rem;
   background: rgb(var(--bg));
   color: rgb(var(--ink));
@@ -1735,7 +1744,8 @@ a.ext:hover::after {
   }
 }
 @media print {
-  .kuro,
+  .kuro-body,
+  .kuro-eyes,
   .kuro-bubble,
   .kuro-paper {
     display: none;

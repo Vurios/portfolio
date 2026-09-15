@@ -26,17 +26,19 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/kuro.js            # Kuro, the pixel cat (roams the content column; waves, grooms, hunts the cursor, kneads on scroll, purrs when petted, peeks when idle, mochi drag)
+js/kuro-render.js     # Kuro's canvas drawing: pixel rig, colors, two-canvas mount, hit-test, favicon
+js/kuro-state.js      # Kuro's state machine and behaviour (roam, groom, hunt, knead, purr, peek, drag)
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
   images/internships/   # internship completion certificates (single image each)
   images/certificates/  # certificate scans (single image each)
-  profile/              # portrait (kim.png), favicons, Open Graph card
+  profile/              # portrait (kim.png), Open Graph card
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
-design/               # Kuro reference sheet + GIF previews (not served)
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
+
+Kuro (the pixel cat) is drawn entirely on `<canvas>` at runtime — no image or sprite-sheet assets. The favicon is also Kuro's face, rendered procedurally and installed via `<link>` tags added by `js/kuro-render.js`; there is no committed favicon file.
 
 ## Adding images
 
@@ -74,7 +76,7 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` |
 | Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` |
 
-**Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, square). The favicons and `og.png` are separate files in the same folder and need regenerating if the portrait changes.
+**Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, square). `og.png` is a separate file in the same folder and needs regenerating if the portrait changes.
 
 ## Deployment
 

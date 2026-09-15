@@ -1,333 +1,49 @@
 /* Kim De Guzman — portfolio
-   Kuro, the black pixel cat that lives inside the content column.
-
-   Original artwork: a chunky procedural pixel rig (36x30 logical px, drawn
-   on a low-resolution canvas and scaled with nearest-neighbour sampling), so
-   every pose is code rather than a sprite sheet. Pupils are a separate layer
-   drawn over the body pose. The waypoint/idle timing follows the oneko.js
-   pattern (adryd325, MIT). No dependencies. The page works without it. */
+   Kuro state machine + DOM wiring. Drawing lives in js/kuro-render.js
+   (window.KuroRender); this file owns behaviour: the state machine driving
+   requestAnimationFrame across idle / walk / peek / groom / curious /
+   stretch / startle / hunt / pounce / held / drop / knead / purr, the
+   speech bubble and scroll-note elements, and every cursor/scroll/drag
+   listener. The waypoint/idle timing follows the oneko.js pattern
+   (adryd325, MIT). No dependencies. The page works without it. */
 (function () {
   "use strict";
 
+  var Render = window.KuroRender;
+  if (!Render) return; // js/kuro-render.js failed to load; the page still works
+
   var host = document.querySelector(".content");
+  if (!host) return;
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   var small = window.innerWidth < 1024;
   var canDrag = !coarse && !small && !reduceMotion;
 
-  // Logical pixel grid and on-screen scale. Chunky: 4 screen px per pixel.
-  var W = 36;
-  var H = 30;
+  // Screen px per logical grid px. Chunky: matches the 36x30 grid in
+  // js/kuro-render.js.
   var SCALE = small ? 3 : 4;
-  var CX = 20; // horizontal centre (tail room behind)
-  var BY = 27; // baseline: where the paws touch the floor
-
-  /* ============================================================ RIG ==== */
-  function ink() {
-    return "#0a0a0a";
-  }
-  function light() {
-    return document.documentElement.getAttribute("data-theme") === "light" ? "#ffffff" : "#f4f4f5";
-  }
-
-  function ell(c, cx, cy, rx, ry) {
-    var x0 = Math.ceil(-rx), x1 = Math.floor(rx), y0 = Math.ceil(-ry), y1 = Math.floor(ry);
-    for (var y = y0; y <= y1; y++) {
-      for (var x = x0; x <= x1; x++) {
-        if ((x * x) / (rx * rx) + (y * y) / (ry * ry) <= 1) c.fillRect(Math.round(cx + x), Math.round(cy + y), 1, 1);
-      }
-    }
-  }
-  // Scanline-filled triangle: hard pixels, no anti-aliasing
-  function tri(c, ax, ay, bx, by, qx, qy) {
-    var pts = [[ax, ay], [bx, by], [qx, qy]];
-    var yMin = Math.ceil(Math.min(ay, by, qy)), yMax = Math.floor(Math.max(ay, by, qy));
-    for (var y = yMin; y <= yMax; y++) {
-      var xs = [];
-      for (var i = 0; i < 3; i++) {
-        var p0 = pts[i], p1 = pts[(i + 1) % 3];
-        if ((y >= p0[1] && y < p1[1]) || (y >= p1[1] && y < p0[1])) {
-          xs.push(p0[0] + ((y - p0[1]) * (p1[0] - p0[0])) / (p1[1] - p0[1]));
-        }
-      }
-      if (xs.length < 2) continue;
-      var x0 = Math.ceil(Math.min(xs[0], xs[1])), x1 = Math.floor(Math.max(xs[0], xs[1]));
-      if (x1 >= x0) c.fillRect(x0, y, x1 - x0 + 1, 1);
-    }
-  }
-  function cap(c, x0, y0, x1, y1, r) {
-    var dx = x1 - x0, dy = y1 - y0;
-    var steps = Math.ceil(Math.hypot(dx, dy)) + 1;
-    for (var i = 0; i <= steps; i++) {
-      var t = i / steps;
-      ell(c, x0 + dx * t, y0 + dy * t, r, r);
-    }
-  }
-  function px(c, x, y) {
-    c.fillRect(Math.round(x), Math.round(y), 1, 1);
-  }
-
-  function defaultPose() {
-    return {
-      facing: 1,
-      bob: 0,
-      headUp: 0, // + lifts the head block, - lowers it (groom, crouch)
-      ear: 0, // + perks, - flattens
-      step: 0, // walk amount
-      legPhase: 0,
-      tail: 0, // sway -1..1
-      dangle: 0, // paws hang (held)
-      paw: 0, // front paw raised (wave / groom)
-      pawSwing: 0,
-      knead: 0, // paws pressing alternately
-      kneadPhase: 0,
-      arch: 0, // stretch: back rises, head drops
-      crouch: 0, // hunt: low and forward
-      peek: 0, // only the face and front paws show
-      closed: 0, // eyes shut
-      squint: 0, // relaxed purr eyes
-      happy: 0, // ^ ^ eyes
-      wide: 0, // startled eyes
-      pupilX: 0,
-      pupilY: 0,
-      sx: 1,
-      sy: 1,
-      tilt: 0,
-      lift: 0
-    };
-  }
-
-  // Inclusive integer rectangle, relative to the paws at (0,0); y is negative upward
-  function R(c, x0, y0, x1, y1) {
-    c.fillRect(Math.round(Math.min(x0, x1)), Math.round(Math.min(y0, y1)), Math.abs(x1 - x0) + 1, Math.abs(y1 - y0) + 1);
-  }
-
-  // Body silhouette. Facing right: the head is the front (+x) of one loaf.
-  function drawSilhouette(c, p) {
-    c.fillStyle = "#000";
-    var b = Math.round(p.bob);
-    var hu = Math.round(p.headUp);
-    var arch = Math.round(p.arch * 3);
-    var cr = p.crouch;
-    var top = -13 + b + Math.round(cr * 3); // loaf top
-    var headTop = -16 + b - hu + Math.round(cr * 2);
-    var backX = -9, frontX = 11;
-    if (p.peek > 0.5) backX = 1; // only the face block
-
-    // loaf: rounded by trimming the corners
-    R(c, backX + 1, top, frontX - 1, -2);
-    R(c, backX, top + 1, frontX, -3);
-    // stretch: the back rises into an arch
-    if (arch > 0) {
-      R(c, backX + 1, top - arch, backX + 7, top);
-      R(c, backX + 2, top - arch - 1, backX + 6, top - arch);
-    }
-    // head block (front, taller)
-    R(c, 0, headTop, frontX - 1, top);
-    R(c, 1, headTop - 1, frontX - 2, headTop);
-    // ears: back ear and front ear, flatten with negative ear
-    var e = Math.round(p.ear);
-    var earY = headTop - 1 - e;
-    R(c, 1, earY - 1, 3, earY - 1);
-    R(c, 2, earY - 2, 2, earY - 2 - (e > 0 ? 1 : 0));
-    R(c, 7, earY - 1, 9, earY - 1);
-    R(c, 8, earY - 2, 8, earY - 2 - (e > 0 ? 1 : 0));
-    if (e < -1) {
-      // flattened: wider, lower stubs instead
-      R(c, 0, headTop - 1, 3, headTop - 1);
-      R(c, 7, headTop - 1, 10, headTop - 1);
-    }
-    // feet: two bumps, alternate while walking or kneading
-    var lf = 0, rf = 0, kf = 0, kb = 0;
-    if (p.step > 0.05) {
-      lf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2)) * 1.5 * p.step;
-      rf = Math.max(0, Math.sin(p.legPhase * Math.PI * 2 + Math.PI)) * 1.5 * p.step;
-    }
-    if (p.knead > 0.05) {
-      kf = Math.round(Math.max(0, Math.sin(p.kneadPhase * Math.PI * 2)) * 2 * p.knead);
-      kb = Math.round(Math.max(0, Math.sin(p.kneadPhase * Math.PI * 2 + Math.PI)) * 2 * p.knead);
-    }
-    var dangle = Math.round(p.dangle * 2);
-    if (p.peek < 0.5) R(c, -6 - kb, -2 - Math.round(lf) + dangle, -4 - kb, 0 + dangle);
-    if (p.paw < 0.05) {
-      R(c, 5 + kf, -2 - Math.round(rf) + dangle, 7 + kf, 0 + dangle);
-    } else {
-      // front paw raised beside the face
-      var ty = Math.round(-9 - p.paw * 6 + p.pawSwing);
-      R(c, 12, ty, 14, -2);
-      R(c, 13, ty - 1, 15, ty);
-    }
-    // tail: curls up behind
-    if (p.peek < 0.5) {
-      var wag = Math.round(p.tail * 1.5);
-      var t0y = -8 + b;
-      R(c, backX - 2, t0y, backX, t0y + 1);
-      R(c, backX - 4, t0y - 1 + wag, backX - 2, t0y);
-      R(c, backX - 5, t0y - 4 + wag, backX - 4, t0y - 1 + wag);
-      R(c, backX - 4, t0y - 7 + wag * 2, backX - 3, t0y - 4 + wag);
-    }
-  }
-
-  // Eye whites, inner-ear highlights (no pupils here)
-  function drawFace(c, p) {
-    var b = Math.round(p.bob);
-    var hu = Math.round(p.headUp);
-    var cr = p.crouch;
-    var headTop = -16 + b - hu + Math.round(cr * 2);
-    var L = light();
-    c.fillStyle = L;
-    // inner ear highlights (skip when flattened)
-    if (p.ear > -1) {
-      var e = Math.round(p.ear);
-      var earY = headTop - 1 - e;
-      px(c, 2, earY - 1);
-      px(c, 8, earY - 1);
-    }
-    var ey = headTop + 6; // eye row
-    var exs = [3, 8];
-    for (var i = 0; i < 2; i++) {
-      var x = exs[i];
-      if (p.closed > 0.5) {
-        R(c, x, ey + 2, x + 1, ey + 2);
-      } else if (p.squint > 0.5) {
-        R(c, x, ey + 1, x + 1, ey + 1);
-      } else if (p.happy > 0.5) {
-        px(c, x, ey + 2);
-        px(c, x + 1, ey + 1);
-        px(c, x + 2, ey + 2);
-      } else if (p.wide > 0.5) {
-        R(c, x, ey - 1, x + 1, ey + 3);
-      } else {
-        R(c, x, ey, x + 1, ey + 2);
-      }
-    }
-  }
-
-  // Pupils: their own layer over the body pose
-  function drawPupils(c, p) {
-    if (p.closed > 0.5 || p.squint > 0.5 || p.happy > 0.5) return;
-    var b = Math.round(p.bob);
-    var hu = Math.round(p.headUp);
-    var cr = p.crouch;
-    var headTop = -16 + b - hu + Math.round(cr * 2);
-    var ey = headTop + 6;
-    var ox = p.pupilX > 0.4 ? 1 : 0; // eyes are 2 px wide: the pupil sits left or right
-    var oy = Math.max(-1, Math.min(1, Math.round(p.pupilY)));
-    if (p.wide > 0.5) oy = Math.max(-1, Math.min(2, oy));
-    c.fillStyle = ink();
-    var exs = [3, 8];
-    for (var i = 0; i < 2; i++) px(c, exs[i] + ox, ey + 1 + oy);
-  }
-
-  // Face-only crop for the favicon: head block, ears, eyes
-  function drawFaceOnly(c, size) {
-    var g = document.createElement("canvas");
-    g.width = 16;
-    g.height = 16;
-    var gc = g.getContext("2d");
-    var rows = [
-      "0000000000000000",
-      "0001000000010000",
-      "0011100000111000",
-      "0012110001121100",
-      "0012221111222100",
-      "0122222222222210",
-      "1222222222222221",
-      "1222222222222221",
-      "1223322222332221",
-      "1223322222332221",
-      "1222222222222221",
-      "1222222222222221",
-      "0122222222222210",
-      "0122222222222210",
-      "0011112222111100",
-      "0000001111100000"
-    ];
-    for (var y = 0; y < 16; y++) {
-      for (var x = 0; x < 16; x++) {
-        var ch = rows[y].charAt(x);
-        if (ch === "0") continue;
-        gc.fillStyle = ch === "2" ? "#0a0a0a" : "#ffffff";
-        gc.fillRect(x, y, 1, 1);
-      }
-    }
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    c.imageSmoothingEnabled = false;
-    c.drawImage(g, 0, 0, size, size);
-  }
-
-  /* ========================================================= CANVASES == */
-  function buffer(w, h) {
-    var c = document.createElement("canvas");
-    c.width = w;
-    c.height = h;
-    return c;
-  }
-  var canvas = document.createElement("canvas");
-  canvas.className = "kuro";
-  canvas.width = W * SCALE;
-  canvas.height = H * SCALE;
-  canvas.style.width = W * SCALE + "px";
-  canvas.style.height = H * SCALE + "px";
-  canvas.setAttribute("aria-hidden", "true");
-  var ctx = canvas.getContext("2d");
-  var mask = buffer(W, H), mctx = mask.getContext("2d");
-  var outline = buffer(W, H), octx = outline.getContext("2d");
-  var face = buffer(W, H), fctx = face.getContext("2d");
-  var pupilLayer = buffer(W, H), pctx = pupilLayer.getContext("2d");
-
-  function renderPose(p, target) {
-    var c = target || ctx;
-    [mctx, octx, fctx, pctx].forEach(function (b) {
-      b.setTransform(1, 0, 0, 1, 0, 0);
-      b.clearRect(0, 0, W, H);
-    });
-    function rig(b) {
-      b.setTransform(p.facing, 0, 0, 1, CX, BY);
-    }
-    rig(mctx);
-    drawSilhouette(mctx, p);
-    for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) if (dx || dy) octx.drawImage(mask, dx, dy);
-    octx.globalCompositeOperation = "source-in";
-    octx.fillStyle = light();
-    octx.fillRect(0, 0, W, H);
-    octx.globalCompositeOperation = "source-over";
-    rig(fctx);
-    drawFace(fctx, p);
-    rig(pctx);
-    drawPupils(pctx, p);
-
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    c.clearRect(0, 0, c.canvas.width, c.canvas.height);
-    c.imageSmoothingEnabled = false;
-    c.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-    c.translate(CX, BY - p.lift);
-    c.rotate(p.tilt);
-    c.scale(p.sx, p.sy);
-    c.drawImage(outline, -CX, -BY);
-    c.drawImage(mask, -CX, -BY);
-    c.drawImage(face, -CX, -BY);
-    c.drawImage(pupilLayer, -CX, -BY);
-  }
-
-  // Exposed for the reference-sheet renderer and the favicon export
-  window.Kuro = { W: W, H: H, SCALE: SCALE, defaultPose: defaultPose, renderPose: renderPose, drawFaceOnly: drawFaceOnly };
-  if (document.documentElement.hasAttribute("data-kuro-sheet")) return; // sheet page drives the rig itself
-  if (!host) return;
+  var CX = Render.CX, BY = Render.BY;
 
   /* =========================================================== MOUNT ==== */
-  host.appendChild(canvas);
+  var layers = Render.mount(SCALE);
+  host.appendChild(layers.bodyCanvas);
+  host.appendChild(layers.eyeCanvas);
+
   var bubble = document.createElement("div");
   bubble.className = "kuro-bubble";
   bubble.setAttribute("aria-hidden", "true");
   host.appendChild(bubble);
 
-  var fx = buffer(W * SCALE, H * SCALE + 40); // hearts float above the head
-  void fx;
+  var paper = document.createElement("div");
+  paper.className = "kuro-paper";
+  paper.setAttribute("aria-hidden", "true");
+  paper.innerHTML = '<span class="kuro-paper__text"></span>';
+  host.appendChild(paper);
+  var paperText = paper.querySelector(".kuro-paper__text");
 
   /* ========================================================== STATE ==== */
-  var pose = defaultPose();
+  var pose = Render.defaultPose();
   var T = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0, squint: 0, knead: 0, arch: 0, crouch: 0, peek: 0 };
   var A = { step: 0, ear: 0, headUp: 0, paw: 0, dangle: 0, closed: 0, happy: 0, wide: 0, squint: 0, knead: 0, arch: 0, crouch: 0, peek: 0 };
   var S = {
@@ -357,10 +73,9 @@
   var pointer = { x: -1, y: -1, vx: 0, vy: 0, at: 0 };
   var lastActivity = performance.now();
   var lastScroll = 0;
-  var scrollNote = null;
   var grab = null;
   var SPEED = small ? 48 : 70;
-  var halfW = (W * SCALE) / 2;
+  var halfW = layers.bodyCanvas.width / 2;
   var bodyH = 22 * SCALE;
 
   var MESSAGES = [
@@ -373,6 +88,8 @@
     "Drag me if you're bored!",
     "Scroll on, there's more below."
   ];
+  var PAPER_NOTES = ["scroll log: kneading along...", "still here. keep going!", "projects are further down.", "you scroll, I knead."];
+  var paperIdx = 0;
 
   function hostRect() {
     return host.getBoundingClientRect();
@@ -384,8 +101,10 @@
     var bottom = Math.min(r.height, window.innerHeight - r.top) - 8;
     return { x0: halfW + 4, x1: Math.max(halfW + 4, r.width - halfW - 4), y0: top + bodyH, y1: Math.max(top + bodyH, bottom) };
   }
-  function placeCanvas() {
-    canvas.style.transform = "translate(" + (S.x - halfW).toFixed(1) + "px, " + (S.y - BY * SCALE).toFixed(1) + "px)";
+  function placeLayers() {
+    var t = "translate(" + (S.x - halfW).toFixed(1) + "px, " + (S.y - BY * SCALE).toFixed(1) + "px)";
+    layers.bodyCanvas.style.transform = t;
+    layers.eyeCanvas.style.transform = t;
   }
 
   var TEXTY = "p, h1, h2, h3, h4, li, a, button, figcaption, span, label, input, textarea, .pill, .label, .meta";
@@ -400,7 +119,7 @@
     for (var i = 0; i < pts.length; i++) {
       var els = document.elementsFromPoint(r.left + pts[i][0], r.top + pts[i][1]);
       for (var j = 0; j < els.length; j++) {
-        if (els[j] === canvas || els[j] === bubble) continue;
+        if (els[j] === layers.bodyCanvas || els[j] === layers.eyeCanvas || els[j] === bubble || els[j] === paper) continue;
         if (els[j].closest && els[j].closest(TEXTY)) return true;
         break;
       }
@@ -436,6 +155,10 @@
     return null;
   }
 
+  /* ==================================================== STATE MACHINE === */
+  // Named states drive both the eased pose channels (T/A below) and the
+  // per-frame branch in frame(). Every requestAnimationFrame tick advances
+  // exactly one active state.
   function resetTargets() {
     for (var k in T) if (Object.prototype.hasOwnProperty.call(T, k)) T[k] = 0;
   }
@@ -533,10 +256,29 @@
       below = true;
     }
     bubble.classList.toggle("is-below", below);
-    // tail points at the head
     var tailX = Math.max(10, Math.min(bw - 10, S.x - x));
     bubble.style.setProperty("--tail-x", tailX + "px");
     bubble.style.transform = "translate(" + x.toFixed(1) + "px, " + top.toFixed(1) + "px)";
+  }
+  function placePaper() {
+    var r = hostRect();
+    var pw = paper.offsetWidth;
+    var x = Math.max(0, Math.min(r.width - pw, S.x - pw / 2));
+    paper.style.transform = "translate(" + x.toFixed(1) + "px, " + (S.y + 4).toFixed(1) + "px)";
+  }
+
+  /* ---------------------------------------------------- hit test -------- */
+  // The canvases are pointer-events:none (see CSS); every listener below is
+  // on document and decides whether the pointer was "over Kuro" by alpha-
+  // testing the body canvas, so real links/buttons underneath always still
+  // receive the click.
+  function overKuro(cx, cy) {
+    return Render.hitTest(layers.bodyCanvas, cx, cy);
+  }
+
+  function catCenter() {
+    var r = hostRect();
+    return { x: r.left + S.x + 6 * SCALE * pose.facing, y: r.top + S.y - 9 * SCALE };
   }
 
   /* ---------------------------------------------------------- input ---- */
@@ -553,16 +295,13 @@
       pointer.y = e.clientY;
       pointer.at = now;
       if (grab) dragMove(e);
-      else maybeStartle(now);
+      else maybeReact(now);
+      if (reduceMotion) updateEyesOnly(now);
     },
     { passive: true }
   );
 
-  function catCenter() {
-    var r = hostRect();
-    return { x: r.left + S.x + 6 * SCALE * pose.facing, y: r.top + S.y - 9 * SCALE };
-  }
-  function maybeStartle(now) {
+  function maybeReact(now) {
     lastActivity = now;
     if (S.state === "peek") leavePeek();
     if (reduceMotion || S.state === "held" || S.state === "startle" || S.state === "hunt" || S.state === "pounce") return;
@@ -571,6 +310,7 @@
     var cc = catCenter();
     var d = Math.hypot(pointer.x - cc.x, pointer.y - cc.y);
     if (d < 100 && now - S.startleAt > 4000) {
+      // Startle: a fast cursor passing close by
       S.startleAt = now;
       S.jumpV = -7;
       pose.facing = pointer.x < cc.x ? -1 : 1;
@@ -594,24 +334,12 @@
     walkTo({ x: Math.max(b.x0, Math.min(b.x1, S.x + (S.x < hostRect().width / 2 ? 90 : -90))), y: S.y }, "idle");
   }
 
-  function hitCat(cx, cy) {
-    var rect = canvas.getBoundingClientRect();
-    if (cx < rect.left || cx > rect.right || cy < rect.top || cy > rect.bottom) return false;
-    var lx = (cx - rect.left) * (W / rect.width);
-    var ly = (cy - rect.top) * (H / rect.height);
-    try {
-      return mctx.getImageData(Math.floor(lx), Math.floor(ly), 1, 1).data[3] > 0;
-    } catch (err) {
-      return true;
-    }
-  }
-
   var swallowClick = false;
   if (canDrag) {
     document.addEventListener(
       "pointerdown",
       function (e) {
-        if (e.button !== 0 || !hitCat(e.clientX, e.clientY)) return;
+        if (e.button !== 0 || !overKuro(e.clientX, e.clientY)) return;
         e.preventDefault();
         swallowClick = true;
         var r = hostRect();
@@ -667,20 +395,6 @@
   }
 
   /* ---------------------------------------------------- scroll paper --- */
-  var paper = document.createElement("div");
-  paper.className = "kuro-paper";
-  paper.setAttribute("aria-hidden", "true");
-  paper.innerHTML = '<span class="kuro-paper__text"></span>';
-  host.appendChild(paper);
-  var paperText = paper.querySelector(".kuro-paper__text");
-  var PAPER_NOTES = ["scroll log: kneading along...", "still here. keep going!", "projects are further down.", "you scroll, I knead."];
-  var paperIdx = 0;
-  function placePaper() {
-    var r = hostRect();
-    var pw = paper.offsetWidth;
-    var x = Math.max(0, Math.min(r.width - pw, S.x - pw / 2));
-    paper.style.transform = "translate(" + x.toFixed(1) + "px, " + (S.y + 4).toFixed(1) + "px)";
-  }
   if (!reduceMotion) {
     window.addEventListener(
       "scroll",
@@ -691,7 +405,7 @@
         var vb = visibleBox();
         var onScreen = S.y >= vb.y0 - 10 && S.y <= vb.y1 + 10;
         if (!onScreen) {
-          // He scrolled out of view: come back before doing anything else
+          // Scrolled out of view: come back before doing anything else
           if (S.state === "idle" || S.state === "knead" || S.state === "curious" || S.state === "groom") {
             paper.classList.remove("is-open");
             var wp0 = pickWaypoint();
@@ -722,7 +436,11 @@
   function frame(now) {
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    for (var key in T) if (Object.prototype.hasOwnProperty.call(T, key)) A[key] = ease(A[key], T[key], key === "closed" || key === "happy" || key === "wide" || key === "squint" || key === "peek" ? 0.5 : 0.18);
+    for (var key in T) {
+      if (Object.prototype.hasOwnProperty.call(T, key)) {
+        A[key] = ease(A[key], T[key], key === "closed" || key === "happy" || key === "wide" || key === "squint" || key === "peek" ? 0.5 : 0.18);
+      }
+    }
 
     var st = S.state;
 
@@ -758,7 +476,6 @@
           else startIdle();
         }
       }
-      // periodic bubble
       if (now > S.bubbleAt && bubbleUntil < now) {
         say(MESSAGES[S.msg % MESSAGES.length]);
         S.msg += 1;
@@ -776,15 +493,15 @@
       }
       if (d <= 1) {
         if (S.after === "corner") {
-          pose.facing = S.x < hostRect().width / 2 ? 1 : -1; // look back into the page
+          pose.facing = S.x < hostRect().width / 2 ? 1 : -1;
           startIdle(6000 + Math.random() * 6000);
         } else if (S.after === "peek") {
-          pose.facing = S.x < hostRect().width / 2 ? 1 : -1; // face into the page
+          pose.facing = S.x < hostRect().width / 2 ? 1 : -1;
           setState("peek", 0);
         } else startIdle();
       }
     } else if (st === "groom") {
-      pose.pawSwing = Math.sin(now / 90) * 1.5; // lick, lick
+      pose.pawSwing = Math.sin(now / 90) * 1.5;
       if (now > S.until) startIdle(900 + Math.random() * 1500);
     } else if (st === "curious") {
       if (now > S.until) startIdle(600);
@@ -796,7 +513,7 @@
     } else if (st === "startle") {
       if (now > S.until) startIdle(1200);
     } else if (st === "hunt") {
-      pose.tail = Math.sin(now / 60) * 0.8; // twitch
+      pose.tail = Math.sin(now / 60) * 0.8;
       if (now > S.until) {
         S.jumpV = -5;
         setState("pounce", 900);
@@ -816,8 +533,8 @@
         startIdle(1400);
       }
     } else if (st === "purr") {
-      if (!(pointer.x >= 0 && hitCat(pointer.x, pointer.y))) startIdle(900);
-      if (Math.random() < 0.02) S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -14 - Math.random() * 4, v: 0.3, t: 0, d: 1100 + Math.random() * 400 });
+      if (!(pointer.x >= 0 && overKuro(pointer.x, pointer.y))) startIdle(900);
+      if (Math.random() < 0.02) S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -14 - Math.random() * 4, t: 0, d: 1100 + Math.random() * 400 });
     } else if (st === "stretch") {
       if (now > S.until) startIdle(700);
     } else if (st === "knead") {
@@ -827,7 +544,7 @@
         startIdle(900);
       }
     } else if (st === "peek") {
-      // stays tucked until the visitor moves or scrolls
+      // stays tucked until activity or scroll pulls him back out
     } else if (st === "held") {
       var vv = Math.hypot(pointer.vx, pointer.vy);
       var stretch = Math.min(0.55, vv / 60 + Math.max(0, (S.y - grab.feet) / 900));
@@ -852,7 +569,7 @@
     pose.pawSwing = st === "groom" || st === "wave" ? pose.pawSwing : 0;
 
     // petting: cursor resting on the cat
-    if (!reduceMotion && canDrag && st !== "held" && pointer.x >= 0 && hitCat(pointer.x, pointer.y) && Math.hypot(pointer.vx, pointer.vy) < 6) {
+    if (!reduceMotion && canDrag && st !== "held" && pointer.x >= 0 && overKuro(pointer.x, pointer.y) && Math.hypot(pointer.vx, pointer.vy) < 6) {
       S.hoverMs += dt * 1000;
       if (S.hoverMs > 1300 && now - S.petAt > 6000 && st !== "happy" && st !== "purr") {
         S.petAt = now;
@@ -861,7 +578,9 @@
           if (S.state === "happy") setState("purr", 0);
         }, 900);
         kick(1.08, 0.94);
-        for (var hh = 0; hh < 5; hh++) S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -16 - Math.random() * 4, v: 0.35 + Math.random() * 0.3, t: 0, d: 1100 + Math.random() * 500 });
+        for (var hh = 0; hh < 5; hh++) {
+          S.hearts.push({ x: (Math.random() - 0.5) * 20, y: -16 - Math.random() * 4, t: 0, d: 1100 + Math.random() * 500 });
+        }
         if (Math.random() < 0.5) say("purr...", 1800);
       }
     } else {
@@ -892,7 +611,7 @@
     }
     if (S.wobbleUntil > now) pose.tilt += Math.sin(now / 45) * 0.18 * ((S.wobbleUntil - now) / 1000);
 
-    // breathing, bob, tail
+    // breathing, walk bob, tail
     var breathe = Math.sin(now / 650) * 0.4;
     pose.bob = breathe + (A.step > 0.1 ? -Math.abs(Math.sin(pose.legPhase * Math.PI * 2)) * 1.4 * A.step : 0);
     pose.tail = Math.sin(now / (st === "walk" ? 160 : st === "happy" ? 120 : 420)) * (st === "happy" ? 1.4 : 1);
@@ -910,7 +629,23 @@
     pose.crouch = A.crouch;
     pose.peek = A.peek;
 
-    // pupils track the cursor; look down at the hand while held
+    updatePupils(st);
+
+    placeLayers();
+    layers.drawBody(pose, SCALE);
+    layers.drawEyes(pose, SCALE);
+    drawHearts(now, dt);
+
+    if (paper.classList.contains("is-open")) placePaper();
+    if (bubbleUntil > now && st !== "held") placeBubble();
+    else if (bubble.classList.contains("is-on")) bubble.classList.remove("is-on");
+
+    raf = window.requestAnimationFrame(frame);
+  }
+
+  // Eye follow: pupils track the cursor in every state; looks down at the
+  // hand while held, up-and-forward while curious.
+  function updatePupils(st) {
     if (st === "held") {
       pose.pupilX = 0;
       pose.pupilY = 1;
@@ -925,23 +660,22 @@
       pose.pupilX = (ddx / dd) * 1.3 * reach * pose.facing;
       pose.pupilY = (ddy / dd) * 1.3 * reach;
     }
+  }
 
-    placeCanvas();
-    renderPose(pose);
-    drawHearts(now, dt);
-
-    if (paper.classList.contains("is-open")) placePaper();
-    if (bubbleUntil > now && st !== "held") placeBubble();
-    else if (bubble.classList.contains("is-on")) bubble.classList.remove("is-on");
-
-    raf = window.requestAnimationFrame(frame);
+  // Reduced motion: no rAF loop at all. The body is drawn once at rest;
+  // only the eye canvas redraws, directly from the pointermove listener.
+  function updateEyesOnly(now) {
+    void now;
+    updatePupils(S.state);
+    layers.drawEyes(pose, SCALE);
   }
 
   function drawHearts(now, dt) {
     if (!S.hearts.length) return;
+    var ctx = layers.bodyCtx;
     ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
     ctx.translate(CX, BY);
-    ctx.fillStyle = light();
+    ctx.fillStyle = Render.COLORS.OUTLINE;
     var keep = [];
     for (var i = 0; i < S.hearts.length; i++) {
       var h = S.hearts[i];
@@ -949,18 +683,15 @@
       if (h.t > h.d) continue;
       var y = h.y - (h.t / h.d) * 14;
       var x = h.x + Math.sin(h.t / 160) * 1.5;
-      // tiny pixel heart
-      px(ctx, x - 1, y);
-      px(ctx, x + 1, y);
-      px(ctx, x - 2, y + 1);
-      px(ctx, x - 1, y + 1);
-      px(ctx, x, y + 1);
-      px(ctx, x + 1, y + 1);
-      px(ctx, x + 2, y + 1);
-      px(ctx, x - 1, y + 2);
-      px(ctx, x, y + 2);
-      px(ctx, x + 1, y + 2);
-      px(ctx, x, y + 3);
+      var cells = [
+        [-1, 0], [1, 0],
+        [-2, 1], [-1, 1], [0, 1], [1, 1], [2, 1],
+        [-1, 2], [0, 2], [1, 2],
+        [0, 3]
+      ];
+      for (var c = 0; c < cells.length; c++) {
+        ctx.fillRect(Math.round(x + cells[c][0]), Math.round(y + cells[c][1]), 1, 1);
+      }
       keep.push(h);
     }
     S.hearts = keep;
@@ -981,9 +712,11 @@
   pose.facing = -1;
   S.blinkAt = performance.now() + 1500;
   S.bubbleAt = performance.now() + 2500;
-  placeCanvas();
-  renderPose(pose);
-  canvas.classList.add("is-ready");
+  placeLayers();
+  layers.drawBody(pose, SCALE);
+  layers.drawEyes(pose, SCALE);
+  layers.bodyCanvas.classList.add("is-ready");
+  layers.eyeCanvas.classList.add("is-ready");
 
   window.addEventListener("resize", function () {
     small = window.innerWidth < 1024;
@@ -994,30 +727,20 @@
     if (document.hidden) {
       if (raf) window.cancelAnimationFrame(raf);
       raf = null;
-    } else if (!raf) {
+    } else if (!raf && !reduceMotion) {
       last = performance.now();
       raf = window.requestAnimationFrame(frame);
     }
   });
 
   if (reduceMotion) {
-    // Sits still; eyes follow the cursor; says hello once
+    // Static: draw once, say hello once, then only ever redraw the eye
+    // layer, directly from the pointermove listener above — no rAF loop.
     setState("idle", Infinity);
     say(MESSAGES[0], 4000);
-    (function still() {
-      var now = performance.now();
-      if (pointer.x >= 0) {
-        var cc = catCenter();
-        var ddx = pointer.x - cc.x, ddy = pointer.y - cc.y;
-        var d = Math.hypot(ddx, ddy) || 1;
-        pose.pupilX = (ddx / d) * 1.3 * pose.facing;
-        pose.pupilY = (ddy / d) * 1.3;
-      }
-      renderPose(pose);
-      if (bubbleUntil > now) placeBubble();
-      else bubble.classList.remove("is-on");
-      window.setTimeout(still, 200);
-    })();
+    window.setTimeout(function () {
+      bubble.classList.remove("is-on");
+    }, 4000);
     return;
   }
 
