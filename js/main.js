@@ -3,8 +3,10 @@
 
 /* ----------------------------------------------------------------- images
    Add or remove filenames here; no markup changes needed. Each key matches a
-   data-carousel="group:key" attribute in index.html. Missing files are
-   skipped automatically; when none load, the halftone placeholder shows. */
+   data-carousel="group:key" attribute in index.html. Entries are either a
+   path string or { src, caption }; a caption shows as a small chip on that
+   slide. Missing files are skipped automatically; when none load, the
+   halftone placeholder shows. */
 var IMAGES = {
   projects: {
     saro: [
@@ -30,14 +32,16 @@ var IMAGES = {
   },
   achievements: {
     "ibalong-2026": [
-      "assets/images/achievements/ibalong-2026-1.jpg",
-      "assets/images/achievements/ibalong-2026-2.jpg",
-      "assets/images/achievements/ibalong-2026-3.jpg"
+      { src: "assets/images/achievements/ibalong-2026-1.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ibalong-2026-2.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ibalong-2026-3.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ibalong-cert.jpg", caption: "3rd Place Certificate · 2026" }
     ],
     "ai4ai-2026": [
-      "assets/images/achievements/ai4ai-2026-1.jpg",
-      "assets/images/achievements/ai4ai-2026-2.jpg",
-      "assets/images/achievements/ai4ai-2026-3.jpg"
+      { src: "assets/images/achievements/ai4ai-2026-1.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ai4ai-2026-2.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ai4ai-2026-3.jpg", caption: "Event photo · 2026" },
+      { src: "assets/images/achievements/ai4ai-cert.jpg", caption: "1st Runner-Up Certificate · 2026" }
     ]
   }
 };
@@ -88,10 +92,12 @@ var IMAGES = {
     var pending = sources.length;
     if (!pending) return finish();
 
-    sources.forEach(function (src, i) {
+    sources.forEach(function (entry, i) {
+      var src = typeof entry === "string" ? entry : entry.src;
+      var caption = typeof entry === "string" ? "" : entry.caption || "";
       var img = new Image();
       img.onload = function () {
-        loaded.push({ src: src, index: i });
+        loaded.push({ src: src, caption: caption, index: i });
         done();
       };
       img.onerror = done;
@@ -125,6 +131,11 @@ var IMAGES = {
         });
         slide.appendChild(placeholder(initials));
         slide.appendChild(img);
+        if (item.caption) {
+          var cap = el("p", "carousel__caption");
+          cap.textContent = item.caption;
+          slide.appendChild(cap);
+        }
         track.appendChild(slide);
       });
       if (loaded.length > 1) enableControls(host, track, loaded.length, altBase);

@@ -981,6 +981,10 @@ a.ext:hover::after {
     padding-top: 0.2rem;
   }
 }
+.tl__tag {
+  margin-bottom: 0.5rem;
+}
+
 /* Internship entries carry a certificate slot beside the bullets */
 .tl__body--with-cert {
   display: grid;
@@ -1173,6 +1177,21 @@ a.ext:hover::after {
 .carousel__slide .thumb__ph {
   z-index: 0;
 }
+.carousel__caption {
+  position: absolute;
+  z-index: 2;
+  left: 0.6rem;
+  bottom: 0.6rem;
+  margin: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: rgb(var(--bg) / 0.9);
+  border: 1px solid rgb(var(--gray-200));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgb(var(--ink));
+}
 .carousel__btn {
   position: absolute;
   z-index: 2;
@@ -1211,11 +1230,10 @@ a.ext:hover::after {
 .carousel__dots {
   position: absolute;
   z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.6rem;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0.3rem;
 }
 .carousel__dot {

@@ -38,7 +38,7 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 
 ## Adding images
 
-**Projects and achievements** use carousels. The file lists live at the top of [js/main.js](js/main.js) in the `IMAGES` object; add or remove paths there and drop the files in place. Missing files are skipped, and when none of a card's files exist the dotted placeholder shows. Arrows and dots appear only when two or more images load.
+**Projects and achievements** use carousels. The file lists live at the top of [js/main.js](js/main.js) in the `IMAGES` object; add or remove paths there and drop the files in place. Entries are a path string or `{ src, caption }`; a caption shows as a small chip on that slide (use the form "Document name · Year"). Missing files are skipped, and when none of a card's files exist the dotted placeholder shows. Arrows and dots appear only when two or more images load.
 
 | Card | Config key | Default paths |
 |---|---|---|
@@ -46,8 +46,8 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | ARGUSPH | `projects.argusph` | `assets/images/projects/argusph-1.jpg` … `argusph-3.jpg` |
 | SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack-1.jpg` … `safetrack-3.jpg` |
 | Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant-1.jpg` … `-3.jpg` |
-| Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
-| AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
+| Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg`, plus `ibalong-cert.jpg` |
+| AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg`, plus `ai4ai-cert.jpg` |
 
 **Internship certificates** are single images referenced directly in `index.html`:
 
