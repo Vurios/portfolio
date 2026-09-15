@@ -9,8 +9,7 @@
       content="Adrian Kim P. De Guzman — full-stack developer, mobile developer, and QA tester from Ligao City, Albay, Philippines. BSIT student building web, mobile, and civic tech systems."
     />
     <meta name="author" content="Adrian Kim P. De Guzman" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0c0c0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#0c0c0f" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Kim De Guzman" />
@@ -44,10 +43,8 @@
         try {
           saved = localStorage.getItem("theme");
         } catch (e) {}
-        var dark =
-          saved === "dark" ||
-          (saved !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-        root.setAttribute("data-theme", dark ? "dark" : "light");
+        // Dark by default; light only when the visitor chose it
+        root.setAttribute("data-theme", saved === "light" ? "light" : "dark");
       })();
     </script>
 

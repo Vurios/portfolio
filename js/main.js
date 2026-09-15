@@ -237,8 +237,7 @@ var IMAGES = {
   }
 
   /* ------------------------------------------------------------------ theme */
-  // Two modes only. First visit follows the OS preference; after that the
-  // choice is stored under "theme".
+  // Two modes only, dark by default; the choice is stored under "theme".
   var toggles = document.querySelectorAll("[data-theme-toggle]");
 
   function currentTheme() {
