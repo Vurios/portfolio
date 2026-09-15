@@ -30,7 +30,8 @@ assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
   images/certificates/  # certificate scans (single image each)
-  profile/              # portrait, brand mark, favicons, Open Graph card
+  profile/              # portrait (kim.png), favicons, Open Graph card
+  fonts/                # Geist Pixel (self-hosted, SIL OFL)
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
@@ -56,7 +57,7 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` |
 | Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` |
 
-**Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, roughly square). The brand mark, favicons, and `og.png` are separate files in the same folder and need regenerating if the portrait changes.
+**Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, square). The favicons and `og.png` are separate files in the same folder and need regenerating if the portrait changes.
 
 ## Deployment
 

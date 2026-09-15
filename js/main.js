@@ -1,6 +1,5 @@
 /* Kim De Guzman — portfolio
-   Image config, carousels, theme toggle, overlay menu, active nav + progress,
-   footer year. No dependencies. The page is usable without this file. */
+   Image config, carousels, theme toggle, overlay menu, active nav, footer year. No dependencies. The page is usable without this file. */
 
 /* ----------------------------------------------------------------- images
    Add or remove filenames here; no markup changes needed. Each key matches a
@@ -370,34 +369,6 @@ var IMAGES = {
       { rootMargin: "-30% 0px -60% 0px", threshold: [0, 0.01] }
     );
     for (var q = 0; q < sections.length; q++) spy.observe(sections[q]);
-  }
-
-  // Progress bar beside the rail nav: how far through the sections you are
-  var bar = document.querySelector("[data-progress]");
-  if (bar && sections.length) {
-    var ticking = false;
-    function updateProgress() {
-      ticking = false;
-      var first = sections[0];
-      var last = sections[sections.length - 1];
-      var start = first.getBoundingClientRect().top + window.scrollY;
-      var end = last.getBoundingClientRect().top + window.scrollY + last.offsetHeight - window.innerHeight;
-      var p = (window.scrollY - start + window.innerHeight * 0.3) / Math.max(1, end - start + window.innerHeight * 0.3);
-      p = Math.max(0, Math.min(1, p));
-      bar.style.transform = "scaleY(" + p.toFixed(4) + ")";
-    }
-    window.addEventListener(
-      "scroll",
-      function () {
-        if (!ticking) {
-          ticking = true;
-          window.requestAnimationFrame(updateProgress);
-        }
-      },
-      { passive: true }
-    );
-    window.addEventListener("resize", updateProgress);
-    updateProgress();
   }
 
   /* -------------------------------------------------------------- footer year */

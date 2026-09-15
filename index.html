@@ -56,8 +56,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
     />
+    <link rel="preload" href="assets/fonts/GeistPixel-Square.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
 
@@ -125,10 +126,7 @@
     <div class="site">
       <!-- Top bar: < 1024px -->
       <header class="topbar">
-        <a class="brand" href="#top">
-          <img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" />
-          <span>Kim De Guzman</span>
-        </a>
+        <a class="brand" href="#top">kim de guzman</a>
         <div class="topbar__actions">
           <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
             <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
@@ -151,29 +149,29 @@
       <!-- Full-screen overlay menu: < 1024px -->
       <div class="menu" id="menu" data-open="false" role="dialog" aria-modal="true" aria-label="Site menu">
         <div class="menu__head">
-          <span class="brand"><img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" /><span>Menu</span></span>
+          <span class="brand">menu</span>
           <button class="icon-btn" type="button" data-menu-close aria-label="Close menu">
             <svg class="icon" aria-hidden="true"><use href="#i-close" /></svg>
           </button>
         </div>
         <nav class="menu__nav" aria-label="Sections">
           <ul class="menu__list" data-nav>
-            <li><a class="nav-link" href="#about">About</a></li>
-            <li><a class="nav-link" href="#education">Education</a></li>
-            <li><a class="nav-link" href="#skills">Skills</a></li>
-            <li><a class="nav-link" href="#experience">Experience</a></li>
-            <li><a class="nav-link" href="#projects">Projects</a></li>
-            <li><a class="nav-link" href="#achievements">Achievements</a></li>
-            <li><a class="nav-link" href="#certificates">Certificates</a></li>
-            <li><a class="nav-link" href="#contact">Contact</a></li>
+            <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
+            <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
+            <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
+            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
+            <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
+            <li><a class="nav-link" href="#achievements"><span class="nav-link__num">06</span>achievements</a></li>
+            <li><a class="nav-link" href="#certificates"><span class="nav-link__num">07</span>certificates</a></li>
+            <li><a class="nav-link" href="#contact"><span class="nav-link__num">08</span>contact</a></li>
           </ul>
         </nav>
         <div class="menu__foot">
-          <p class="status"><span class="status__dot" aria-hidden="true"></span>Available for opportunities</p>
+          <p class="status"><span class="status__dot" aria-hidden="true"></span>available for opportunities</p>
           <!-- TODO: add resume.pdf at the repo root -->
           <a class="btn" href="resume.pdf" download>
             <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
-            Download resume
+            download resume
           </a>
           <div class="social">
             <a class="icon-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
@@ -189,74 +187,65 @@
         </div>
       </div>
 
-      <div class="frame" id="top">
-        <!-- Sidebar rail: ≥ 1024px -->
-        <aside class="sidebar">
-          <div class="sidebar__inner">
-            <a class="brand brand--lg" href="#top">
-              <img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" />
-              <span class="brand__text">
-                <span class="brand__name">Kim De Guzman</span>
-                <span class="brand__role">Full-stack developer</span>
-              </span>
+      <!-- Sidebar: ≥ 1024px -->
+      <aside class="sidebar">
+        <div class="sidebar__group">
+          <a class="brand" href="#top">kim de guzman</a>
+          <p class="label sidebar__role">bsit · full-stack dev</p>
+        </div>
+        <div class="sidebar__group sidebar__meta">
+          <p class="status"><span class="status__dot" aria-hidden="true"></span>available for opportunities</p>
+          <p class="meta-line">
+            <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+            ligao city, albay, ph
+          </p>
+        </div>
+        <nav class="sidebar__group" aria-label="Sections">
+          <ul data-nav>
+            <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
+            <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
+            <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
+            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
+            <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
+            <li><a class="nav-link" href="#achievements"><span class="nav-link__num">06</span>achievements</a></li>
+            <li><a class="nav-link" href="#certificates"><span class="nav-link__num">07</span>certificates</a></li>
+            <li><a class="nav-link" href="#contact"><span class="nav-link__num">08</span>contact</a></li>
+          </ul>
+        </nav>
+        <div class="sidebar__group">
+          <!-- TODO: add resume.pdf at the repo root -->
+          <a class="btn" href="resume.pdf" download>
+            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
+            download resume
+          </a>
+        </div>
+        <div class="sidebar__foot">
+          <div class="social">
+            <a class="icon-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
+              <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
             </a>
-
-            <div class="sidebar__meta">
-              <p class="status"><span class="status__dot" aria-hidden="true"></span>Available for opportunities</p>
-              <p class="meta-line">
-                <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
-                Ligao City, Albay, PH
-              </p>
-            </div>
-
-            <nav class="sidebar__nav" aria-label="Sections">
-              <div class="progress" aria-hidden="true"><span class="progress__bar" data-progress></span></div>
-              <ul data-nav>
-                <li><a class="nav-link" href="#about">About</a></li>
-                <li><a class="nav-link" href="#education">Education</a></li>
-                <li><a class="nav-link" href="#skills">Skills</a></li>
-                <li><a class="nav-link" href="#experience">Experience</a></li>
-                <li><a class="nav-link" href="#projects">Projects</a></li>
-                <li><a class="nav-link" href="#achievements">Achievements</a></li>
-                <li><a class="nav-link" href="#certificates">Certificates</a></li>
-                <li><a class="nav-link" href="#contact">Contact</a></li>
-              </ul>
-            </nav>
-
-            <!-- TODO: add resume.pdf at the repo root -->
-            <a class="btn" href="resume.pdf" download>
-              <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
-              Download resume
+            <a class="icon-btn" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
+              <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
             </a>
-
-            <div class="sidebar__foot">
-              <div class="social">
-                <a class="icon-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
-                </a>
-                <a class="icon-btn" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
-                </a>
-                <a class="icon-btn" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)">
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
-                </a>
-              </div>
-              <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
-                <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
-                <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
-                <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
-              </button>
-            </div>
+            <a class="icon-btn" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)">
+              <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
+            </a>
           </div>
-        </aside>
+          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
+            <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
+            <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
+            <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
+          </button>
+        </div>
+      </aside>
 
         <main class="main" id="main">
+          <div class="content" id="top">
           <!-- ============================================================ Hero -->
           <header class="hero">
-            <div class="hero__grid" aria-hidden="true"></div>
             <div class="hero__text">
-              <p class="hero__eyebrow fade-up" style="--d: 0">Ligao City, Albay, Philippines</p>
-              <h1 class="hero__name fade-up" style="--d: 1">Kim De Guzman</h1>
+              <p class="hero__eyebrow fade-up" style="--d: 0">ligao city, albay · philippines</p>
+              <h1 class="hero__name fade-up" style="--d: 1">kim de guzman</h1>
               <p class="hero__role fade-up" style="--d: 2">
                 <span>Full-Stack Developer</span><span class="hero__sep" aria-hidden="true">|</span><span>Mobile Developer</span><span class="hero__sep" aria-hidden="true">|</span><span>QA Tester</span>
               </p>
@@ -300,7 +289,8 @@
             </div>
             <figure class="hero__portrait fade-up" style="--d: 1">
               <div class="portrait">
-                <img src="assets/profile/kim.png" alt="Portrait of Kim De Guzman" width="520" height="496" decoding="async" fetchpriority="high" />
+                <span class="portrait__dots halftone" aria-hidden="true"></span>
+                <img src="assets/profile/kim.png" alt="Portrait of Kim De Guzman" width="500" height="500" decoding="async" fetchpriority="high" />
               </div>
             </figure>
           </header>
@@ -308,7 +298,7 @@
           <!-- ============================================================ About -->
           <section class="section" id="about" aria-labelledby="about-title">
             <div class="section__head">
-              <h2 class="section__title" id="about-title">About</h2>
+              <h2 class="section__title" id="about-title"><span class="num">01</span> — about</h2>
             </div>
             <div class="about">
               <div class="prose">
@@ -345,8 +335,8 @@
           <!-- ============================================================ Education -->
           <section class="section" id="education" aria-labelledby="education-title">
             <div class="section__head">
-              <h2 class="section__title" id="education-title">Education</h2>
-              <p class="section__aside">2021 — 2027</p>
+              <h2 class="section__title" id="education-title"><span class="num">02</span> — education</h2>
+              <p class="label section__aside">2021 — 2027</p>
             </div>
             <ol class="timeline">
               <li class="tl">
@@ -371,7 +361,7 @@
           <!-- ============================================================ Skills -->
           <section class="section" id="skills" aria-labelledby="skills-title">
             <div class="section__head">
-              <h2 class="section__title" id="skills-title">Skills</h2>
+              <h2 class="section__title" id="skills-title"><span class="num">03</span> — skills</h2>
             </div>
             <div class="skills">
               <div class="skill-group">
@@ -439,8 +429,8 @@
           <!-- ============================================================ Experience -->
           <section class="section" id="experience" aria-labelledby="experience-title">
             <div class="section__head">
-              <h2 class="section__title" id="experience-title">Experience</h2>
-              <p class="section__aside">oldest to newest</p>
+              <h2 class="section__title" id="experience-title"><span class="num">04</span> — experience</h2>
+              <p class="label section__aside">oldest → newest</p>
             </div>
             <ol class="timeline">
               <li class="tl">
@@ -496,7 +486,7 @@
                 </div>
                 <div class="tl__body">
                   <h3 class="tl__title">AI4AI Fair: Vibe Coding Competition</h3>
-                  <p class="tl__sub"><span class="pill pill--accent">1st Runner-Up</span></p>
+                  <p class="tl__sub"><span class="pill pill--inverted">1st Runner-Up</span></p>
                   <ul class="bullets">
                     <li>Placed 1st Runner-Up in a single-day AI-assisted vibe coding competition, building an AI-powered solution to a real community problem in Albay.</li>
                     <li>Collaborated with a 4-member team to ideate, design, and develop the solution within an 8-hour window.</li>
@@ -511,7 +501,7 @@
                 </div>
                 <div class="tl__body">
                   <h3 class="tl__title">Ibalong Festival Hackathon: Heroes of Innovation Challenge</h3>
-                  <p class="tl__sub"><span class="pill pill--accent">3rd Place of 35 teams</span></p>
+                  <p class="tl__sub"><span class="pill pill--inverted">3rd Place of 35 teams</span></p>
                   <ul class="bullets">
                     <li>Collaborated with a 5-member team across a two-day onsite hackathon (The Forge and Hero's Pitch) to design, build, and pitch SARO, a civic reporting and emergency dispatch platform for Legazpi City.</li>
                     <li>Conducted problem discovery and solution design under the Bantong (Strategist) Hero Pathway, addressing real gaps in the city's emergency and hazard reporting process.</li>
@@ -525,8 +515,8 @@
           <!-- ============================================================ Projects -->
           <section class="section" id="projects" aria-labelledby="projects-title">
             <div class="section__head">
-              <h2 class="section__title" id="projects-title">Projects</h2>
-              <p class="section__aside">4 projects</p>
+              <h2 class="section__title" id="projects-title"><span class="num">05</span> — projects</h2>
+              <p class="label section__aside">4 projects</p>
             </div>
             <ul class="projects">
               <!-- Image lists live in js/main.js (IMAGES.projects); the carousel builds itself from data-carousel -->
@@ -547,7 +537,7 @@
                     <li class="pill">Leaflet</li>
                     <li class="pill">AI Chatbot</li>
                   </ul>
-                  <p class="project__badge"><span class="pill pill--accent">3rd Place · Ibalong Festival Hackathon 2026</span></p>
+                  <p class="project__badge"><span class="pill pill--inverted">3rd Place · Ibalong Festival Hackathon 2026</span></p>
                 </div>
               </li>
 
@@ -589,7 +579,7 @@
                     <li class="pill">Leaflet</li>
                     <li class="pill">AI Chatbot</li>
                   </ul>
-                  <p class="project__badge"><span class="pill pill--accent">1st Runner-Up · AI4AI Fair Vibe Coding Competition 2026</span></p>
+                  <p class="project__badge"><span class="pill pill--inverted">1st Runner-Up · AI4AI Fair Vibe Coding Competition 2026</span></p>
                 </div>
               </li>
 
@@ -616,8 +606,8 @@
           <!-- ============================================================ Achievements -->
           <section class="section" id="achievements" aria-labelledby="achievements-title">
             <div class="section__head">
-              <h2 class="section__title" id="achievements-title">Achievements</h2>
-              <p class="section__aside">hackathons &amp; competitions</p>
+              <h2 class="section__title" id="achievements-title"><span class="num">06</span> — achievements</h2>
+              <p class="label section__aside">hackathons &amp; competitions</p>
             </div>
             <ul class="achievements">
               <li class="card achievement">
@@ -644,7 +634,7 @@
           <!-- ============================================================ Certificates -->
           <section class="section" id="certificates" aria-labelledby="certificates-title">
             <div class="section__head">
-              <h2 class="section__title" id="certificates-title">Certificates</h2>
+              <h2 class="section__title" id="certificates-title"><span class="num">07</span> — certificates</h2>
             </div>
             <ul class="certs">
               <li class="cert">
@@ -697,7 +687,7 @@
           <!-- ============================================================ Contact -->
           <section class="section" id="contact" aria-labelledby="contact-title">
             <div class="section__head">
-              <h2 class="section__title" id="contact-title">Contact</h2>
+              <h2 class="section__title" id="contact-title"><span class="num">08</span> — contact</h2>
             </div>
             <div class="contact">
               <div>
@@ -740,8 +730,8 @@
               <p class="label">© <span data-year>2026</span> · Ligao City, Albay</p>
             </footer>
           </section>
+          </div>
         </main>
-      </div>
     </div>
 
     <script src="js/main.js" defer></script>
