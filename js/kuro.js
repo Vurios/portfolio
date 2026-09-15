@@ -813,16 +813,31 @@
   }
 
   /* ---------------------------------------------------- favicon ---- */
-  // The idle frame's face, cropped from the sprite sheet onto a light tile
+  // The idle frame, cut from the sprite sheet, drawn in negative (white cat,
+  // dark details) on a black rounded tile so it reads in a dark tab strip
+  // and still stands out as a tile in a light one
   function installFavicon(sheetCanvas) {
     var cx = sheetCanvas.getContext("2d");
     var x0 = 3 * 32, y0 = 3 * 32; // idle cell
-    var data;
+    var cellData;
     try {
-      data = cx.getImageData(x0, y0, 32, 32).data;
+      cellData = cx.getImageData(x0, y0, 32, 32);
     } catch (e) {
       return;
     }
+    var data = cellData.data;
+    // negative: every opaque pixel flips, so the black body turns white
+    for (var i = 0; i < data.length; i += 4) {
+      if (data[i + 3] > 0) {
+        data[i] = 255 - data[i];
+        data[i + 1] = 255 - data[i + 1];
+        data[i + 2] = 255 - data[i + 2];
+      }
+    }
+    var cat = document.createElement("canvas");
+    cat.width = 32;
+    cat.height = 32;
+    cat.getContext("2d").putImageData(cellData, 0, 0);
     var minX = 32, minY = 32, maxX = -1, maxY = -1;
     for (var y = 0; y < 32; y++) {
       for (var x = 0; x < 32; x++) {
@@ -842,14 +857,22 @@
       c.width = px;
       c.height = px;
       var g = c.getContext("2d");
-      g.fillStyle = "#e9e9e9"; // light tile so the black cat reads in any tab strip
-      g.fillRect(0, 0, px, px);
-      var box = px * 0.86;
+      var rad = Math.round(px * 0.2);
+      g.fillStyle = "#0c0c0f"; // the site's dark background
+      g.beginPath();
+      g.moveTo(rad, 0);
+      g.arcTo(px, 0, px, px, rad);
+      g.arcTo(px, px, 0, px, rad);
+      g.arcTo(0, px, 0, 0, rad);
+      g.arcTo(0, 0, px, 0, rad);
+      g.closePath();
+      g.fill();
+      var box = px * 0.8;
       var k = Math.min(box / w, box / h);
       if (k >= 1) k = Math.floor(k); // whole pixels when scaling up: stays crisp
       g.imageSmoothingEnabled = k < 1; // tiny sizes: smooth rather than drop pixels
       var dw = Math.round(w * k), dh = Math.round(h * k);
-      g.drawImage(sheetCanvas, x0 + minX, y0 + minY, w, h, Math.round((px - dw) / 2), Math.round((px - dh) / 2), dw, dh);
+      g.drawImage(cat, minX, minY, w, h, Math.round((px - dw) / 2), Math.round((px - dh) / 2), dw, dh);
       var isTouch = px === 180;
       var id = "kuro-favicon-" + px;
       var link = document.getElementById(id);
