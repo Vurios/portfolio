@@ -50,8 +50,8 @@
   var CELL = 32 * SCALE;
   var HALF = CELL / 2;
   var canFollow = !mobile && !reduceMotion; // following needs a hovering cursor
-  var WANDER_SPEED = mobile ? 70 : 100; // px per second
-  var FOLLOW_SPEED = 170;
+  var WANDER_SPEED = mobile ? 90 : 135; // px per second
+  var FOLLOW_SPEED = 200;
   var HOLD_MS = 450; // press and hold this long: pick him up (mouse) or pet him (touch)
 
   // A click (tap) moves him on to the next mode
@@ -336,7 +336,7 @@
       idle();
       if (mode === "wander" && idleAnimation == null && petTicks === 0) {
         if (now > wanderAt) {
-          wanderAt = now + 4000; // try again later if nowhere is free
+          wanderAt = now + 1500; // try again soon if nowhere is free
           if (inView()) wanderTarget = pickWander();
         } else if (ticks % 5 === 0) {
           keepOutOfTheWay();
@@ -590,7 +590,9 @@
   function setMode(next) {
     mode = next;
     wanderTarget = null;
-    wanderAt = performance.now() + 6000;
+    // "Off exploring!": he sets off right after saying so
+    wanderAt = performance.now() + (next === "wander" ? 1500 : 6000);
+    idleTime = 0;
     moving = false;
     save();
   }
@@ -872,7 +874,8 @@
     if (typeof saved.vx === "number" && typeof saved.vy === "number") {
       pos = clampTo({ x: saved.vx * pageW, y: window.scrollY + saved.vy * window.innerHeight }, v);
     } else {
-      pos = clampTo({ x: pageW - (mobile ? 44 : 150), y: window.scrollY + window.innerHeight - (mobile ? 96 : 70) }, v);
+      // first visit: clearly on screen, bottom right, clear of the edges
+      pos = clampTo({ x: pageW - (mobile ? 64 : 180), y: window.scrollY + window.innerHeight - (mobile ? 150 : 130) }, v);
     }
   }
   measure();
@@ -913,7 +916,7 @@
   // He sits and says hello, then explains how to play with him, then
   // goes about his day
   var INTRO = canFollow
-    ? ["Hi, I'm Kuro!", "Click me and I'll follow you. Drag me anywhere!", "Rest your cursor on me and I'll purr."]
+    ? ["Hi, I'm Kuro!", "Click me to follow you. Drag me anywhere!", "Rest your cursor on me and I'll purr."]
     : ["Hi, I'm Kuro!", "Tap me to make me stay. Drag me anywhere!", "Hold me and I'll purr."];
   msgIndex = 1;
   INTRO.forEach(function (line, i) {

@@ -429,6 +429,39 @@ var IMAGES = {
     });
   }
 
+  /* ----------------------------------------------------------- resume viewer */
+  // "view resume" opens the PDF in a dialog on screens with a pointer; on
+  // phones (no room, and mobile browsers seldom render PDFs in frames) the
+  // link opens the file itself in a new tab, as it does without JS.
+  var resume = document.getElementById("resume");
+  var resumeFrame = resume && resume.querySelector(".resume__frame");
+  var resumeInline = window.matchMedia("(min-width: 768px) and (hover: hover)");
+  if (resume && typeof resume.showModal === "function") {
+    var openResume = function (e) {
+      if (!resumeInline.matches) return;
+      e.preventDefault();
+      if (!resumeFrame.src) resumeFrame.src = resumeFrame.getAttribute("data-src");
+      resume.showModal();
+      document.body.style.overflow = "hidden";
+    };
+    var closeResume = function () {
+      document.body.style.overflow = "";
+    };
+    var openers = document.querySelectorAll("[data-resume-open]");
+    for (var ro = 0; ro < openers.length; ro++) openers[ro].addEventListener("click", openResume);
+    var closers = resume.querySelectorAll("[data-resume-close]");
+    for (var rc = 0; rc < closers.length; rc++) {
+      closers[rc].addEventListener("click", function () {
+        resume.close();
+      });
+    }
+    resume.addEventListener("close", closeResume);
+    // a click on the backdrop closes it too
+    resume.addEventListener("click", function (e) {
+      if (e.target === resume) resume.close();
+    });
+  }
+
   /* ------------------------------------------------------- portrait develops */
   // The halftone field behind the photo resolves in once, the first time the
   // hero is on screen (styles.css, "Developing"). A timer guarantees the

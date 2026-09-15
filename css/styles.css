@@ -23,12 +23,12 @@
 :root {
   color-scheme: dark;
 
-  --bg: 255 255 255;
+  --bg: 240 240 237; /* soft off-white: easier on the eyes than pure white */
   --ink: 10 10 10;
-  --gray-50: 250 250 250;
-  --gray-100: 245 245 245;
-  --gray-200: 233 233 233;
-  --gray-300: 212 212 212;
+  --gray-50: 234 234 231;
+  --gray-100: 228 228 224;
+  --gray-200: 215 215 211;
+  --gray-300: 196 196 192;
   --gray-400: 128 128 128; /* decorative only, 3.9:1 */
   --gray-500: 94 94 94; /* labels, captions, dates: 6.4:1 on white */
   --gray-600: 68 68 68; /* muted body: 9.2:1 */
@@ -1757,18 +1757,18 @@ a.ext:hover::after {
   left: 0;
   z-index: 39;
   width: max-content;
-  max-width: min(14rem, calc(100vw - 12px)); /* long lines wrap, never clip */
-  padding: 0.35rem 0.6rem;
+  max-width: min(15rem, calc(100vw - 12px)); /* long lines wrap, never clip */
+  padding: 0.4rem 0.65rem;
   background: rgb(var(--ink));
   color: rgb(var(--bg));
   border: 2px solid rgb(var(--bg));
   box-shadow: 0 0 0 2px rgb(var(--ink));
   font-family: var(--font-mono);
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.45;
   white-space: normal;
   overflow-wrap: break-word;
-  text-wrap: balance;
+  text-align: left;
   pointer-events: none;
   opacity: 0;
   transition: opacity 180ms ease;
@@ -1824,6 +1824,75 @@ a.ext:hover::after {
   .kuro-bubble,
   .kuro-heart {
     display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Resume viewer: a <dialog> with the PDF in a frame, in the site's own
+   chrome (mono label bar, hairline borders, halftone-free). main.js opens it
+   on screens with a pointer; phones open the PDF itself.
+   -------------------------------------------------------------------------- */
+.resume {
+  width: min(56rem, calc(100vw - 2rem));
+  height: min(calc(100vh - 3rem), 62rem);
+  padding: 0;
+  border: 1px solid rgb(var(--gray-300));
+  border-radius: 12px;
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  box-shadow: var(--shadow-hover);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+}
+.resume[open] {
+  display: flex;
+  animation: resume-in 260ms var(--ease-out);
+}
+.resume::backdrop {
+  background: rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.resume__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem 0.6rem 1rem;
+  border-bottom: 1px solid rgb(var(--gray-200));
+}
+.resume__title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgb(var(--ink));
+}
+.resume__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn--sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 11px;
+}
+.resume__page {
+  flex: 1;
+  min-height: 0;
+  background: rgb(var(--gray-100));
+}
+.resume__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgb(var(--gray-100));
+}
+@keyframes resume-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
   }
 }
 
