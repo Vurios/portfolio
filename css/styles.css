@@ -1647,6 +1647,10 @@ a.ext:hover::after {
    -------------------------------------------------------------------------- */
 .content {
   position: relative;
+  /* Kuro's canvases carry transparent padding for stretch/hop room; clip
+     it at the column edge so it never causes sideways scrolling (this also
+     tucks him half out of sight in peek mode) */
+  overflow-x: clip;
 }
 .kuro-body,
 .kuro-eyes {

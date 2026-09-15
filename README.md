@@ -26,8 +26,8 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/kuro-render.js     # Kuro's canvas drawing: pixel rig, colors, two-canvas mount, hit-test, favicon
-js/kuro-state.js      # Kuro's state machine and behaviour (roam, groom, hunt, knead, purr, peek, drag)
+js/kuro-render.js     # Kuro's pixel maps (32x32 frames), colors, two-canvas mount, hit-test, favicon
+js/kuro-state.js      # Kuro's state machine and behaviour (roam, wash, scratch, nap, hunt, knead, purr, peek, drag)
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
@@ -38,7 +38,7 @@ assets/
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
-Kuro (the pixel cat) is drawn entirely on `<canvas>` at runtime — no image or sprite-sheet assets. The favicon is also Kuro's face, rendered procedurally and installed via `<link>` tags added by `js/kuro-render.js`; there is no committed favicon file.
+Kuro (the pixel cat) is an original black cat in the spirit of the classic Neko desktop pet, drawn entirely on `<canvas>` at runtime from hand-authored 32x32 pixel maps in `js/kuro-render.js` — no image or sprite-sheet assets. The favicon is also Kuro's face, rendered procedurally and installed via `<link>` tags added by `js/kuro-render.js`; there is no committed favicon file.
 
 ## Adding images
 
