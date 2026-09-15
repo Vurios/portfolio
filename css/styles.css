@@ -302,11 +302,15 @@ a.ext:hover::after {
   font-size: 12px;
   text-decoration: none;
   color: rgb(var(--ink));
-  transition: border-color 200ms ease, background-color 200ms ease;
+  transition: border-color 200ms ease, background-color 200ms ease, transform 200ms var(--ease-out);
 }
 .btn:hover {
   border-color: rgb(var(--ink));
   background: rgb(var(--gray-50));
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
 }
 .btn .icon {
   width: 0.95rem;
@@ -393,8 +397,9 @@ a.ext:hover::after {
   transition: color 200ms ease, border-color 200ms ease;
 }
 .pill:hover {
-  color: rgb(var(--ink));
-  border-color: rgb(var(--gray-400));
+  color: rgb(var(--bg));
+  background: rgb(var(--ink));
+  border-color: rgb(var(--ink));
 }
 .pill--text {
   text-transform: none;
@@ -750,6 +755,21 @@ a.ext:hover::after {
   letter-spacing: 0;
   text-wrap: balance;
 }
+.hero__name.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 0.9em;
+  margin-left: 0.12em;
+  vertical-align: -0.08em;
+  background: rgb(var(--ink));
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
 .hero__role {
   margin-top: 1rem;
   display: flex;
@@ -825,12 +845,16 @@ a.ext:hover::after {
   letter-spacing: 0.2px;
   color: rgb(var(--gray-500));
   text-decoration: none;
-  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease, transform 200ms var(--ease-out);
 }
 .social-btn:hover {
   color: rgb(var(--ink));
   border-color: rgb(var(--ink));
   background: rgb(var(--gray-50));
+  transform: translateY(-1px);
+}
+.social-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 .social-btn .icon {
   width: 0.9rem;
@@ -975,6 +999,25 @@ a.ext:hover::after {
 }
 .tl--event .tl__body::before {
   background: rgb(var(--ink));
+}
+.tl__body::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgb(var(--ink) / 0.55);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 900ms var(--ease-out) 150ms;
+}
+.tl.is-visible .tl__body::after {
+  transform: scaleY(1);
+}
+.tl.is-visible .tl__body::before {
+  background: rgb(var(--ink));
+  transition: background-color 300ms ease 400ms;
 }
 .tl__title {
   font-size: 15px;
@@ -1156,6 +1199,29 @@ a.ext:hover::after {
 }
 .card:focus-within {
   border-color: rgb(var(--gray-300));
+}
+/* Spotlight: a soft light that follows the pointer (position set by main.js) */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgb(var(--ink) / 0.07), transparent 60%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.card:hover::after {
+  opacity: 1;
+}
+/* Hovering one card lets the others step back */
+.projects:hover .card:not(:hover),
+.achievements:hover .card:not(:hover) {
+  opacity: 0.6;
+}
+.card {
+  transition: box-shadow 350ms var(--ease-out), transform 420ms var(--ease-out), border-color 200ms ease, opacity 300ms ease;
 }
 
 .thumb {
@@ -1497,6 +1563,44 @@ a.ext:hover::after {
 .contact__row .label {
   padding-top: 0.2rem;
 }
+.contact__value {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+}
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid rgb(var(--gray-300));
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgb(var(--gray-500));
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+.copy-btn:hover {
+  color: rgb(var(--ink));
+  border-color: rgb(var(--ink));
+}
+.copy-btn .icon {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+.copy-btn .icon--check,
+.copy-btn.is-copied .icon--copy {
+  display: none;
+}
+.copy-btn.is-copied {
+  color: rgb(var(--bg));
+  background: rgb(var(--ink));
+  border-color: rgb(var(--ink));
+}
+.copy-btn.is-copied .icon--check {
+  display: block;
+}
 @media (min-width: 640px) {
   .contact__row {
     grid-template-columns: 7rem 1fr;
@@ -1518,6 +1622,43 @@ a.ext:hover::after {
   font-size: 12px;
   text-transform: lowercase;
   color: rgb(var(--gray-500));
+}
+
+/* Back to top: phones and tablets only (the rail covers desktop) */
+.to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 35;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgb(var(--bg) / 0.92);
+  border: 1px solid rgb(var(--gray-300));
+  color: rgb(var(--ink));
+  box-shadow: var(--shadow-rest);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 250ms ease, transform 250ms var(--ease-out), visibility 0s linear 250ms;
+}
+.to-top.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 250ms ease, transform 250ms var(--ease-out);
+}
+.to-top .icon {
+  width: 1rem;
+  height: 1rem;
+}
+@media (min-width: 1024px) {
+  .to-top {
+    display: none;
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -1549,6 +1690,35 @@ html.js .fade-up {
   animation-delay: calc(50ms + var(--d, 0) * 70ms);
 }
 
+/* Scroll reveal: main.js adds .reveal, then .is-visible as items enter */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Theme switch: circular reveal from the toggle (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) {
+  animation: theme-reveal 540ms var(--ease-out);
+}
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1560,12 +1730,24 @@ html.js .fade-up {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  html.js .fade-up {
+  html.js .fade-up,
+  .reveal {
     opacity: 1;
     transform: none;
     animation: none;
   }
   .status__dot {
     animation: none;
+  }
+  .tl__body::after {
+    display: none;
+  }
+  .card::after,
+  .projects:hover .card:not(:hover),
+  .achievements:hover .card:not(:hover) {
+    opacity: 1;
+  }
+  .card::after {
+    display: none;
   }
 }

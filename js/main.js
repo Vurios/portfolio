@@ -1,5 +1,7 @@
 /* Kim De Guzman — portfolio
-   Image config, carousels, theme toggle, overlay menu, active nav, footer year. No dependencies. The page is usable without this file. */
+   Image config, carousels, theme toggle, overlay menu, active nav, scroll
+   reveal, card spotlight, typed name, local clock, copy button, back-to-top.
+   No dependencies. The page is usable without this file. */
 
 /* ----------------------------------------------------------------- images
    Add or remove filenames here; no markup changes needed. Each key matches a
@@ -244,13 +246,7 @@ var IMAGES = {
     return root.getAttribute("data-theme") === "dark" ? "dark" : "light";
   }
 
-  function applyTheme(theme, animate) {
-    if (animate && !reduceMotion.matches) {
-      root.classList.add("theme-transition");
-      window.setTimeout(function () {
-        root.classList.remove("theme-transition");
-      }, 320);
-    }
+  function setTheme(theme) {
     root.setAttribute("data-theme", theme);
     var next = theme === "dark" ? "light" : "dark";
     for (var i = 0; i < toggles.length; i++) {
@@ -258,13 +254,36 @@ var IMAGES = {
     }
   }
 
+  function applyTheme(theme, animate, origin) {
+    if (!animate || reduceMotion.matches) return setTheme(theme);
+    if (typeof document.startViewTransition === "function" && origin) {
+      // Circular reveal expanding from the toggle
+      var r = origin.getBoundingClientRect();
+      var x = r.left + r.width / 2;
+      var y = r.top + r.height / 2;
+      var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+      root.style.setProperty("--vt-x", x + "px");
+      root.style.setProperty("--vt-y", y + "px");
+      root.style.setProperty("--vt-r", radius + "px");
+      document.startViewTransition(function () {
+        setTheme(theme);
+      });
+      return;
+    }
+    root.classList.add("theme-transition");
+    window.setTimeout(function () {
+      root.classList.remove("theme-transition");
+    }, 320);
+    setTheme(theme);
+  }
+
   for (var t = 0; t < toggles.length; t++) {
-    toggles[t].addEventListener("click", function () {
+    toggles[t].addEventListener("click", function (e) {
       var next = currentTheme() === "dark" ? "light" : "dark";
       try {
         localStorage.setItem("theme", next);
-      } catch (e) {}
-      applyTheme(next, true);
+      } catch (e2) {}
+      applyTheme(next, true, e.currentTarget);
     });
   }
   applyTheme(currentTheme(), false);
@@ -378,6 +397,141 @@ var IMAGES = {
     window.addEventListener("resize", updateActive);
     window.addEventListener("load", updateActive);
     updateActive();
+  }
+
+  /* ------------------------------------------------------------ scroll reveal */
+  // Section content fades up as it enters; items that arrive together are
+  // staggered a little. Nothing moves under prefers-reduced-motion.
+  var revealSelector =
+    ".section__head, .prose, .highlight, .tl, .skill-group, .card, .cert, .contact > *, .footer";
+  var revealItems = document.querySelectorAll(revealSelector);
+  if (revealItems.length && !reduceMotion.matches && "IntersectionObserver" in window) {
+    for (var ri = 0; ri < revealItems.length; ri++) revealItems[ri].classList.add("reveal");
+    var revealIO = new IntersectionObserver(
+      function (entries, obs) {
+        var k = 0;
+        for (var i = 0; i < entries.length; i++) {
+          if (!entries[i].isIntersecting) continue;
+          entries[i].target.style.transitionDelay = Math.min(k * 70, 420) + "ms";
+          entries[i].target.classList.add("is-visible");
+          obs.unobserve(entries[i].target);
+          k += 1;
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+    );
+    for (var rj = 0; rj < revealItems.length; rj++) revealIO.observe(revealItems[rj]);
+    // Anything already on screen shows at once
+    window.requestAnimationFrame(function () {
+      for (var rk = 0; rk < revealItems.length; rk++) {
+        if (revealItems[rk].getBoundingClientRect().top < window.innerHeight * 0.9) {
+          revealItems[rk].classList.add("is-visible");
+        }
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------- card spotlight */
+  // A soft light follows the pointer across cards (pointer devices only)
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var cards = document.querySelectorAll(".card");
+    for (var ci = 0; ci < cards.length; ci++) {
+      cards[ci].addEventListener("pointermove", function (e) {
+        var r = this.getBoundingClientRect();
+        this.style.setProperty("--mx", e.clientX - r.left + "px");
+        this.style.setProperty("--my", e.clientY - r.top + "px");
+      });
+    }
+  }
+
+  /* -------------------------------------------------------------- typed name */
+  var typed = document.querySelector("[data-type]");
+  if (typed && !reduceMotion.matches) {
+    var full = typed.getAttribute("data-type");
+    typed.textContent = "";
+    typed.classList.add("is-typing");
+    var n = 0;
+    var tick = function () {
+      n += 1;
+      typed.textContent = full.slice(0, n);
+      if (n < full.length) {
+        window.setTimeout(tick, 55 + Math.random() * 45);
+      } else {
+        window.setTimeout(function () {
+          typed.classList.remove("is-typing");
+        }, 1400);
+      }
+    };
+    window.setTimeout(tick, 350);
+  }
+
+  /* ------------------------------------------------------------- local clock */
+  var clock = document.querySelector("[data-clock]");
+  if (clock) {
+    var fmt = null;
+    try {
+      fmt = new Intl.DateTimeFormat("en-PH", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Manila" });
+    } catch (e) {}
+    var updateClock = function () {
+      clock.textContent = fmt ? fmt.format(new Date()) : "";
+    };
+    updateClock();
+    window.setInterval(updateClock, 15000);
+  }
+
+  /* ------------------------------------------------------------- copy button */
+  var copyBtns = document.querySelectorAll("[data-copy]");
+  for (var cb = 0; cb < copyBtns.length; cb++) {
+    copyBtns[cb].addEventListener("click", function () {
+      var btn = this;
+      var text = btn.getAttribute("data-copy");
+      var label = btn.querySelector("[data-copy-label]");
+      var done = function () {
+        btn.classList.add("is-copied");
+        if (label) label.textContent = "copied";
+        window.setTimeout(function () {
+          btn.classList.remove("is-copied");
+          if (label) label.textContent = "copy";
+        }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, done);
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+        } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  }
+
+  /* -------------------------------------------------------------- back to top */
+  var toTop = document.querySelector("[data-to-top]");
+  if (toTop) {
+    var topTicking = false;
+    var updateTop = function () {
+      topTicking = false;
+      toTop.classList.toggle("is-shown", window.scrollY > 700);
+    };
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!topTicking) {
+          topTicking = true;
+          window.requestAnimationFrame(updateTop);
+        }
+      },
+      { passive: true }
+    );
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    });
+    updateTop();
   }
 
   /* -------------------------------------------------------------- footer year */
