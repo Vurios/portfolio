@@ -46,13 +46,13 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   var mobile = coarse || window.innerWidth < 1024;
-  var SCALE = mobile ? 1.5 : 2; // screen px per sprite px (64px cat on desktop)
+  var SCALE = mobile ? 1.75 : 2.25; // screen px per sprite px (72px cat on desktop)
   var CELL = 32 * SCALE;
   var HALF = CELL / 2;
   var canFollow = !mobile && !reduceMotion; // following needs a hovering cursor
   var WANDER_SPEED = mobile ? 70 : 100; // px per second
   var FOLLOW_SPEED = 170;
-  var HOLD_MS = 450; // press and hold this long to pick him up without moving
+  var HOLD_MS = 450; // press and hold this long: pick him up (mouse) or pet him (touch)
 
   // A click (tap) moves him on to the next mode
   var MODES = canFollow ? ["wander", "follow", "stay"] : ["wander", "stay"];
@@ -117,7 +117,7 @@
   var cursor = { x: null, y: null, vx: 0, vy: 0, at: 0 }; // viewport px
   var moving = false;
   var wanderTarget = null;
-  var wanderAt = performance.now() + 7000; // first stroll after saying hello
+  var wanderAt = performance.now() + 14000; // set again below, once the intro is timed
   var ticks = 0;
   var idleTime = 0;
   var idleAnimation = null;
@@ -185,8 +185,7 @@
           py: Math.round(pos.y),
           vx: pos.x / pageW,
           vy: (pos.y - window.scrollY) / window.innerHeight,
-          mode: mode,
-          hinted: !!saved.hinted
+          mode: mode
         })
       );
     } catch (e) {}
@@ -549,17 +548,20 @@
     var still = performance.now() - cursor.at > 80 || Math.hypot(cursor.vx, cursor.vy) < 6;
     if (still && overKuro(cursor.x, cursor.y)) {
       hoverMs += dt * 1000;
-      if (hoverMs > 1200 && performance.now() - petAt > 5000) {
-        petAt = performance.now();
-        hoverMs = 0;
-        resetIdleAnimation();
-        petTicks = 16;
-        say("purr...", 1800);
-        for (var i = 0; i < 4; i++) window.setTimeout(spawnHeart, i * 180);
-      }
+      if (hoverMs > 1200) pet();
     } else {
       hoverMs = 0;
     }
+  }
+  // Purrs, closes his eyes for a moment, floats a few hearts
+  function pet() {
+    if (performance.now() - petAt < 5000) return;
+    petAt = performance.now();
+    hoverMs = 0;
+    resetIdleAnimation();
+    petTicks = 16;
+    say("purr...", 1800);
+    for (var i = 0; i < 4; i++) window.setTimeout(spawnHeart, i * 180);
   }
   function spawnHeart() {
     var h = document.createElement("span");
@@ -590,7 +592,6 @@
     wanderTarget = null;
     wanderAt = performance.now() + 6000;
     moving = false;
-    saved.hinted = true;
     save();
   }
   function onTap() {
@@ -616,7 +617,13 @@
         } catch (err) {}
         window.clearTimeout(holdTimer);
         holdTimer = window.setTimeout(function () {
-          if (press && !held) pickUp(press.x, press.y);
+          if (!press || held) return;
+          // a finger held still on him is a pet; a mouse held still lifts him
+          if (press.type === "mouse") pickUp(press.x, press.y);
+          else {
+            press.petted = true;
+            pet();
+          }
         }, HOLD_MS);
       },
       { capture: true }
@@ -676,7 +683,7 @@
     document.addEventListener("pointerup", function () {
       window.clearTimeout(holdTimer);
       if (held) drop();
-      else if (press) onTap();
+      else if (press && !press.petted) onTap();
       press = null;
       // a touch whose touchstart was cancelled never sends a click
       window.setTimeout(function () {
@@ -814,31 +821,33 @@
     } catch (e) {
       return;
     }
-    var minX = 32, minY = 32, maxX = -1;
+    var minX = 32, minY = 32, maxX = -1, maxY = -1;
     for (var y = 0; y < 32; y++) {
       for (var x = 0; x < 32; x++) {
         if (data[(y * 32 + x) * 4 + 3] > 0) {
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
           if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
         }
       }
     }
     if (maxX < 0) return;
-    // the head: a square about three-quarters of the cat's width, from the
-    // ear tips down, so the favicon reads as a face rather than a whole cat
-    var size = Math.max(10, Math.min(Math.round((maxX - minX + 1) * 0.72), 32 - minY));
-    var sx = Math.max(0, Math.min(32 - size, Math.round((minX + maxX + 1) / 2 - size / 2)));
+    // the whole sitting cat, centred on the tile with a little breathing room
+    var w = maxX - minX + 1, h = maxY - minY + 1;
     [16, 32, 180, 192].forEach(function (px) {
       var c = document.createElement("canvas");
       c.width = px;
       c.height = px;
       var g = c.getContext("2d");
-      g.imageSmoothingEnabled = false;
       g.fillStyle = "#e9e9e9"; // light tile so the black cat reads in any tab strip
       g.fillRect(0, 0, px, px);
-      var pad = Math.round(px * 0.06);
-      g.drawImage(sheetCanvas, x0 + sx, y0 + minY, size, size, pad, pad, px - pad * 2, px - pad * 2);
+      var box = px * 0.86;
+      var k = Math.min(box / w, box / h);
+      if (k >= 1) k = Math.floor(k); // whole pixels when scaling up: stays crisp
+      g.imageSmoothingEnabled = k < 1; // tiny sizes: smooth rather than drop pixels
+      var dw = Math.round(w * k), dh = Math.round(h * k);
+      g.drawImage(sheetCanvas, x0 + minX, y0 + minY, w, h, Math.round((px - dw) / 2), Math.round((px - dh) / 2), dw, dh);
       var isTouch = px === 180;
       var id = "kuro-favicon-" + px;
       var link = document.getElementById(id);
@@ -901,17 +910,19 @@
     return;
   }
 
-  // Hello, then (first visit only) how to play with him
-  window.setTimeout(function () {
-    if (inView()) say(MESSAGES[0], 3000);
-    msgIndex = 1;
-  }, 700);
-  if (!saved.hinted) {
+  // He sits and says hello, then explains how to play with him, then
+  // goes about his day
+  var INTRO = canFollow
+    ? ["Hi, I'm Kuro!", "Click me and I'll follow you. Drag me anywhere!", "Rest your cursor on me and I'll purr."]
+    : ["Hi, I'm Kuro!", "Tap me to make me stay. Drag me anywhere!", "Hold me and I'll purr."];
+  msgIndex = 1;
+  INTRO.forEach(function (line, i) {
     window.setTimeout(function () {
-      if (!held && !press) say(canFollow ? "Click me and I'll follow!" : "Tap me to make me stay.", 3400);
-      nextChatter = performance.now() + 14000;
-    }, 4200);
-  }
+      if (!held && !press && inView()) say(line, 3400);
+    }, 700 + i * 4000);
+  });
+  nextChatter = performance.now() + 700 + INTRO.length * 4000 + 9000;
+  wanderAt = performance.now() + 700 + INTRO.length * 4000 + 3000; // sits still until he has said his piece
 
   var last = performance.now();
   var tickAcc = 0;

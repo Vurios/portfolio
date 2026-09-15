@@ -392,6 +392,14 @@ a.ext:hover::after {
   color: rgb(var(--gray-500));
   transition: color 200ms ease, border-color 200ms ease;
 }
+/* Brand mark (Simple Icons, CC0) beside a skill; inherits the pill's colour */
+.pill__logo {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  fill: currentColor;
+}
 .pill:hover {
   color: rgb(var(--bg));
   background: rgb(var(--ink));
