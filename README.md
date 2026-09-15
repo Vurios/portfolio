@@ -26,7 +26,7 @@ Then visit <http://localhost:8000>.
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
 js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
-js/cat.js             # the black pixel cat (walks the viewport floor, eye follow, mochi drag, fling)
+js/kuro.js            # Kuro, the pixel cat companion (roams the content column, speech bubble, petting, mochi drag)
 assets/
   images/projects/      # project screenshots (carousels)
   images/achievements/  # hackathon / competition photos (carousels)
@@ -34,6 +34,7 @@ assets/
   images/certificates/  # certificate scans (single image each)
   profile/              # portrait (kim.png), favicons, Open Graph card
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
+design/               # Kuro reference sheet + GIF previews (not served)
 resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
