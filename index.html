@@ -3,28 +3,37 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kim De Guzman — IT Student &amp; Full-Stack Developer</title>
+    <title>Kim De Guzman — Full-Stack Developer</title>
     <meta
       name="description"
-      content="Adrian Kim P. De Guzman — Information Technology student and full-stack developer from Ligao City, Albay, Philippines. Web, mobile, and civic tech projects."
+      content="Adrian Kim P. De Guzman — full-stack developer, mobile developer, and QA tester from Ligao City, Albay, Philippines. BSIT student building web, mobile, and civic tech systems."
     />
     <meta name="author" content="Adrian Kim P. De Guzman" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0c0c0f" media="(prefers-color-scheme: dark)" />
-    <meta property="og:title" content="Kim De Guzman — IT Student & Full-Stack Developer" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kim De Guzman" />
+    <meta property="og:title" content="Kim De Guzman — Full-Stack Developer" />
     <meta
       property="og:description"
-      content="Information Technology student and full-stack developer based in Ligao City, Albay, Philippines."
+      content="Full-stack developer, mobile developer, and QA tester from Ligao City, Albay. BSIT student building web, mobile, and civic tech systems."
     />
-    <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kim-deguzman-portfolio.vercel.app/" />
-    <meta property="og:image" content="https://kim-deguzman-portfolio.vercel.app/assets/profile/kim.png" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="https://kim-deguzman-portfolio.vercel.app/assets/profile/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Portrait of Kim De Guzman" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kim De Guzman — Full-Stack Developer" />
+    <meta name="twitter:image" content="https://kim-deguzman-portfolio.vercel.app/assets/profile/og.png" />
     <link rel="canonical" href="https://kim-deguzman-portfolio.vercel.app/" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Ctext x='32' y='42' text-anchor='middle' font-family='ui-monospace,monospace' font-size='30' font-weight='600' fill='%23ffffff'%3Ekd%3C/text%3E%3C/svg%3E"
-    />
+
+    <link rel="icon" href="assets/profile/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/profile/favicon-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/profile/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/profile/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/profile/apple-touch-icon.png" />
 
     <!-- Resolve the theme before first paint to avoid a flash -->
     <script>
@@ -47,9 +56,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
     />
-    <link rel="preload" href="assets/fonts/GeistPixel-Square.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
 
@@ -70,6 +78,15 @@
       <symbol id="i-pin" viewBox="0 0 24 24">
         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
         <circle cx="12" cy="10" r="3" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 3v12M7 10l5 5 5-5M4 19h16" />
+      </symbol>
+      <symbol id="i-arrow-left" viewBox="0 0 24 24">
+        <path d="M15 5l-7 7 7 7" />
+      </symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24">
+        <path d="M9 5l7 7-7 7" />
       </symbol>
       <symbol id="i-sun" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="4" />
@@ -108,7 +125,10 @@
     <div class="site">
       <!-- Top bar: < 1024px -->
       <header class="topbar">
-        <a class="brand" href="#top">kim de guzman</a>
+        <a class="brand" href="#top">
+          <img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" />
+          <span>Kim De Guzman</span>
+        </a>
         <div class="topbar__actions">
           <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
             <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
@@ -131,206 +151,229 @@
       <!-- Full-screen overlay menu: < 1024px -->
       <div class="menu" id="menu" data-open="false" role="dialog" aria-modal="true" aria-label="Site menu">
         <div class="menu__head">
-          <span class="brand">menu</span>
+          <span class="brand"><img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" /><span>Menu</span></span>
           <button class="icon-btn" type="button" data-menu-close aria-label="Close menu">
             <svg class="icon" aria-hidden="true"><use href="#i-close" /></svg>
           </button>
         </div>
-        <nav aria-label="Sections">
+        <nav class="menu__nav" aria-label="Sections">
           <ul class="menu__list" data-nav>
-            <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
-            <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
-            <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
-            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
-            <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
-            <li><a class="nav-link" href="#certifications"><span class="nav-link__num">06</span>certifications</a></li>
-            <li><a class="nav-link" href="#contact"><span class="nav-link__num">07</span>contact</a></li>
+            <li><a class="nav-link" href="#about">About</a></li>
+            <li><a class="nav-link" href="#education">Education</a></li>
+            <li><a class="nav-link" href="#skills">Skills</a></li>
+            <li><a class="nav-link" href="#experience">Experience</a></li>
+            <li><a class="nav-link" href="#projects">Projects</a></li>
+            <li><a class="nav-link" href="#achievements">Achievements</a></li>
+            <li><a class="nav-link" href="#certificates">Certificates</a></li>
+            <li><a class="nav-link" href="#contact">Contact</a></li>
           </ul>
         </nav>
-      </div>
-
-      <!-- Sidebar: ≥ 1024px -->
-      <aside class="sidebar">
-        <div class="sidebar__group">
-          <a class="brand" href="#top">kim de guzman</a>
-          <p class="label" style="margin-top: 0.6rem">bsit · full-stack dev</p>
-        </div>
-        <nav class="sidebar__group" aria-label="Sections">
-          <ul data-nav>
-            <li><a class="nav-link" href="#about"><span class="nav-link__num">01</span>about</a></li>
-            <li><a class="nav-link" href="#education"><span class="nav-link__num">02</span>education</a></li>
-            <li><a class="nav-link" href="#skills"><span class="nav-link__num">03</span>skills</a></li>
-            <li><a class="nav-link" href="#experience"><span class="nav-link__num">04</span>experience</a></li>
-            <li><a class="nav-link" href="#projects"><span class="nav-link__num">05</span>projects</a></li>
-            <li><a class="nav-link" href="#certifications"><span class="nav-link__num">06</span>certifications</a></li>
-            <li><a class="nav-link" href="#contact"><span class="nav-link__num">07</span>contact</a></li>
-          </ul>
-        </nav>
-        <div class="sidebar__foot">
-          <div class="sidebar__social">
+        <div class="menu__foot">
+          <p class="status"><span class="status__dot" aria-hidden="true"></span>Available for opportunities</p>
+          <!-- TODO: add resume.pdf at the repo root -->
+          <a class="btn" href="resume.pdf" download>
+            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
+            Download resume
+          </a>
+          <div class="social">
             <a class="icon-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
               <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
             </a>
-            <a
-              class="icon-btn"
-              href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn (opens in a new tab)"
-            >
+            <a class="icon-btn" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
               <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
             </a>
-            <a
-              class="icon-btn"
-              href="https://www.facebook.com/kim.pdeguzman/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook (opens in a new tab)"
-            >
+            <a class="icon-btn" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)">
               <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
             </a>
           </div>
-          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
-            <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
-            <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
-            <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
-          </button>
         </div>
-      </aside>
+      </div>
 
-      <main class="main" id="main">
-        <div class="content" id="top">
+      <div class="frame" id="top">
+        <!-- Sidebar rail: ≥ 1024px -->
+        <aside class="sidebar">
+          <div class="sidebar__inner">
+            <a class="brand brand--lg" href="#top">
+              <img class="mark" src="assets/profile/mark.png" alt="" width="64" height="64" />
+              <span class="brand__text">
+                <span class="brand__name">Kim De Guzman</span>
+                <span class="brand__role">Full-stack developer</span>
+              </span>
+            </a>
+
+            <div class="sidebar__meta">
+              <p class="status"><span class="status__dot" aria-hidden="true"></span>Available for opportunities</p>
+              <p class="meta-line">
+                <svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+                Ligao City, Albay, PH
+              </p>
+            </div>
+
+            <nav class="sidebar__nav" aria-label="Sections">
+              <div class="progress" aria-hidden="true"><span class="progress__bar" data-progress></span></div>
+              <ul data-nav>
+                <li><a class="nav-link" href="#about">About</a></li>
+                <li><a class="nav-link" href="#education">Education</a></li>
+                <li><a class="nav-link" href="#skills">Skills</a></li>
+                <li><a class="nav-link" href="#experience">Experience</a></li>
+                <li><a class="nav-link" href="#projects">Projects</a></li>
+                <li><a class="nav-link" href="#achievements">Achievements</a></li>
+                <li><a class="nav-link" href="#certificates">Certificates</a></li>
+                <li><a class="nav-link" href="#contact">Contact</a></li>
+              </ul>
+            </nav>
+
+            <!-- TODO: add resume.pdf at the repo root -->
+            <a class="btn" href="resume.pdf" download>
+              <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
+              Download resume
+            </a>
+
+            <div class="sidebar__foot">
+              <div class="social">
+                <a class="icon-btn" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
+                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
+                </a>
+                <a class="icon-btn" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
+                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
+                </a>
+                <a class="icon-btn" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)">
+                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
+                </a>
+              </div>
+              <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Theme: system. Click to change.">
+                <svg class="icon icon--system" aria-hidden="true"><use href="#i-monitor" /></svg>
+                <svg class="icon icon--light" aria-hidden="true"><use href="#i-sun" /></svg>
+                <svg class="icon icon--dark" aria-hidden="true"><use href="#i-moon" /></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <main class="main" id="main">
           <!-- ============================================================ Hero -->
           <header class="hero">
-            <figure class="hero__portrait fade-up" style="--d: 0">
-              <div class="portrait">
-                <img
-                  src="assets/profile/kim.png"
-                  alt="Portrait of Kim De Guzman"
-                  width="520"
-                  height="496"
-                  decoding="async"
-                  fetchpriority="high"
-                />
-                <span class="portrait__dots halftone" aria-hidden="true"></span>
-              </div>
-            </figure>
+            <div class="hero__grid" aria-hidden="true"></div>
             <div class="hero__text">
-              <p class="hero__eyebrow fade-up" style="--d: 0">ligao city, albay · philippines</p>
-              <h1 class="hero__name fade-up" style="--d: 1">kim de guzman</h1>
-              <p class="hero__role fade-up" style="--d: 2">Information Technology Student &amp; Full-Stack Developer</p>
+              <p class="hero__eyebrow fade-up" style="--d: 0">Ligao City, Albay, Philippines</p>
+              <h1 class="hero__name fade-up" style="--d: 1">Kim De Guzman</h1>
+              <p class="hero__role fade-up" style="--d: 2">
+                <span>Full-Stack Developer</span><span class="hero__sep" aria-hidden="true">|</span><span>Mobile Developer</span><span class="hero__sep" aria-hidden="true">|</span><span>QA Tester</span>
+              </p>
               <p class="hero__intro fade-up" style="--d: 3">
                 I'm Adrian Kim P. De Guzman, a BSIT student at Bicol University Polangui. I build full-stack,
                 AI-integrated platforms end to end, from the database to the interface, across web, mobile, and civic
                 tech.
               </p>
-
-            <ul class="hero__links fade-up" style="--d: 4" aria-label="Contact and social links">
-              <li>
-                <a class="primary" href="mailto:deguzmanadriankim@gmail.com">
-                  <svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg>
-                  deguzmanadriankim@gmail.com
-                </a>
-              </li>
-              <li>
-                <span>
-                  <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
-                  +63 994 996 1074
-                </span>
-              </li>
-              <li>
-                <a class="ext" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer">
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
-                  GitHub<span class="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="ext"
-                  href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
-                  LinkedIn<span class="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              </li>
-              <li>
-                <a class="ext" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer">
-                  <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
-                  Facebook<span class="visually-hidden"> (opens in a new tab)</span>
-                </a>
-              </li>
-            </ul>
+              <ul class="hero__links fade-up" style="--d: 4" aria-label="Contact and social links">
+                <li>
+                  <a class="primary" href="mailto:deguzmanadriankim@gmail.com">
+                    <svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg>
+                    deguzmanadriankim@gmail.com
+                  </a>
+                </li>
+                <li>
+                  <span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-phone" /></svg>
+                    +63 994 996 1074
+                  </span>
+                </li>
+                <li>
+                  <a class="ext" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-github" /></svg>
+                    GitHub<span class="visually-hidden"> (opens in a new tab)</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="ext" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-linkedin" /></svg>
+                    LinkedIn<span class="visually-hidden"> (opens in a new tab)</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="ext" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon icon--fill" aria-hidden="true"><use href="#i-facebook" /></svg>
+                    Facebook<span class="visually-hidden"> (opens in a new tab)</span>
+                  </a>
+                </li>
+              </ul>
             </div>
+            <figure class="hero__portrait fade-up" style="--d: 1">
+              <div class="portrait">
+                <img src="assets/profile/kim.png" alt="Portrait of Kim De Guzman" width="520" height="496" decoding="async" fetchpriority="high" />
+              </div>
+            </figure>
           </header>
 
-          <!-- ============================================================ 01 About -->
+          <!-- ============================================================ About -->
           <section class="section" id="about" aria-labelledby="about-title">
             <div class="section__head">
-              <h2 class="section__title" id="about-title"><span class="num">01</span> — about</h2>
+              <h2 class="section__title" id="about-title">About</h2>
             </div>
-            <div class="prose">
-              <p>
-                I'm a BSIT student at Bicol University Polangui Campus and a full-stack developer. I've shipped web
-                platforms, mobile apps, and civic tech systems for local government, trained under TESDA, interned with
-                companies in Quezon City and Singapore, and placed in hackathon and coding competitions.
-              </p>
-              <p>
-                I like owning a product end to end, from the database and backend to the interface people use, and I add
-                AI where it makes a system more useful.
-              </p>
+            <div class="about">
+              <div class="prose">
+                <p>
+                  I'm a BSIT student at Bicol University Polangui Campus and a full-stack developer. I've shipped web
+                  platforms, mobile apps, and civic tech systems for local government, trained under TESDA, interned with
+                  companies in Quezon City and Singapore, and placed in hackathon and coding competitions.
+                </p>
+                <p>
+                  I like owning a product end to end, from the database and backend to the interface people use, and I add
+                  AI where it makes a system more useful.
+                </p>
+              </div>
+              <ul class="highlights" aria-label="Highlights">
+                <li class="highlight">
+                  <p class="label">Academics</p>
+                  <p class="highlight__value">President's &amp; Dean's Lister</p>
+                  <p class="highlight__meta">A.Y. 2023 to present</p>
+                </li>
+                <li class="highlight">
+                  <p class="label">Hackathon</p>
+                  <p class="highlight__value">3rd Place of 35 teams</p>
+                  <p class="highlight__meta">Ibalong Festival Hackathon 2026</p>
+                </li>
+                <li class="highlight">
+                  <p class="label">Competition</p>
+                  <p class="highlight__value">1st Runner-Up</p>
+                  <p class="highlight__meta">AI4AI Fair Vibe Coding Competition 2026</p>
+                </li>
+              </ul>
             </div>
-            <ul class="highlights" aria-label="Highlights">
-              <li class="highlight">
-                <p class="label">Academics</p>
-                <p class="highlight__value">President's &amp; Dean's Lister</p>
-                <p class="highlight__meta">A.Y. 2023 to present</p>
-              </li>
-              <li class="highlight">
-                <p class="label">Hackathon</p>
-                <p class="highlight__value">3rd Place</p>
-                <p class="highlight__meta">Ibalong Festival Hackathon 2026</p>
-              </li>
-              <li class="highlight">
-                <p class="label">Competition</p>
-                <p class="highlight__value">1st Runner-Up</p>
-                <p class="highlight__meta">AI4AI Fair Vibe Coding Competition 2026</p>
-              </li>
-            </ul>
           </section>
 
-          <!-- ============================================================ 02 Education -->
+          <!-- ============================================================ Education -->
           <section class="section" id="education" aria-labelledby="education-title">
             <div class="section__head">
-              <h2 class="section__title" id="education-title"><span class="num">02</span> — education</h2>
+              <h2 class="section__title" id="education-title">Education</h2>
+              <p class="section__aside">2021 — 2027</p>
             </div>
-            <ol class="list">
-              <li class="list__item">
-                <p class="list__when">2023 — 2027 (expected)</p>
-                <div>
-                  <h3 class="list__title">Bicol University Polangui Campus</h3>
-                  <p class="list__sub">Bachelor of Science in Information Technology</p>
-                  <p class="list__note">Consistent President's and Dean's List Awardee, A.Y. 2023 to present.</p>
+            <ol class="timeline">
+              <li class="tl">
+                <div class="tl__when"><span class="label">2023 — 2027</span><span class="tl__note">expected graduation</span></div>
+                <div class="tl__body">
+                  <h3 class="tl__title">Bicol University Polangui Campus</h3>
+                  <p class="tl__sub">Bachelor of Science in Information Technology</p>
+                  <p class="tl__text">Consistent President's and Dean's List Awardee, A.Y. 2023 to present.</p>
                 </div>
               </li>
-              <li class="list__item">
-                <p class="list__when">2021 — 2023</p>
-                <div>
-                  <h3 class="list__title">Ligao National High School</h3>
-                  <p class="list__sub">Senior High School, STEM strand</p>
-                  <p class="list__note">Graduated With Honors.</p>
+              <li class="tl">
+                <div class="tl__when"><span class="label">2021 — 2023</span></div>
+                <div class="tl__body">
+                  <h3 class="tl__title">Ligao National High School</h3>
+                  <p class="tl__sub">Senior High School, STEM strand</p>
+                  <p class="tl__text">Graduated With Honors.</p>
                 </div>
               </li>
             </ol>
           </section>
 
-          <!-- ============================================================ 03 Skills -->
+          <!-- ============================================================ Skills -->
           <section class="section" id="skills" aria-labelledby="skills-title">
             <div class="section__head">
-              <h2 class="section__title" id="skills-title"><span class="num">03</span> — skills</h2>
+              <h2 class="section__title" id="skills-title">Skills</h2>
             </div>
-            <div class="skill-groups">
+            <div class="skills">
               <div class="skill-group">
                 <h3 class="label skill-group__label">Programming Languages</h3>
                 <ul class="pills">
@@ -351,6 +394,8 @@
                   <li class="pill">Node.js</li>
                   <li class="pill">Next.js</li>
                   <li class="pill">Vite</li>
+                  <li class="pill">Flutter</li>
+                  <li class="pill">Dart</li>
                   <li class="pill">Leaflet.js</li>
                   <li class="pill">Bootstrap</li>
                 </ul>
@@ -372,10 +417,9 @@
                   <li class="pill pill--text">System Diagnostics</li>
                   <li class="pill pill--text">Windows/OS Maintenance</li>
                   <li class="pill pill--text">IT Infrastructure Support</li>
-                  <li class="pill pill--text">Cisco Packet Tracer</li>
                 </ul>
               </div>
-              <div class="skill-group">
+              <div class="skill-group skill-group--wide">
                 <h3 class="label skill-group__label">Tools &amp; Platforms</h3>
                 <ul class="pills">
                   <li class="pill">GitHub</li>
@@ -392,134 +436,132 @@
             </div>
           </section>
 
-          <!-- ============================================================ 04 Experience -->
+          <!-- ============================================================ Experience -->
           <section class="section" id="experience" aria-labelledby="experience-title">
             <div class="section__head">
-              <h2 class="section__title" id="experience-title"><span class="num">04</span> — experience</h2>
-              <p class="label section__aside">oldest → newest</p>
+              <h2 class="section__title" id="experience-title">Experience</h2>
+              <p class="section__aside">oldest to newest</p>
             </div>
             <ol class="timeline">
-              <li class="tl-item">
-                <div class="tl-item__meta">
-                  <p class="label">June 2025 — August 2025</p>
-                  <p class="label">Ligao City, Albay · Hybrid</p>
+              <li class="tl">
+                <div class="tl__when">
+                  <span class="label">Jun — Aug 2025</span>
+                  <span class="tl__note">Ligao City, Albay · Hybrid</span>
                 </div>
-                <h3 class="tl-item__org">NRG Info-Tech Institute, Inc. <small>· TESDA Scholarship Program</small></h3>
-                <p class="tl-item__role">Java Programming NC III Trainee</p>
-                <ul class="tl-item__bullets">
-                  <li>
-                    Built and deployed Java applications through a full development workflow: planning, coding, testing,
-                    and documentation.
-                  </li>
-                  <li>Wrote Java programs and mini-projects applying OOP: data handling, control structures, modular design.</li>
-                  <li>Took part in hands-on workshops, skills assessments, and project presentations.</li>
-                </ul>
+                <div class="tl__body">
+                  <h3 class="tl__title">NRG Info-Tech Institute, Inc.</h3>
+                  <p class="tl__sub">Java Programming NC III Trainee · TESDA Scholarship Program</p>
+                  <ul class="bullets">
+                    <li>Built and deployed Java applications through a full development workflow: planning, coding, testing, and documentation.</li>
+                    <li>Wrote Java programs and mini-projects applying OOP: data handling, control structures, modular design.</li>
+                    <li>Took part in hands-on workshops, skills assessments, and project presentations.</li>
+                  </ul>
+                </div>
               </li>
-              <li class="tl-item">
-                <div class="tl-item__meta">
-                  <p class="label">August 2025 — September 2025</p>
-                  <p class="label">Fairview, Quezon City · Remote</p>
+              <li class="tl">
+                <div class="tl__when">
+                  <span class="label">Aug — Sep 2025</span>
+                  <span class="tl__note">Fairview, Quezon City · Remote</span>
                 </div>
-                <h3 class="tl-item__org">Ollopa Corporation</h3>
-                <p class="tl-item__role">Programming Intern</p>
-                <ul class="tl-item__bullets">
-                  <li>
-                    Applied object-oriented analysis, design, and Java development in an enterprise setting under industry
-                    supervision.
-                  </li>
-                  <li>
-                    Designed and storyboarded game concepts, mechanics, and digital assets in the Game Design and
-                    Development track.
-                  </li>
-                  <li>Delivered to industry quality standards in a fast-paced, remote team.</li>
-                </ul>
+                <div class="tl__body">
+                  <h3 class="tl__title">Ollopa Corporation</h3>
+                  <p class="tl__sub">Programming Intern</p>
+                  <ul class="bullets">
+                    <li>Applied object-oriented analysis, design, and Java development in an enterprise setting under industry supervision.</li>
+                    <li>Designed and storyboarded game concepts, mechanics, and digital assets in the Game Design and Development track.</li>
+                    <li>Delivered to industry quality standards in a fast-paced, remote team.</li>
+                  </ul>
+                </div>
               </li>
-              <li class="tl-item">
-                <div class="tl-item__meta">
-                  <p class="label">April 2026 — June 2026</p>
-                  <p class="label">Singapore · Remote</p>
+              <li class="tl">
+                <div class="tl__when">
+                  <span class="label">Apr — Jun 2026</span>
+                  <span class="tl__note">Singapore · Remote</span>
                 </div>
-                <h3 class="tl-item__org">Knowles Training Institute × SSGC Group</h3>
-                <p class="tl-item__role">IT Intern</p>
-                <ul class="tl-item__bullets">
-                  <li>
-                    Led the field monitoring team: supervised fellow interns, handled documentation and reporting, and
-                    coordinated issue resolution across departments.
-                  </li>
-                  <li>
-                    Built and maintained company websites on WordPress: content updates, layout improvements, and asset
-                    integration.
-                  </li>
-                  <li>
-                    Designed social media visuals and multimedia for international branding with interns across
-                    departments and schools.
-                  </li>
-                </ul>
+                <div class="tl__body">
+                  <h3 class="tl__title">Knowles Training Institute × SSGC Group</h3>
+                  <p class="tl__sub">IT Intern (Team Leader)</p>
+                  <ul class="bullets">
+                    <li>Led the field monitoring team as Team Leader, supervising fellow interns, overseeing documentation and reporting, and coordinating cross-departmental issue resolution in a fully remote, multicultural environment.</li>
+                    <li>Maintained and improved company websites end to end: site security, content updates, layout adjustments, and performance optimization.</li>
+                    <li>Handled general IT support and troubleshooting alongside the monitoring role, resolving technical issues raised across departments.</li>
+                    <li>Designed social media visuals and multimedia content for the organization's international branding.</li>
+                  </ul>
+                </div>
+              </li>
+              <li class="tl tl--event">
+                <div class="tl__when">
+                  <span class="label">Jun 2026</span>
+                  <span class="tl__note">Polangui, Albay · Onsite</span>
+                </div>
+                <div class="tl__body">
+                  <h3 class="tl__title">AI4AI Fair: Vibe Coding Competition</h3>
+                  <p class="tl__sub"><span class="pill pill--accent">1st Runner-Up</span></p>
+                  <ul class="bullets">
+                    <li>Placed 1st Runner-Up in a single-day AI-assisted vibe coding competition, building an AI-powered solution to a real community problem in Albay.</li>
+                    <li>Collaborated with a 4-member team to ideate, design, and develop the solution within an 8-hour window.</li>
+                    <li>Developed SafeTrack, a zero-hosting-cost web app combining JavaScript, Leaflet mapping, and a dual-access AI chatbot for regional hazard tracking.</li>
+                  </ul>
+                </div>
+              </li>
+              <li class="tl tl--event">
+                <div class="tl__when">
+                  <span class="label">Aug 2026</span>
+                  <span class="tl__note">Legazpi City, Albay · Onsite</span>
+                </div>
+                <div class="tl__body">
+                  <h3 class="tl__title">Ibalong Festival Hackathon: Heroes of Innovation Challenge</h3>
+                  <p class="tl__sub"><span class="pill pill--accent">3rd Place of 35 teams</span></p>
+                  <ul class="bullets">
+                    <li>Collaborated with a 5-member team across a two-day onsite hackathon (The Forge and Hero's Pitch) to design, build, and pitch SARO, a civic reporting and emergency dispatch platform for Legazpi City.</li>
+                    <li>Conducted problem discovery and solution design under the Bantong (Strategist) Hero Pathway, addressing real gaps in the city's emergency and hazard reporting process.</li>
+                    <li>Presented the final solution at Hero's Pitch, placing 3rd out of 35 competing teams.</li>
+                  </ul>
+                </div>
               </li>
             </ol>
           </section>
 
-          <!-- ============================================================ 05 Projects -->
+          <!-- ============================================================ Projects -->
           <section class="section" id="projects" aria-labelledby="projects-title">
             <div class="section__head">
-              <h2 class="section__title" id="projects-title"><span class="num">05</span> — projects</h2>
+              <h2 class="section__title" id="projects-title">Projects</h2>
+              <p class="section__aside">4 projects</p>
             </div>
             <ul class="projects">
-              <!-- Project card: drop a screenshot at the src path and it replaces the placeholder automatically -->
+              <!-- Image lists live in js/main.js (IMAGES.projects); the carousel builds itself from data-carousel -->
               <li class="card project">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/projects/saro.jpg"
-                    alt="Screenshot of SARO, the unified geo-reporting and emergency dispatch platform"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone" data-initials="SA" aria-hidden="true"></span>
-                </figure>
+                <div class="carousel" data-carousel="projects:saro" data-initials="SA" data-alt="SARO screenshot"></div>
                 <div class="project__body">
-                  <div class="project__top">
-                    <p class="meta">Web Development &amp; Civic Tech</p>
-                    <span class="pill pill--inverted pill--text">3rd Place · Ibalong Festival Hackathon 2026</span>
-                  </div>
+                  <p class="meta">Web Development &amp; Civic Tech</p>
                   <h3 class="project__title">SARO: Unified Geo-Reporting and Municipal Emergency Dispatch Ecosystem</h3>
                   <p class="project__desc">
                     Civic reporting and emergency dispatch platform for Legazpi City: a React web app and a React Native
                     mobile app with an AI chatbot for hazard reports, automated department routing that replaces 20+
                     municipal hotlines, and Mayon/flood GIS overlays.
                   </p>
-                  <ul class="pills project__tags" aria-label="Tech stack">
+                  <ul class="pills" aria-label="Tech stack">
                     <li class="pill">React (Web)</li>
                     <li class="pill">React Native (Mobile)</li>
                     <li class="pill">Supabase</li>
                     <li class="pill">Leaflet</li>
                     <li class="pill">AI Chatbot</li>
                   </ul>
+                  <p class="project__badge"><span class="pill pill--accent">3rd Place · Ibalong Festival Hackathon 2026</span></p>
                 </div>
               </li>
 
               <li class="card project">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/projects/argusph.jpg"
-                    alt="Screenshot of ARGUSPH, the crime and incident reporting platform for PNP Polangui"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone" data-initials="AR" aria-hidden="true"></span>
-                </figure>
+                <div class="carousel" data-carousel="projects:argusph" data-initials="AR" data-alt="ARGUSPH screenshot"></div>
                 <div class="project__body">
-                  <div class="project__top">
-                    <p class="meta">Civic Tech &amp; Public Safety · Independent Development</p>
-                  </div>
+                  <p class="meta">Civic Tech &amp; Public Safety · Independent Development</p>
                   <h3 class="project__title">ARGUSPH: Crime and Incident Reporting Platform for PNP Polangui</h3>
                   <p class="project__desc">
                     Admin dashboard and React Native responder app for the PNP Polangui Municipal Police Station, with an
                     AI chatbot and a Python facial-recognition verification service on Google Cloud Run. Covers incident
                     reporting, police blotter, officer rosters, and an interactive crime map.
                   </p>
-                  <ul class="pills project__tags" aria-label="Tech stack">
+                  <ul class="pills" aria-label="Tech stack">
                     <li class="pill">HTML/CSS/JS (Web)</li>
                     <li class="pill">React Native (Mobile)</li>
                     <li class="pill">Firebase/Firestore</li>
@@ -531,28 +573,36 @@
               </li>
 
               <li class="card project">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/projects/library-assistant.jpg"
-                    alt="Screenshot of the Intelligent Library Assistant capstone project"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone" data-initials="LA" aria-hidden="true"></span>
-                </figure>
+                <div class="carousel" data-carousel="projects:safetrack" data-initials="ST" data-alt="SafeTrack screenshot"></div>
                 <div class="project__body">
-                  <div class="project__top">
-                    <p class="meta">Capstone Project · Bicol University Polangui</p>
-                  </div>
-                  <h3 class="project__title">
-                    Intelligent Library Assistant for Collection Analysis and Narrative Reporting
-                  </h3>
+                  <p class="meta">Web Development &amp; AI Integration · AI4AI Fair Vibe Coding Competition</p>
+                  <h3 class="project__title">SafeTrack: Geo-Reporting Ecosystem with Dual-Access AI Assistance</h3>
+                  <p class="project__desc">
+                    Responsive geo-reporting web app for localized hazard tracking in Polangui, built in a single 8-hour
+                    competition window at zero hosting cost. A dual-access AI chatbot handles conversational hazard
+                    reporting for residents and filtering for admins, on Leaflet-based mapping.
+                  </p>
+                  <ul class="pills" aria-label="Tech stack">
+                    <li class="pill">HTML</li>
+                    <li class="pill">CSS</li>
+                    <li class="pill">JavaScript</li>
+                    <li class="pill">Leaflet</li>
+                    <li class="pill">AI Chatbot</li>
+                  </ul>
+                  <p class="project__badge"><span class="pill pill--accent">1st Runner-Up · AI4AI Fair Vibe Coding Competition 2026</span></p>
+                </div>
+              </li>
+
+              <li class="card project">
+                <div class="carousel" data-carousel="projects:library-assistant" data-initials="LA" data-alt="Intelligent Library Assistant screenshot"></div>
+                <div class="project__body">
+                  <p class="meta">Capstone Project · Bicol University Polangui</p>
+                  <h3 class="project__title">Intelligent Library Assistant for Collection Analysis and Narrative Reporting</h3>
                   <p class="project__desc">
                     AI platform for automated metadata extraction and natural-language chatbot queries over a library
                     collection, syncing a React Native app and a PHP web module through a shared Firebase backend.
                   </p>
-                  <ul class="pills project__tags" aria-label="Tech stack">
+                  <ul class="pills" aria-label="Tech stack">
                     <li class="pill">PHP</li>
                     <li class="pill">JavaScript</li>
                     <li class="pill">Firebase</li>
@@ -563,167 +613,135 @@
             </ul>
           </section>
 
-          <!-- ============================================================ 06 Certifications -->
-          <section class="section" id="certifications" aria-labelledby="certifications-title">
+          <!-- ============================================================ Achievements -->
+          <section class="section" id="achievements" aria-labelledby="achievements-title">
             <div class="section__head">
-              <h2 class="section__title" id="certifications-title"><span class="num">06</span> — certifications &amp; achievements</h2>
+              <h2 class="section__title" id="achievements-title">Achievements</h2>
+              <p class="section__aside">hackathons &amp; competitions</p>
             </div>
-            <ul class="certs">
-              <li class="card cert">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/certifications/ibalong-hackathon-2026.jpg"
-                    alt="Ibalong Festival Hackathon 2026, 3rd Place certificate or event photo"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="IH" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">3rd Place — SARO: Unified Geo-Reporting and Municipal Emergency Dispatch Ecosystem</h3>
-                  <p class="cert__issuer">Ibalong Festival Hackathon: Heroes of Innovation Challenge</p>
-                  <div class="cert__foot">
-                    <span class="label">Hackathon</span>
-                    <span class="label">2026</span>
-                  </div>
+            <ul class="achievements">
+              <li class="card achievement">
+                <div class="carousel" data-carousel="achievements:ibalong-2026" data-initials="3RD" data-alt="Ibalong Festival Hackathon 2026 event photo"></div>
+                <div class="achievement__body">
+                  <p class="achievement__place">3rd Place</p>
+                  <h3 class="achievement__title">Ibalong Festival Hackathon: Heroes of Innovation Challenge</h3>
+                  <p class="achievement__for">for SARO: Unified Geo-Reporting and Municipal Emergency Dispatch Ecosystem</p>
+                  <p class="meta">Legazpi City, Albay · 2026</p>
                 </div>
               </li>
-              <li class="card cert">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/certifications/ai4ai-vibe-coding-2026.jpg"
-                    alt="AI4AI Fair Vibe Coding Competition 2026, 1st Runner-Up certificate or event photo"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="AI" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">1st Runner-Up — AI-Powered Rural Development Solution (SafeTrack)</h3>
-                  <p class="cert__issuer">AI4AI Fair: Vibe Coding Competition</p>
-                  <div class="cert__foot">
-                    <span class="label">Competition</span>
-                    <span class="label">2026</span>
-                  </div>
-                </div>
-              </li>
-              <li class="card cert">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/certifications/cisco-intro-cybersecurity.jpg"
-                    alt="Cisco Networking Academy Introduction to Cybersecurity badge"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="CS" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">Introduction to Cybersecurity</h3>
-                  <p class="cert__issuer">Cisco Networking Academy</p>
-                  <div class="cert__foot">
-                    <span class="label">Certificate</span>
-                    <span class="label">2026</span>
-                  </div>
-                </div>
-              </li>
-              <li class="card cert">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/certifications/cisco-junior-cybersecurity-analyst.jpg"
-                    alt="Cisco Networking Academy Junior Cybersecurity Analyst badge"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="JC" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">Junior Cybersecurity Analyst</h3>
-                  <p class="cert__issuer">Cisco Networking Academy</p>
-                  <div class="cert__foot">
-                    <span class="label">Certificate</span>
-                    <span class="label">2026</span>
-                  </div>
-                </div>
-              </li>
-              <li class="card cert">
-                <figure class="thumb">
-                  <img
-                    src="assets/images/certifications/tesda-java-nc3.jpg"
-                    alt="TESDA Programming (Java) NC III certificate"
-                    loading="lazy"
-                    decoding="async"
-                    onerror="this.parentNode.classList.add('thumb--missing')"
-                  />
-                  <span class="thumb__ph halftone halftone--dense" data-initials="NC" aria-hidden="true"></span>
-                </figure>
-                <div class="cert__body">
-                  <h3 class="cert__title">Programming (Java) NC III</h3>
-                  <p class="cert__issuer">TESDA Scholarship Program · NRG Info-Tech Institute, Inc.</p>
-                  <div class="cert__foot">
-                    <span class="label">Certificate</span>
-                    <span class="label">2025</span>
-                  </div>
+              <li class="card achievement">
+                <div class="carousel" data-carousel="achievements:ai4ai-2026" data-initials="1ST" data-alt="AI4AI Fair Vibe Coding Competition 2026 event photo"></div>
+                <div class="achievement__body">
+                  <p class="achievement__place">1st Runner-Up</p>
+                  <h3 class="achievement__title">AI4AI Fair: Vibe Coding Competition</h3>
+                  <p class="achievement__for">for SafeTrack, an AI-powered rural development solution</p>
+                  <p class="meta">Polangui, Albay · 2026</p>
                 </div>
               </li>
             </ul>
           </section>
 
-          <!-- ============================================================ 07 Contact -->
+          <!-- ============================================================ Certificates -->
+          <section class="section" id="certificates" aria-labelledby="certificates-title">
+            <div class="section__head">
+              <h2 class="section__title" id="certificates-title">Certificates</h2>
+            </div>
+            <ul class="certs">
+              <li class="cert">
+                <figure class="thumb thumb--cert">
+                  <img src="assets/images/certificates/tesda-java-nc3.jpg" alt="TESDA Programming (Java) NC III certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                  <span class="thumb__ph halftone halftone--dense" data-initials="NC" aria-hidden="true"></span>
+                </figure>
+                <div class="cert__body">
+                  <h3 class="cert__title">Programming (Java) NC III</h3>
+                  <p class="cert__issuer">TESDA Scholarship Program · NRG Info-Tech Institute, Inc.</p>
+                </div>
+                <p class="cert__year label">2025</p>
+              </li>
+              <li class="cert">
+                <figure class="thumb thumb--cert">
+                  <img src="assets/images/certificates/albay-ai-practical-applications.jpg" alt="Practical Applications of AI for Daily Use certificate" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                  <span class="thumb__ph halftone halftone--dense" data-initials="AI" aria-hidden="true"></span>
+                </figure>
+                <div class="cert__body">
+                  <h3 class="cert__title">Practical Applications of AI for Daily Use</h3>
+                  <p class="cert__issuer">Albay Institute for AI</p>
+                </div>
+                <p class="cert__year label">2025</p>
+              </li>
+              <li class="cert">
+                <figure class="thumb thumb--cert">
+                  <img src="assets/images/certificates/cisco-intro-cybersecurity.jpg" alt="Cisco Networking Academy Introduction to Cybersecurity badge" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                  <span class="thumb__ph halftone halftone--dense" data-initials="CS" aria-hidden="true"></span>
+                </figure>
+                <div class="cert__body">
+                  <h3 class="cert__title">Introduction to Cybersecurity</h3>
+                  <p class="cert__issuer">Cisco Networking Academy</p>
+                </div>
+                <p class="cert__year label">2026</p>
+              </li>
+              <li class="cert">
+                <figure class="thumb thumb--cert">
+                  <img src="assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg" alt="Cisco Networking Academy Junior Cybersecurity Analyst badge" loading="lazy" decoding="async" onerror="this.parentNode.classList.add('thumb--missing')" />
+                  <span class="thumb__ph halftone halftone--dense" data-initials="JC" aria-hidden="true"></span>
+                </figure>
+                <div class="cert__body">
+                  <h3 class="cert__title">Junior Cybersecurity Analyst</h3>
+                  <p class="cert__issuer">Cisco Networking Academy</p>
+                </div>
+                <p class="cert__year label">2026</p>
+              </li>
+            </ul>
+          </section>
+
+          <!-- ============================================================ Contact -->
           <section class="section" id="contact" aria-labelledby="contact-title">
             <div class="section__head">
-              <h2 class="section__title" id="contact-title"><span class="num">07</span> — contact</h2>
+              <h2 class="section__title" id="contact-title">Contact</h2>
             </div>
-            <p class="contact__lead">
-              Open to internships, freelance work, and collaborations. Email is the fastest way to reach me.
-            </p>
-            <div class="contact__grid">
-              <div class="contact__row">
-                <span class="label">Email</span>
-                <a href="mailto:deguzmanadriankim@gmail.com">deguzmanadriankim@gmail.com</a>
+            <div class="contact">
+              <div>
+                <p class="contact__lead">Open to internships, freelance work, and collaborations. Email is the fastest way to reach me.</p>
+                <a class="btn btn--primary" href="mailto:deguzmanadriankim@gmail.com">
+                  <svg class="icon" aria-hidden="true"><use href="#i-mail" /></svg>
+                  Send an email
+                </a>
               </div>
-              <div class="contact__row">
-                <span class="label">Phone</span>
-                <span class="val">+63 994 996 1074</span>
-              </div>
-              <div class="contact__row">
-                <span class="label">Location</span>
-                <span class="val">Ligao City, Albay, Philippines</span>
-              </div>
-              <div class="contact__row">
-                <span class="label">GitHub</span>
-                <a class="ext" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer"
-                  >github.com/Vurios<span class="visually-hidden"> (opens in a new tab)</span></a
-                >
-              </div>
-              <div class="contact__row">
-                <span class="label">LinkedIn</span>
-                <a
-                  class="ext"
-                  href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >linkedin.com/in/adrian-kim-de-guzman<span class="visually-hidden"> (opens in a new tab)</span></a
-                >
-              </div>
-              <div class="contact__row">
-                <span class="label">Facebook</span>
-                <a class="ext" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer"
-                  >facebook.com/kim.pdeguzman<span class="visually-hidden"> (opens in a new tab)</span></a
-                >
+              <div class="contact__grid">
+                <div class="contact__row">
+                  <span class="label">Email</span>
+                  <a href="mailto:deguzmanadriankim@gmail.com">deguzmanadriankim@gmail.com</a>
+                </div>
+                <div class="contact__row">
+                  <span class="label">Phone</span>
+                  <span class="val">+63 994 996 1074</span>
+                </div>
+                <div class="contact__row">
+                  <span class="label">Location</span>
+                  <span class="val">Ligao City, Albay, Philippines</span>
+                </div>
+                <div class="contact__row">
+                  <span class="label">GitHub</span>
+                  <a class="ext" href="https://github.com/Vurios" target="_blank" rel="noopener noreferrer">github.com/Vurios<span class="visually-hidden"> (opens in a new tab)</span></a>
+                </div>
+                <div class="contact__row">
+                  <span class="label">LinkedIn</span>
+                  <a class="ext" href="https://www.linkedin.com/in/adrian-kim-de-guzman-2b3683367/" target="_blank" rel="noopener noreferrer">linkedin.com/in/adrian-kim-de-guzman<span class="visually-hidden"> (opens in a new tab)</span></a>
+                </div>
+                <div class="contact__row">
+                  <span class="label">Facebook</span>
+                  <a class="ext" href="https://www.facebook.com/kim.pdeguzman/" target="_blank" rel="noopener noreferrer">facebook.com/kim.pdeguzman<span class="visually-hidden"> (opens in a new tab)</span></a>
+                </div>
               </div>
             </div>
 
             <footer class="footer">
-              <p class="footer__name">adrian kim p. de guzman</p>
+              <p class="footer__name">Adrian Kim P. De Guzman</p>
               <p class="label">© <span data-year>2026</span> · Ligao City, Albay</p>
             </footer>
           </section>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="js/main.js" defer></script>

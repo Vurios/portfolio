@@ -24,33 +24,39 @@ Then visit <http://localhost:8000>.
 
 ```
 index.html            # the whole site
-css/styles.css        # design tokens, layout, components, motion
-js/main.js            # theme toggle, mobile menu, active nav, scroll reveal
+css/styles.css        # tokens, layout, components, motion
+js/main.js            # image config, carousels, theme, mobile menu, active nav + progress
 assets/
-  fonts/              # Geist Pixel (self-hosted, SIL OFL)
-  images/projects/    # project screenshots (drop files here)
-  images/certifications/  # certificate / badge images (drop files here)
-  profile/            # kim.png, the hero portrait (transparent PNG)
+  images/projects/      # project screenshots (carousels)
+  images/achievements/  # hackathon / competition photos (carousels)
+  images/certificates/  # certificate scans (single image each)
+  profile/              # portrait, brand mark, favicons, Open Graph card
+resume.pdf            # TODO: not added yet; the sidebar button already links here
 ```
 
 ## Adding images
 
-Each project and certification card already points at a file path. Drop an image at that path and the placeholder is replaced automatically, no markup changes needed:
+**Projects and achievements** use carousels. The file lists live at the top of [js/main.js](js/main.js) in the `IMAGES` object; add or remove paths there and drop the files in place. Missing files are skipped, and when none of a card's files exist the dotted placeholder shows. Arrows and dots appear only when two or more images load.
 
-| Card | Path |
+| Card | Config key | Default paths |
+|---|---|---|
+| SARO | `projects.saro` | `assets/images/projects/saro-1.jpg` … `saro-3.jpg` |
+| ARGUSPH | `projects.argusph` | `assets/images/projects/argusph-1.jpg` … `argusph-3.jpg` |
+| SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack-1.jpg` … `safetrack-3.jpg` |
+| Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant-1.jpg` … `-3.jpg` |
+| Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
+| AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
+
+**Certificates** are single images referenced directly in `index.html`:
+
+| Certificate | Path |
 |---|---|
-| SARO | `assets/images/projects/saro.jpg` |
-| ARGUSPH | `assets/images/projects/argusph.jpg` |
-| Intelligent Library Assistant | `assets/images/projects/library-assistant.jpg` |
-| Ibalong Hackathon 3rd Place | `assets/images/certifications/ibalong-hackathon-2026.jpg` |
-| AI4AI Vibe Coding 1st Runner-Up | `assets/images/certifications/ai4ai-vibe-coding-2026.jpg` |
-| Cisco Intro to Cybersecurity | `assets/images/certifications/cisco-intro-cybersecurity.jpg` |
-| Cisco Junior Cybersecurity Analyst | `assets/images/certifications/cisco-junior-cybersecurity-analyst.jpg` |
-| TESDA Java NC III | `assets/images/certifications/tesda-java-nc3.jpg` |
+| Programming (Java) NC III | `assets/images/certificates/tesda-java-nc3.jpg` |
+| Practical Applications of AI for Daily Use | `assets/images/certificates/albay-ai-practical-applications.jpg` |
+| Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` |
+| Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` |
 
-Project images are shown at 16:9, certification images at 4:3.
-
-To replace the hero portrait, overwrite `assets/profile/kim.png` with another transparent PNG (roughly square, subject centered); the frame and halftone dissolve adapt automatically.
+**Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, roughly square). The brand mark, favicons, and `og.png` are separate files in the same folder and need regenerating if the portrait changes.
 
 ## Deployment
 
