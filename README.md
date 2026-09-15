@@ -49,7 +49,7 @@ resume.pdf            # TODO: not added yet; the sidebar button already links he
 | Ibalong Hackathon 2026 (event photos) | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
 | AI4AI Fair 2026 (event photos) | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
 
-**Award certificates** (cards under Achievements) are single images referenced directly in `index.html`:
+**Award certificates** (first two rows of the Certificates section) are single images referenced directly in `index.html`:
 
 | Card | Path |
 |---|---|
