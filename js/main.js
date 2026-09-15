@@ -429,6 +429,31 @@ var IMAGES = {
     });
   }
 
+  /* ------------------------------------------------------- portrait develops */
+  // The halftone field behind the photo resolves in once, the first time the
+  // hero is on screen (styles.css, "Developing"). A timer guarantees the
+  // photo shows even if the observer never fires.
+  var portrait = document.querySelector(".portrait");
+  if (portrait) {
+    var develop = function () {
+      portrait.classList.add("is-developed");
+    };
+    if (reduceMotion.matches || !("IntersectionObserver" in window)) {
+      develop();
+    } else {
+      var portraitIO = new IntersectionObserver(
+        function (entries, obs) {
+          if (!entries[0].isIntersecting) return;
+          obs.disconnect();
+          window.setTimeout(develop, 120);
+        },
+        { threshold: 0.3 }
+      );
+      portraitIO.observe(portrait);
+      window.setTimeout(develop, 2500);
+    }
+  }
+
   /* -------------------------------------------------------------- typed name */
   var typed = document.querySelector("[data-type]");
   if (typed && !reduceMotion.matches) {

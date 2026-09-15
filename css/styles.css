@@ -424,9 +424,15 @@ a.ext:hover::after {
   border-color: rgb(var(--ink));
 }
 
-/* Halftone texture */
+/* Halftone texture. The dot radius is a registered property so the portrait
+   can grow its dots in from nothing (see "Portrait" below). */
+@property --dot-r {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 1px;
+}
 .halftone {
-  background-image: radial-gradient(circle at center, rgb(var(--ink) / var(--dot-alpha)) 1px, transparent 1.1px);
+  background-image: radial-gradient(circle at center, rgb(var(--ink) / var(--dot-alpha)) var(--dot-r, 1px), transparent calc(var(--dot-r, 1px) + 0.1px));
   background-size: 9px 9px;
 }
 .halftone--dense {
@@ -878,6 +884,39 @@ a.ext:hover::after {
   inset: 0;
   pointer-events: none;
 }
+/* Crop marks in the corners, like a print proof: the frame */
+.portrait::before,
+.portrait::after,
+.portrait__marks::before,
+.portrait__marks::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  width: 12px;
+  height: 12px;
+  border: 0 solid rgb(var(--ink) / 0.3);
+  pointer-events: none;
+}
+.portrait::before {
+  top: 11px;
+  left: 11px;
+  border-width: 1px 0 0 1px;
+}
+.portrait::after {
+  top: 11px;
+  right: 11px;
+  border-width: 1px 1px 0 0;
+}
+.portrait__marks::before {
+  bottom: 11px;
+  left: 11px;
+  border-width: 0 0 1px 1px;
+}
+.portrait__marks::after {
+  bottom: 11px;
+  right: 11px;
+  border-width: 0 1px 1px 0;
+}
 .portrait__dots--fine {
   --dot-alpha: var(--portrait-fine);
   -webkit-mask-image: radial-gradient(ellipse 55% 50% at 50% 42%, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 100%);
@@ -895,6 +934,46 @@ a.ext:hover::after {
   height: 100%;
   object-fit: cover;
   object-position: 50% 0%;
+}
+/* Developing: the first time the hero is on screen the dots grow in from
+   nothing, fine screen first then the coarse one, while the photo comes up
+   from a washed-out print to full contrast. Runs once (main.js adds
+   .is-developed); without JS, or with reduced motion, the resting state
+   shows at once. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .portrait:not(.is-developed) .portrait__dots {
+    --dot-r: 0px;
+  }
+  html.js .portrait:not(.is-developed) img {
+    opacity: 0;
+    filter: contrast(0.55) brightness(1.2);
+  }
+  html.js .portrait .portrait__dots {
+    transition: --dot-r 900ms var(--ease-out);
+  }
+  html.js .portrait .portrait__dots--coarse {
+    transition-delay: 180ms;
+  }
+  html.js .portrait img {
+    transition: opacity 1000ms ease, filter 1300ms ease;
+  }
+  /* Ambient: once developed, the two screens breathe very slowly against
+     each other so the field never goes fully still */
+  .portrait.is-developed .portrait__dots--fine {
+    animation: portrait-breathe 11s ease-in-out 1.4s infinite;
+  }
+  .portrait.is-developed .portrait__dots--coarse {
+    animation: portrait-breathe 11s ease-in-out 6.9s infinite;
+  }
+}
+@keyframes portrait-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.78;
+  }
 }
 
 /* --------------------------------------------------------------------------
