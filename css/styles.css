@@ -1195,24 +1195,50 @@ a.ext:hover::after {
 .card:hover {
   border-color: rgb(var(--gray-400));
 }
-/* Card titles gain an underline on hover */
-.project__title,
-.achievement__title {
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-  transition: text-decoration-color 300ms ease;
+/* Card hover: the halftone field zooms like a photo would, the initials chip
+   inverts, the category label turns ink, and the tag pills light up one after
+   another from left to right */
+.card .thumb__ph {
+  transition: transform 600ms var(--ease-out);
+  transform-origin: center;
 }
-.card:hover .project__title,
-.card:hover .achievement__title {
-  text-decoration-color: rgb(var(--ink) / 0.6);
+.card:hover .thumb__ph {
+  transform: scale(1.06);
+}
+.card .thumb__ph::after {
+  transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+}
+.card:hover .thumb__ph::after {
+  background: rgb(var(--ink));
+  color: rgb(var(--bg));
+  border-color: rgb(var(--ink));
 }
 .card:hover .meta {
   color: rgb(var(--ink));
 }
 .meta {
   transition: color 250ms ease;
+}
+.card .pills .pill {
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+.card:hover .pills .pill {
+  color: rgb(var(--ink));
+  border-color: rgb(var(--ink) / 0.6);
+}
+.card:hover .pills .pill:nth-child(1) { transition-delay: 0ms; }
+.card:hover .pills .pill:nth-child(2) { transition-delay: 45ms; }
+.card:hover .pills .pill:nth-child(3) { transition-delay: 90ms; }
+.card:hover .pills .pill:nth-child(4) { transition-delay: 135ms; }
+.card:hover .pills .pill:nth-child(5) { transition-delay: 180ms; }
+.card:hover .pills .pill:nth-child(6) { transition-delay: 225ms; }
+.card:hover .pills .pill:nth-child(7) { transition-delay: 270ms; }
+.card:hover .pills .pill:nth-child(8) { transition-delay: 315ms; }
+.card .achievement__place {
+  transition: letter-spacing 400ms var(--ease-out);
+}
+.card:hover .achievement__place {
+  letter-spacing: 0.04em;
 }
 
 .thumb {
