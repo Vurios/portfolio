@@ -35,7 +35,7 @@ assets/
   profile/              # portrait (kim.png), Open Graph card
   kuro/jess.png         # Kuro's sprite sheet: 256x128, 8x4 cells of 32x32, oneko layout
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
-resume.pdf            # TODO: not added yet; the sidebar button already links here
+resume.pdf            # shown by "view resume": a viewer dialog on desktop, the file itself on phones
 ```
 
 Kuro, the black cat, is built on [oneko.js](https://github.com/adryd325/oneko.js) by adryd (MIT, license kept in `js/kuro.js`). He sits on the page, so he scrolls with it and stays where he was left. Clicking him (tapping, on phones) cycles his modes: wander (strolls to quiet spots, never onto text or links), follow (chases your cursor, desktop only) and stay. Drag him anywhere and he stays there. Rest the cursor on him to pet him. He remembers his mode and spot between visits. His sprite sheet is `assets/kuro/jess.png`; swap that file for another 256x128 oneko-layout sheet to change his look. The favicon is his face, cropped from the same sheet at runtime; there is no committed favicon file.
