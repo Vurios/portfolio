@@ -257,14 +257,37 @@ var IMAGES = {
     if (typeof document.startViewTransition === "function" && origin) {
       // Circular reveal expanding from the toggle
       var r = origin.getBoundingClientRect();
-      var x = r.left + r.width / 2;
-      var y = r.top + r.height / 2;
-      var radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-      root.style.setProperty("--vt-x", x + "px");
-      root.style.setProperty("--vt-y", y + "px");
-      root.style.setProperty("--vt-r", radius + "px");
-      document.startViewTransition(function () {
+      var x = Math.round(r.left + r.width / 2);
+      var y = Math.round(r.top + r.height / 2);
+      var radius = Math.ceil(Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y)));
+
+      window.__themeTransitioning = true;
+      var transition = document.startViewTransition(function () {
         setTheme(theme);
+      });
+
+      transition.ready.then(function () {
+        var anim = document.documentElement.animate(
+          {
+            clipPath: [
+              "circle(0px at " + x + "px " + y + "px)",
+              "circle(" + radius + "px at " + x + "px " + y + "px)"
+            ]
+          },
+          {
+            duration: 360,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            pseudoElement: "::view-transition-new(root)"
+          }
+        );
+        anim.finished.finally(function () {
+          window.__themeTransitioning = false;
+        });
+      }).catch(function () {
+        window.__themeTransitioning = false;
+      });
+      transition.finished.finally(function () {
+        window.__themeTransitioning = false;
       });
       return;
     }
@@ -277,6 +300,7 @@ var IMAGES = {
 
   for (var t = 0; t < toggles.length; t++) {
     toggles[t].addEventListener("click", function (e) {
+      if (window.__themeTransitioning) return;
       var next = currentTheme() === "dark" ? "light" : "dark";
       try {
         localStorage.setItem("theme", next);

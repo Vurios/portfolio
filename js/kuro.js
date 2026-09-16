@@ -311,6 +311,7 @@
 
   /* ------------------------------------ logic tick (oneko cadence) ---- */
   function tick() {
+    if (window.__themeTransitioning) return;
     ticks += 1;
     if (ticks % 10 === 0) measure();
     if (held || settling || press) return;
@@ -372,7 +373,7 @@
 
   /* --------------------------------- smooth movement (every frame) ---- */
   function step(dt) {
-    if (!moving || held || settling || press) return;
+    if (!moving || held || settling || press || window.__themeTransitioning) return;
     var t = currentTarget();
     if (!t) {
       moving = false;
@@ -943,6 +944,11 @@
   var last = performance.now();
   var tickAcc = 0;
   function loop(now) {
+    if (window.__themeTransitioning) {
+      last = now;
+      window.requestAnimationFrame(loop);
+      return;
+    }
     var dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     tickAcc += dt;

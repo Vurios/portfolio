@@ -110,15 +110,22 @@ body {
 /* Theme crossfade — toggled on <html> for ~300ms by main.js; skipped under
    prefers-reduced-motion (main.js never adds the class) */
 html.theme-transition,
-html.theme-transition *,
-html.theme-transition *::before,
-html.theme-transition *::after {
+html.theme-transition body,
+html.theme-transition .site,
+html.theme-transition .main,
+html.theme-transition .sidebar,
+html.theme-transition .topbar,
+html.theme-transition .card,
+html.theme-transition .btn,
+html.theme-transition .icon-btn,
+html.theme-transition .section,
+html.theme-transition .timeline,
+html.theme-transition .highlight,
+html.theme-transition .kuro-bubble {
   transition:
-    background-color 300ms ease,
-    color 300ms ease,
-    border-color 300ms ease,
-    fill 300ms ease,
-    stroke 300ms ease !important;
+    background-color 240ms ease,
+    color 240ms ease,
+    border-color 240ms ease !important;
 }
 
 ::selection {
@@ -1942,16 +1949,11 @@ html.js .fade-up {
   animation: none;
   mix-blend-mode: normal;
 }
-::view-transition-new(root) {
-  animation: theme-reveal 540ms var(--ease-out);
+::view-transition-old(root) {
+  z-index: 1;
 }
-@keyframes theme-reveal {
-  from {
-    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
-  }
-  to {
-    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 50%));
-  }
+::view-transition-new(root) {
+  z-index: 9999;
 }
 
 @media (prefers-reduced-motion: reduce) {
