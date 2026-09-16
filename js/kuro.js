@@ -41,7 +41,7 @@
   "use strict";
 
   var SPRITE = "assets/kuro/jess.png";
-  var STORE = "kuro";
+  var STORE = "kuro_v2";
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarse = window.matchMedia("(hover: none), (pointer: coarse)").matches;
@@ -868,18 +868,25 @@
 
   /* ------------------------------------------------------ start ---- */
   // Somewhere on screen: where he was on screen last time. On a first visit
-  // he sits just under the portrait, where the eye lands first; on phones,
-  // where the hero is packed tight, bottom right of the first screen.
+  // he sits perched right above the Academics card (below the portrait);
+  // on phones, where the hero is packed tight, bottom right of the first screen.
   function placeInView() {
     var v = viewBounds();
     if (typeof saved.vx === "number" && typeof saved.vy === "number") {
       pos = clampTo({ x: saved.vx * pageW, y: window.scrollY + saved.vy * window.innerHeight }, v);
       return;
     }
+    var academics = document.querySelector(".highlights") || document.querySelector(".highlight");
+    var ar = academics && academics.getBoundingClientRect();
     var portrait = document.querySelector(".hero__portrait");
-    var r = portrait && portrait.getBoundingClientRect();
-    if (!mobile && r && r.width > 0) {
-      pos = clampTo({ x: r.left + r.width / 2 + window.scrollX, y: r.bottom + HALF + 24 + window.scrollY }, v);
+    var pr = portrait && portrait.getBoundingClientRect();
+    if (!mobile && ar && ar.width > 0 && ar.top < window.innerHeight) {
+      var x = pr && pr.width > 0 ? (pr.left + pr.width / 2) : (ar.left + ar.width * 0.75);
+      x = Math.min(ar.right - HALF - 8, Math.max(ar.left + HALF + 8, x)) + window.scrollX;
+      var y = ar.top + window.scrollY - Math.round(13.5 * SCALE);
+      pos = clampTo({ x: x, y: y }, v);
+    } else if (!mobile && pr && pr.width > 0) {
+      pos = clampTo({ x: pr.left + pr.width / 2 + window.scrollX, y: pr.bottom + HALF + 24 + window.scrollY }, v);
     } else {
       pos = clampTo({ x: pageW - (mobile ? 64 : 180), y: window.scrollY + window.innerHeight - (mobile ? 150 : 130) }, v);
     }
@@ -898,7 +905,7 @@
   // behind, bring him back into view (unless he was told to stay)
   window.addEventListener("load", function () {
     measure();
-    if (mode !== "stay" && !held && !inView()) {
+    if (mode !== "stay" && !held && (!inView() || (typeof saved.vx !== "number" && !moving && !press))) {
       placeInView();
       place();
     }
