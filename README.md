@@ -25,13 +25,16 @@ Then visit <http://localhost:8000>.
 ```
 index.html            # the whole site
 css/styles.css        # tokens, layout, components, motion
-js/main.js            # image config, carousels, theme, mobile menu, active nav, reveals
+js/images.js          # the image lists: one entry per project / achievement
+js/main.js            # carousels, lightbox, theme, mobile menu, active nav, reveals
 js/kuro.js            # Kuro, the cat: oneko.js sprites/idle logic (MIT) with smooth movement, wander / follow / stay modes, petting, drag, speech bubble, favicon
 assets/
-  images/projects/      # project screenshots (carousels)
-  images/achievements/  # hackathon / competition photos (carousels)
+  images/projects/      # one folder per project, numbered in display order
+  images/achievements/  # one folder per award, numbered in display order
   images/internships/   # internship completion certificates (single image each)
   images/certificates/  # certificate scans (single image each)
+  images/_originals/    # every photo at full resolution, as delivered
+  images/_unused/       # shot but not published, with the reason in git log
   profile/              # portrait (kim.png), Open Graph card
   kuro/jess.png         # Kuro's sprite sheet: 256x128, 8x4 cells of 32x32, oneko layout
   fonts/                # Geist Pixel (self-hosted, SIL OFL)
@@ -42,18 +45,45 @@ Kuro, the black cat, is built on [oneko.js](https://github.com/adryd325/oneko.js
 
 ## Adding images
 
-**Projects and achievements** use carousels. The file lists live at the top of [js/main.js](js/main.js) in the `IMAGES` object; add or remove paths there and drop the files in place. Entries are a path string or `{ src, caption }`; a caption shows as a small chip on that slide (use the form "Document name · Year"). Missing files are skipped, and when none of a card's files exist the dotted placeholder shows. Arrows and dots appear only when two or more images load.
+**Projects and achievements** use carousels. The lists live in
+[js/images.js](js/images.js), one entry per card:
 
-| Card | Config key | Default paths |
+```js
+"ibalong-2026": {
+  title: "Ibalong Festival Hackathon 2026",
+  images: [
+    {
+      src: "assets/images/achievements/ibalong-2026/01-3rd-place-award-card.jpg",
+      w: 1080, h: 1080,               // intrinsic size, so nothing shifts on load
+      alt: "What the picture shows.", // for someone who cannot see it
+      pos: "center 62%",              // optional, when a centre crop cuts the point
+      caption: "3rd Place · Bantong Award" // optional chip on the slide
+    }
+  ]
+}
+```
+
+Files live one folder per item, named with the order prefix that is their
+display order: `01-`, `02-`, `03-`. The first image is the cover, and it is
+the one the card shows. Order the rest as a story — the finished thing, then
+the moment, then the details.
+
+Missing files are skipped, so a card can be listed before its screenshots
+exist; when none of a card's files load, the dotted placeholder shows. Arrows,
+dots and the `1 / n` tally appear only when two or more images load. Every
+frame opens the lightbox on click, with arrow keys, swipe and Esc.
+
+| Card | Config key | Folder |
 |---|---|---|
-| SARO | `projects.saro` | `assets/images/projects/saro-1.jpg` … `saro-3.jpg` |
-| ARGUSPH | `projects.argusph` | `assets/images/projects/argusph-1.jpg` … `argusph-3.jpg` |
-| SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack-1.jpg` … `safetrack-3.jpg` |
-| Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant-1.jpg` … `-3.jpg` |
-| Ibalong Hackathon 2026 (event photos) | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026-1.jpg` … `-3.jpg` |
-| AI4AI Fair 2026 (event photos) | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026-1.jpg` … `-3.jpg` |
+| SARO | `projects.saro` | `assets/images/projects/saro/` |
+| ARGUSPH | `projects.argusph` | `assets/images/projects/argusph/` (empty) |
+| SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack/` |
+| Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant/` (empty) |
+| Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026/` |
+| AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026/` |
 
-**Award certificates** (first two rows of the Certificates section) are single images referenced directly in `index.html`:
+**Award certificates** (first two rows of the Certificates section) are single
+images referenced directly in `index.html`:
 
 | Card | Path |
 |---|---|
@@ -66,15 +96,24 @@ Kuro, the black cat, is built on [oneko.js](https://github.com/adryd325/oneko.js
 |---|---|
 | NRG Info-Tech / TESDA (Programming NC III) | `assets/images/internships/tesda.jpg` |
 | Ollopa Corporation | `assets/images/internships/ollopa.jpg` |
-| Knowles Training Institute | `assets/images/internships/knowles.jpg` |
+| Knowles Training Institute | `assets/images/internships/knowles.jpg` (not supplied yet) |
 
 **Certificates** are single images referenced directly in `index.html`:
 
 | Certificate | Path |
 |---|---|
 | Practical Applications of AI for Daily Use | `assets/images/certificates/albay-ai-practical-applications.jpg` |
-| Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` |
-| Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` |
+| Introduction to Cybersecurity | `assets/images/certificates/cisco-intro-cybersecurity.jpg` (not supplied yet) |
+| Junior Cybersecurity Analyst | `assets/images/certificates/cisco-junior-cybersecurity-analyst.jpg` (not supplied yet) |
+
+Certificate thumbnails open the same lightbox once their file loads, so the
+certificate can be read; the ones still missing keep their placeholder and
+stay inert.
+
+**Sizing**: keep the full-resolution file in `assets/images/_originals/` and
+publish a resized progressive JPEG — under about 150 KB for a cover or card,
+under about 300 KB for a gallery image, longest edge 1200 to 1600 px.
+Certificates are only resized and compressed, never cropped or retouched.
 
 **Portrait**: overwrite `assets/profile/kim.png` (transparent PNG, square). `og.png` is a separate file in the same folder and needs regenerating if the portrait changes.
 
