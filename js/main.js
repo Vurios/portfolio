@@ -1,50 +1,8 @@
 /* Kim De Guzman — portfolio
-   Image config, carousels, theme toggle, overlay menu, active nav, scroll
+   Carousels and lightbox, theme toggle, overlay menu, active nav, scroll
    reveal, typed name, copy button, back-to-top.
+   Image lists live in js/images.js (loaded first).
    No dependencies. The page is usable without this file. */
-
-/* ----------------------------------------------------------------- images
-   Add or remove filenames here; no markup changes needed. Each key matches a
-   data-carousel="group:key" attribute in index.html. Entries are either a
-   path string or { src, caption }; a caption shows as a small chip on that
-   slide. Missing files are skipped automatically; when none load, the
-   halftone placeholder shows. */
-var IMAGES = {
-  projects: {
-    saro: [
-      "assets/images/projects/saro-1.jpg",
-      "assets/images/projects/saro-2.jpg",
-      "assets/images/projects/saro-3.jpg"
-    ],
-    argusph: [
-      "assets/images/projects/argusph-1.jpg",
-      "assets/images/projects/argusph-2.jpg",
-      "assets/images/projects/argusph-3.jpg"
-    ],
-    safetrack: [
-      "assets/images/projects/safetrack-1.jpg",
-      "assets/images/projects/safetrack-2.jpg",
-      "assets/images/projects/safetrack-3.jpg"
-    ],
-    "library-assistant": [
-      "assets/images/projects/library-assistant-1.jpg",
-      "assets/images/projects/library-assistant-2.jpg",
-      "assets/images/projects/library-assistant-3.jpg"
-    ]
-  },
-  achievements: {
-    "ibalong-2026": [
-      { src: "assets/images/achievements/ibalong-2026-1.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ibalong-2026-2.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ibalong-2026-3.jpg", caption: "Event photo · 2026" }
-    ],
-    "ai4ai-2026": [
-      { src: "assets/images/achievements/ai4ai-2026-1.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ai4ai-2026-2.jpg", caption: "Event photo · 2026" },
-      { src: "assets/images/achievements/ai4ai-2026-3.jpg", caption: "Event photo · 2026" }
-    ]
-  }
-};
 
 (function () {
   "use strict";
@@ -73,6 +31,164 @@ var IMAGES = {
     return svg;
   }
 
+  /* -------------------------------------------------------------- lightbox
+     One viewer, reused by every gallery and every certificate thumbnail.
+     Built on first use so a visitor who never enlarges anything never pays
+     for it. */
+  var box = null;
+
+  function buildLightbox() {
+    var node = el("div", "lightbox", {
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": "Image viewer",
+      hidden: "hidden"
+    });
+    var backdrop = el("div", "lightbox__backdrop");
+    var stage = el("div", "lightbox__stage");
+    var img = el("img", "lightbox__img", { alt: "", decoding: "async" });
+    var cap = el("figcaption", "lightbox__cap");
+    var count = el("span", "lightbox__count");
+    var text = el("span", "lightbox__text");
+    cap.appendChild(count);
+    cap.appendChild(text);
+    var fig = el("figure", "lightbox__figure");
+    fig.appendChild(img);
+    fig.appendChild(cap);
+    stage.appendChild(fig);
+
+    var close = el("button", "lightbox__close", { type: "button", "aria-label": "Close image viewer" });
+    close.appendChild(iconSvg("i-close"));
+    var prev = el("button", "lightbox__btn lightbox__btn--prev", { type: "button", "aria-label": "Previous image" });
+    prev.appendChild(iconSvg("i-arrow-left"));
+    var next = el("button", "lightbox__btn lightbox__btn--next", { type: "button", "aria-label": "Next image" });
+    next.appendChild(iconSvg("i-arrow-right"));
+
+    node.appendChild(backdrop);
+    node.appendChild(stage);
+    node.appendChild(close);
+    node.appendChild(prev);
+    node.appendChild(next);
+    document.body.appendChild(node);
+
+    var state = { items: [], index: 0, opener: null };
+
+    function show(n) {
+      var count_ = state.items.length;
+      state.index = ((n % count_) + count_) % count_;
+      var it = state.items[state.index];
+      img.setAttribute("src", it.src);
+      img.setAttribute("alt", it.alt);
+      if (it.w && it.h) {
+        img.setAttribute("width", it.w);
+        img.setAttribute("height", it.h);
+      } else {
+        img.removeAttribute("width");
+        img.removeAttribute("height");
+      }
+      count.textContent = count_ > 1 ? state.index + 1 + " / " + count_ : "";
+      text.textContent = it.caption || "";
+      cap.hidden = !count.textContent && !text.textContent;
+      var many = count_ > 1;
+      prev.hidden = !many;
+      next.hidden = !many;
+    }
+
+    function open(items, index, opener) {
+      if (!items.length) return;
+      state.items = items;
+      state.opener = opener || null;
+      node.hidden = false;
+      document.body.classList.add("is-lightboxed");
+      show(index || 0);
+      close.focus();
+    }
+
+    function shut() {
+      node.hidden = true;
+      document.body.classList.remove("is-lightboxed");
+      img.removeAttribute("src");
+      if (state.opener && document.contains(state.opener)) state.opener.focus();
+      state.opener = null;
+    }
+
+    close.addEventListener("click", shut);
+    backdrop.addEventListener("click", shut);
+    stage.addEventListener("click", function (e) {
+      if (e.target === stage) shut();
+    });
+    prev.addEventListener("click", function () {
+      show(state.index - 1);
+    });
+    next.addEventListener("click", function () {
+      show(state.index + 1);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (node.hidden) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        shut();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        show(state.index - 1);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        show(state.index + 1);
+      } else if (e.key === "Tab") {
+        // Keep focus inside the dialog: three controls, wrap by hand.
+        var focusable = [close, prev, next].filter(function (b) {
+          return !b.hidden;
+        });
+        var at = focusable.indexOf(document.activeElement);
+        e.preventDefault();
+        var step = e.shiftKey ? -1 : 1;
+        var to = (((at < 0 ? 0 : at + step) % focusable.length) + focusable.length) % focusable.length;
+        focusable[to].focus();
+      }
+    });
+
+    swipe(stage, function (dir) {
+      show(state.index + dir);
+    });
+
+    return { open: open };
+  }
+
+  function enlarge(items, index, opener) {
+    if (!box) box = buildLightbox();
+    box.open(items, index, opener);
+  }
+
+  /* Horizontal swipe on a node; calls back with +1 (next) or -1 (prev). */
+  function swipe(node, onSwipe) {
+    var startX = null;
+    var startY = null;
+    node.addEventListener(
+      "pointerdown",
+      function (e) {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        startX = e.clientX;
+        startY = e.clientY;
+      },
+      { passive: true }
+    );
+    node.addEventListener(
+      "pointerup",
+      function (e) {
+        if (startX === null) return;
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+        startX = startY = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) onSwipe(dx < 0 ? 1 : -1);
+      },
+      { passive: true }
+    );
+    node.addEventListener("pointercancel", function () {
+      startX = startY = null;
+    });
+    node.style.touchAction = "pan-y";
+  }
+
   /* --------------------------------------------------------------- carousel */
   function placeholder(initials) {
     var ph = el("span", "thumb__ph halftone", { "aria-hidden": "true" });
@@ -80,27 +196,46 @@ var IMAGES = {
     return ph;
   }
 
-  function buildCarousel(host, sources) {
+  /* Accepts a path string, a { src, caption } pair, or the full
+     { src, w, h, alt, pos, caption } record that js/images.js writes. */
+  function normalize(entry, i, altBase) {
+    var e = typeof entry === "string" ? { src: entry } : entry;
+    return {
+      src: e.src,
+      w: e.w || 0,
+      h: e.h || 0,
+      alt: e.alt || altBase + " " + (i + 1),
+      pos: e.pos || "",
+      caption: e.caption || ""
+    };
+  }
+
+  function buildCarousel(host, item) {
     var initials = host.getAttribute("data-initials") || "";
     var altBase = host.getAttribute("data-alt") || "Image";
+    var list = (item && item.images) || (item && item.length ? item : []);
+    var title = (item && item.title) || altBase;
     var track = el("div", "carousel__track");
     host.appendChild(track);
 
-    // Probe every configured file; keep the ones that actually load.
+    var sources = [];
+    for (var s = 0; s < list.length; s++) sources.push(normalize(list[s], s, altBase));
+
+    // Probe every configured file; keep the ones that actually load, so a
+    // gallery can be listed before its screenshots exist.
     var loaded = [];
     var pending = sources.length;
     if (!pending) return finish();
 
     sources.forEach(function (entry, i) {
-      var src = typeof entry === "string" ? entry : entry.src;
-      var caption = typeof entry === "string" ? "" : entry.caption || "";
-      var img = new Image();
-      img.onload = function () {
-        loaded.push({ src: src, caption: caption, index: i });
+      var probe = new Image();
+      probe.onload = function () {
+        entry.index = i;
+        loaded.push(entry);
         done();
       };
-      img.onerror = done;
-      img.src = src;
+      probe.onerror = done;
+      probe.src = entry.src;
     });
 
     function done() {
@@ -119,29 +254,50 @@ var IMAGES = {
         host.setAttribute("aria-label", altBase + " (no images yet)");
         return;
       }
-      loaded.forEach(function (item, n) {
+      loaded.forEach(function (it, n) {
         var slide = el("div", "carousel__slide", { role: "group", "aria-roledescription": "slide" });
         slide.setAttribute("aria-label", n + 1 + " of " + loaded.length);
-        var img = el("img", null, {
-          src: item.src,
-          alt: altBase + " " + (n + 1),
+        var attrs = {
+          src: it.src,
+          alt: it.alt,
           loading: n === 0 ? "eager" : "lazy",
           decoding: "async"
-        });
+        };
+        if (it.w && it.h) {
+          attrs.width = it.w;
+          attrs.height = it.h;
+        }
+        var img = el("img", null, attrs);
+        if (it.pos) img.style.objectPosition = it.pos; // keep the key line inside the crop
         slide.appendChild(placeholder(initials));
         slide.appendChild(img);
-        if (item.caption) {
+        if (it.caption) {
           var cap = el("p", "carousel__caption");
-          cap.textContent = item.caption;
+          cap.textContent = it.caption;
           slide.appendChild(cap);
         }
         track.appendChild(slide);
       });
-      if (loaded.length > 1) enableControls(host, track, loaded.length, altBase);
+
+      var index = 0;
+      var zoom = el("button", "carousel__zoom", {
+        type: "button",
+        "aria-label": "Enlarge " + title + (loaded.length > 1 ? ", " + loaded.length + " images" : "")
+      });
+      host.appendChild(zoom);
+      zoom.addEventListener("click", function () {
+        enlarge(loaded, index, zoom);
+      });
+
+      if (loaded.length > 1) {
+        enableControls(host, track, loaded.length, altBase, function (n) {
+          index = n;
+        });
+      }
     }
   }
 
-  function enableControls(host, track, count, altBase) {
+  function enableControls(host, track, count, altBase, onChange) {
     var index = 0;
     host.setAttribute("tabindex", "0");
     host.setAttribute("role", "region");
@@ -160,17 +316,21 @@ var IMAGES = {
       dots.appendChild(d);
       dotEls.push(d);
     }
+    var tally = el("p", "carousel__count");
     host.appendChild(prev);
     host.appendChild(next);
     host.appendChild(dots);
+    host.appendChild(tally);
 
     function go(n) {
       index = ((n % count) + count) % count; // wrap both ends
       track.style.transform = "translateX(-" + index * 100 + "%)";
+      tally.textContent = index + 1 + " / " + count;
       for (var k = 0; k < dotEls.length; k++) {
         if (k === index) dotEls[k].setAttribute("aria-current", "true");
         else dotEls[k].removeAttribute("aria-current");
       }
+      onChange(index);
     }
     go(0);
 
@@ -200,40 +360,58 @@ var IMAGES = {
       }
     });
 
-    // Swipe: pointer events, horizontal intent only
-    var startX = null;
-    var startY = null;
-    host.addEventListener(
-      "pointerdown",
-      function (e) {
-        if (e.pointerType === "mouse" && e.button !== 0) return;
-        startX = e.clientX;
-        startY = e.clientY;
-      },
-      { passive: true }
-    );
-    host.addEventListener(
-      "pointerup",
-      function (e) {
-        if (startX === null) return;
-        var dx = e.clientX - startX;
-        var dy = e.clientY - startY;
-        startX = startY = null;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? index + 1 : index - 1);
-      },
-      { passive: true }
-    );
-    host.addEventListener("pointercancel", function () {
-      startX = startY = null;
+    swipe(host, function (dir) {
+      go(index + dir);
     });
-    host.style.touchAction = "pan-y";
   }
 
   var hosts = document.querySelectorAll("[data-carousel]");
   for (var h = 0; h < hosts.length; h++) {
     var key = hosts[h].getAttribute("data-carousel").split(":");
-    var group = IMAGES[key[0]] || {};
-    buildCarousel(hosts[h], group[key[1]] || []);
+    var group = (typeof IMAGES === "object" && IMAGES[key[0]]) || {};
+    buildCarousel(hosts[h], group[key[1]]);
+  }
+
+  /* Certificate and internship thumbnails: same viewer, no visible controls,
+     so a visitor can actually read the certificate. */
+  var thumbs = document.querySelectorAll(".thumb--cert img, .thumb--cert-lg img");
+  for (var t = 0; t < thumbs.length; t++) {
+    (function (img) {
+      var figure = img.parentNode;
+      function openThis() {
+        enlarge(
+          [
+            {
+              src: img.getAttribute("src"),
+              alt: img.getAttribute("alt") || "",
+              caption: "",
+              w: img.naturalWidth,
+              h: img.naturalHeight
+            }
+          ],
+          0,
+          figure
+        );
+      }
+      // Only a thumbnail that actually loaded becomes a control; the ones
+      // still waiting on a file keep their halftone placeholder, inert.
+      function activate() {
+        if (!img.naturalWidth) return;
+        figure.classList.add("thumb--zoomable");
+        figure.setAttribute("tabindex", "0");
+        figure.setAttribute("role", "button");
+        figure.setAttribute("aria-label", "Enlarge: " + (img.getAttribute("alt") || "certificate"));
+        figure.addEventListener("click", openThis);
+        figure.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openThis();
+          }
+        });
+      }
+      if (img.complete) activate();
+      else img.addEventListener("load", activate);
+    })(thumbs[t]);
   }
 
   /* ------------------------------------------------------------------ theme */

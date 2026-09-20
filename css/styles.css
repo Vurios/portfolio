@@ -1461,6 +1461,166 @@ a.ext:hover::after {
   }
 }
 
+/* The whole frame opens the lightbox. It sits above the image and below the
+   arrows, dots and chips so those keep their own clicks. */
+.carousel__zoom {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: zoom-in;
+}
+.carousel__btn,
+.carousel__dots,
+.carousel__caption,
+.carousel__count {
+  z-index: 3;
+}
+.carousel__count {
+  position: absolute;
+  left: 0.6rem;
+  top: 0.6rem;
+  margin: 0;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: rgb(var(--bg) / 0.9);
+  border: 1px solid rgb(var(--gray-200));
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: rgb(var(--gray-600));
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.carousel:hover .carousel__count,
+.carousel:focus-within .carousel__count {
+  opacity: 1;
+}
+@media (hover: none) {
+  .carousel__count {
+    opacity: 1;
+  }
+}
+
+/* Certificate thumbnails become buttons once their file loads. */
+.thumb--zoomable {
+  cursor: zoom-in;
+}
+
+/* --------------------------------------------------------------------------
+   Lightbox — one viewer for every gallery and certificate
+   -------------------------------------------------------------------------- */
+.lightbox {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+}
+.lightbox[hidden] {
+  display: none;
+}
+.lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(6 6 8 / 0.88);
+}
+.lightbox__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 5vw, 3.5rem);
+  touch-action: pan-y;
+}
+.lightbox__figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: min(100%, 78rem);
+}
+.lightbox__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 78vh;
+  object-fit: contain;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(20 20 22);
+}
+.lightbox__cap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: rgb(238 238 238 / 0.72);
+}
+.lightbox__count {
+  color: rgb(238 238 238 / 0.5);
+}
+.lightbox__close,
+.lightbox__btn {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  background: rgb(18 18 20 / 0.72);
+  color: rgb(244 244 245);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+.lightbox__close:hover,
+.lightbox__btn:hover {
+  border-color: rgb(255 255 255 / 0.6);
+  background: rgb(28 28 32 / 0.9);
+}
+.lightbox__close {
+  top: 1rem;
+  right: 1rem;
+}
+.lightbox__btn {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.lightbox__btn--prev {
+  left: 1rem;
+}
+.lightbox__btn--next {
+  right: 1rem;
+}
+.lightbox__close .icon,
+.lightbox__btn .icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.lightbox__btn[hidden] {
+  display: none;
+}
+body.is-lightboxed {
+  overflow: hidden;
+}
+@media (max-width: 40rem) {
+  .lightbox__btn {
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
+  .lightbox__img {
+    max-height: 68vh;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Projects: alternating image / text at wide widths
    -------------------------------------------------------------------------- */
@@ -1522,6 +1682,11 @@ a.ext:hover::after {
 .achievements {
   display: grid;
   gap: 1.5rem;
+}
+/* The cover of each award gallery is a square announcement card; 16/10 would
+   cut the placement line off the bottom. */
+.achievement .carousel {
+  aspect-ratio: 4 / 3;
 }
 @media (min-width: 720px) {
   .achievements {
