@@ -1564,12 +1564,9 @@ a.ext:hover::after {
 }
 
 
-/* Hover and focus read as a still outline drawn inside the frame. */
-.carousel__zoom:hover,
-.carousel__zoom:focus-visible {
-  box-shadow: inset 0 0 0 2px rgb(var(--ink) / 0.35);
-}
-.thumb--zoomable:hover,
+/* Keyboard focus still needs a visible ring, but hover must not draw one:
+   an inset light border around the whole frame read as a stray white box. */
+.carousel__zoom:focus-visible,
 .thumb--zoomable:focus-visible {
   box-shadow: inset 0 0 0 2px rgb(var(--ink) / 0.35);
 }

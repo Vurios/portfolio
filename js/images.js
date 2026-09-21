@@ -237,7 +237,7 @@ var IMAGES = {
         },
         {
           src: "assets/images/achievements/ai4ai-2026/02-first-runner-up-trophy.webp",
-          w: 743,
+          w: 830,
           h: 963,
           alt: "The clear acrylic 1st runner-up trophy held in one hand, etched with the AI4AI Fair 2026 Vibe Coding Competition award and date.",
           caption: "The 1st Runner-up trophy"

@@ -471,27 +471,29 @@
             }
           ],
           0,
-          byPointer ? null : figure,
+          byPointer ? null : img,
           { title: img.getAttribute("alt") || "" }
         );
       }
       // Only a thumbnail that actually loaded becomes a control; the ones
       // still waiting on a file keep their halftone placeholder, inert.
+      // The control is the image, not the whole figure: the figure also holds
+      // the caption, and making that clickable put a button around the text.
       var byPointer = false;
       function activate() {
         if (!img.naturalWidth) return;
-        figure.classList.add("thumb--zoomable");
-        figure.setAttribute("tabindex", "0");
-        figure.setAttribute("role", "button");
-        figure.setAttribute("aria-label", "Enlarge: " + (img.getAttribute("alt") || "certificate"));
-        figure.addEventListener("pointerdown", function () {
+        img.classList.add("thumb--zoomable");
+        img.setAttribute("tabindex", "0");
+        img.setAttribute("role", "button");
+        img.setAttribute("aria-label", "Enlarge: " + (img.getAttribute("alt") || "certificate"));
+        img.addEventListener("pointerdown", function () {
           byPointer = true;
         });
-        figure.addEventListener("blur", function () {
+        img.addEventListener("blur", function () {
           byPointer = false;
         });
-        figure.addEventListener("click", openThis);
-        figure.addEventListener("keydown", function (e) {
+        img.addEventListener("click", openThis);
+        img.addEventListener("keydown", function (e) {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             openThis();
