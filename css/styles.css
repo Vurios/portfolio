@@ -1173,7 +1173,7 @@ a.ext:hover::after {
 .thumb.thumb--cert-lg::before {
   content: "";
   display: block;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 7 / 5;
   border-radius: 10px;
   border: 1px solid rgb(var(--gray-200));
   background: rgb(var(--gray-100));
@@ -1182,14 +1182,16 @@ a.ext:hover::after {
 .thumb.thumb--cert-lg .thumb__ph {
   position: absolute;
   inset: 0 0 auto 0;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 7 / 5;
   height: auto;
   border-radius: 10px;
   overflow: hidden;
 }
 .thumb.thumb--cert-lg img {
   z-index: 1;
-  object-fit: cover;
+  /* The whole certificate, on the flat card surface. */
+  object-fit: contain;
+  background: rgb(var(--gray-100));
 }
 .thumb.thumb--cert-lg .thumb__ph::after {
   font-size: 0.95rem;
@@ -1264,6 +1266,14 @@ a.ext:hover::after {
 .skill-group__label {
   margin-bottom: 0.7rem;
 }
+/* A pill's line box is taller than the pill, so the last row left visible
+   slack under it before the section rule. Trim the line box to the pill. */
+.skill-group .pills {
+  line-height: 1;
+}
+.skills > .skill-group:last-child {
+  padding-bottom: 0;
+}
 
 /* --------------------------------------------------------------------------
    Cards + image slots
@@ -1283,7 +1293,7 @@ a.ext:hover::after {
   box-shadow: var(--shadow-hover);
   transform: translateY(-2px);
 }
-.card:focus-within {
+.card:has(:focus-visible) {
   border-color: rgb(var(--gray-300));
 }
 .card:hover {
@@ -1339,9 +1349,16 @@ a.ext:hover::after {
   display: none;
 }
 
-/* Carousel (projects + achievements). Built by main.js from IMAGES config. */
+/* Carousel (projects + achievements). Built by main.js from IMAGES config.
+
+   One fixed ratio per section, chosen from the real images so the least space
+   is wasted: 16/10 for projects (14 of 20 shots are exactly 1.60), 4/3 for
+   achievements (square award cards next to 3:2 photos), 7/5 for the
+   certificate scans, which all sit between 1.37 and 1.42. Width is 100% and
+   the ratio does the rest, so every card in a section is the same height. */
 .carousel {
   position: relative;
+  width: 100%;
   aspect-ratio: 16 / 10;
   background: rgb(var(--gray-100));
   overflow: hidden;
@@ -1374,8 +1391,34 @@ a.ext:hover::after {
   object-fit: contain;
   object-position: center;
 }
+/* The gap around a contained image is filled by the image itself: same URL,
+   so no extra download, blurred and dimmed, scaled past the edges so the
+   blur's soft border never shows. Set by main.js as --shot on the slide. */
+.carousel__slide::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: var(--shot);
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) brightness(0.45) saturate(1.1);
+  transform: scale(1.18);
+}
+.carousel__slide--plain::before {
+  /* Certificates: a flat neutral, so document text is not smeared behind the
+     scan. */
+  background-image: none;
+  background-color: rgb(var(--gray-100));
+  filter: none;
+  transform: none;
+}
+/* The dotted placeholder is only for a slide with no image at all. */
 .carousel__slide .thumb__ph {
   z-index: 0;
+}
+.carousel__slide:has(img) .thumb__ph {
+  display: none;
 }
 .carousel__caption {
   position: absolute;
@@ -1395,6 +1438,7 @@ a.ext:hover::after {
 .carousel__btn {
   position: absolute;
   z-index: 2;
+  pointer-events: none;
   top: 50%;
   width: 2.75rem;
   height: 2.75rem;
@@ -1415,10 +1459,15 @@ a.ext:hover::after {
 .carousel__btn--next {
   right: 0.6rem;
 }
+/* Controls are hidden at rest. They come back on hover, or when something
+   inside is focused from the keyboard. Deliberately not :focus-within: a
+   mouse click focuses the zoom button, and the controls would then stay up
+   after the popup closed until the next click elsewhere. */
 .carousel:hover .carousel__btn,
-.carousel:focus-within .carousel__btn,
+.carousel:has(:focus-visible) .carousel__btn,
 .carousel__btn:focus-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 .carousel__btn:hover {
   border-color: rgb(var(--ink));
@@ -1435,6 +1484,14 @@ a.ext:hover::after {
   display: flex;
   justify-content: flex-end;
   gap: 0.3rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.carousel:hover .carousel__dots,
+.carousel:has(:focus-visible) .carousel__dots {
+  opacity: 1;
+  pointer-events: auto;
 }
 .carousel__dot {
   width: 1.4rem;
@@ -1457,9 +1514,13 @@ a.ext:hover::after {
   box-shadow: 0 0 0 1px rgb(255 255 255 / 0.7);
   transform: scale(1.2);
 }
+/* No hover to give: show the controls permanently. Swipe still works. */
 @media (hover: none) {
-  .carousel__btn {
+  .carousel__btn,
+  .carousel__dots,
+  .carousel__count {
     opacity: 1;
+    pointer-events: auto;
   }
 }
 
@@ -1498,14 +1559,10 @@ a.ext:hover::after {
   transition: opacity 200ms ease;
 }
 .carousel:hover .carousel__count,
-.carousel:focus-within .carousel__count {
+.carousel:has(:focus-visible) .carousel__count {
   opacity: 1;
 }
-@media (hover: none) {
-  .carousel__count {
-    opacity: 1;
-  }
-}
+
 
 /* Hover and focus read as a still outline drawn inside the frame. */
 .carousel__zoom:hover,
@@ -1739,25 +1796,38 @@ body.is-lightboxed {
 @media (min-width: 900px) {
   .project {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Image column leads at 55%, text takes the rest. */
+    grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
     align-items: stretch;
   }
-  .project .carousel {
-    /* Fills the card's image column, a fixed box per card: the frame never
-       resizes with the picture, so heights never jump between slides. */
-    aspect-ratio: auto;
-    min-height: 16rem;
-    height: 100%;
+  /* The image column is its own flex track, full card height, with the 16/10
+     frame centred in it. The frame cannot be stretched by a taller text
+     column (which is what aspect-ratio: auto + height: 100% used to allow),
+     and the column still paints edge to edge behind it. */
+  .project .carousel-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    background: rgb(var(--gray-100));
     border-right: 1px solid rgb(var(--gray-200));
   }
-  .project:nth-child(even) .carousel {
+  .project:nth-child(even) .carousel-col {
     order: 2;
     border-right: 0;
     border-left: 1px solid rgb(var(--gray-200));
   }
+  .project .carousel {
+    aspect-ratio: 16 / 10;
+    height: auto;
+    width: 100%;
+    border-right: 0;
+  }
+
   .project__body {
     padding: 1.75rem;
-    justify-content: center;
+    /* Same alignment in every card, so titles line up across the section. */
+    justify-content: flex-start;
   }
 }
 
@@ -1768,8 +1838,8 @@ body.is-lightboxed {
   display: grid;
   gap: 1.5rem;
 }
-/* The cover of each award gallery is a square announcement card; 16/10 would
-   cut the placement line off the bottom. */
+/* Square announcement cards sit beside 3:2 event photos; 4/3 wastes the least
+   across the nine of them. */
 .achievement .carousel {
   aspect-ratio: 4 / 3;
 }
@@ -1822,10 +1892,16 @@ body.is-lightboxed {
   border-bottom: 1px solid rgb(var(--gray-200));
 }
 .thumb--cert {
-  aspect-ratio: 4 / 3;
+  /* All five scans measure between 1.37 and 1.42, so 7/5 leaves ~1% empty. */
+  aspect-ratio: 7 / 5;
   width: 4.5rem;
   border-radius: 8px;
   border: 1px solid rgb(var(--gray-200));
+  background: rgb(var(--gray-100));
+}
+/* A certificate is a document: show all of it, never a crop. */
+.thumb--cert img {
+  object-fit: contain;
 }
 .thumb--cert .thumb__ph::after {
   font-size: 0.75rem;

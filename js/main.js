@@ -322,6 +322,12 @@
         }
         var img = el("img", null, attrs);
         if (it.pos) img.style.objectPosition = it.pos; // keep the key line inside the crop
+        // The slide fills the space around a contained image with the image
+        // itself, blurred (see .carousel__slide::before). Same URL, so the
+        // browser reuses the one it already has: no second download. It must
+        // be absolute: a relative url() inside a custom property resolves
+        // against the stylesheet's folder (/css/), not the page.
+        slide.style.setProperty("--shot", 'url("' + new URL(it.src, document.baseURI).href + '")');
         slide.appendChild(placeholder(initials));
         slide.appendChild(img);
         if (it.caption) {
@@ -339,8 +345,20 @@
         "aria-label": "Enlarge " + title + (loaded.length > 1 ? ", " + loaded.length + " images" : "")
       });
       host.appendChild(zoom);
+      // Track how the button was reached. Chromium keeps :focus-visible on a
+      // clicked button, so after the popup closed the controls stayed up until
+      // the next click elsewhere. On a pointer click we hand focus back to the
+      // frame instead of the button, and the controls fade with the pointer.
+      var viaPointer = false;
+      zoom.addEventListener("pointerdown", function () {
+        viaPointer = true;
+      });
+      zoom.addEventListener("blur", function () {
+        viaPointer = false;
+      });
       zoom.addEventListener("click", function () {
-        enlarge(loaded, index, zoom, {
+        var byMouse = viaPointer;
+        enlarge(loaded, index, byMouse ? null : zoom, {
           title: title,
           onClose: function (n) {
             // The card follows the viewer, so closing lands on what was seen.
@@ -453,18 +471,25 @@
             }
           ],
           0,
-          figure,
+          byPointer ? null : figure,
           { title: img.getAttribute("alt") || "" }
         );
       }
       // Only a thumbnail that actually loaded becomes a control; the ones
       // still waiting on a file keep their halftone placeholder, inert.
+      var byPointer = false;
       function activate() {
         if (!img.naturalWidth) return;
         figure.classList.add("thumb--zoomable");
         figure.setAttribute("tabindex", "0");
         figure.setAttribute("role", "button");
         figure.setAttribute("aria-label", "Enlarge: " + (img.getAttribute("alt") || "certificate"));
+        figure.addEventListener("pointerdown", function () {
+          byPointer = true;
+        });
+        figure.addEventListener("blur", function () {
+          byPointer = false;
+        });
         figure.addEventListener("click", openThis);
         figure.addEventListener("keydown", function (e) {
           if (e.key === "Enter" || e.key === " ") {
