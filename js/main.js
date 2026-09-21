@@ -47,15 +47,20 @@
     var backdrop = el("div", "lightbox__backdrop");
     var stage = el("div", "lightbox__stage");
     var img = el("img", "lightbox__img", { alt: "", decoding: "async" });
-    var cap = el("figcaption", "lightbox__cap");
-    var count = el("span", "lightbox__count");
-    var text = el("span", "lightbox__text");
-    cap.appendChild(count);
-    cap.appendChild(text);
     var fig = el("figure", "lightbox__figure");
+    var cap = el("figcaption", "lightbox__cap");
+    var title = el("span", "lightbox__title");
+    var text = el("span", "lightbox__text");
+    var count = el("span", "lightbox__count");
+    cap.appendChild(title);
+    cap.appendChild(text);
+    cap.appendChild(count);
     fig.appendChild(img);
     fig.appendChild(cap);
     stage.appendChild(fig);
+
+    var rail = el("div", "lightbox__thumbs", { role: "tablist", "aria-label": "Choose image" });
+    stage.appendChild(rail);
 
     var close = el("button", "lightbox__close", { type: "button", "aria-label": "Close image viewer" });
     close.appendChild(iconSvg("i-close"));
@@ -71,11 +76,43 @@
     node.appendChild(next);
     document.body.appendChild(node);
 
-    var state = { items: [], index: 0, opener: null };
+    var state = { items: [], index: 0, opener: null, title: "", onClose: null };
+    var thumbEls = [];
+
+    function buildThumbs() {
+      rail.textContent = "";
+      thumbEls = [];
+      // A rail only earns its space once there are three or more images.
+      var wanted = state.items.length >= 3;
+      rail.hidden = !wanted;
+      if (!wanted) return;
+      state.items.forEach(function (it, i) {
+        var b = el("button", "lightbox__thumb", {
+          type: "button",
+          role: "tab",
+          "aria-label": "Image " + (i + 1) + " of " + state.items.length
+        });
+        var t = el("img", null, { src: it.src, alt: "", loading: "lazy", decoding: "async" });
+        b.appendChild(t);
+        b.addEventListener("click", function () {
+          show(i);
+        });
+        rail.appendChild(b);
+        thumbEls.push(b);
+      });
+    }
+
+    function focusables() {
+      return [close, prev, next]
+        .concat(thumbEls)
+        .filter(function (b) {
+          return !b.hidden && b.offsetParent !== null;
+        });
+    }
 
     function show(n) {
-      var count_ = state.items.length;
-      state.index = ((n % count_) + count_) % count_;
+      var total = state.items.length;
+      state.index = ((n % total) + total) % total;
       var it = state.items[state.index];
       img.setAttribute("src", it.src);
       img.setAttribute("alt", it.alt);
@@ -86,18 +123,32 @@
         img.removeAttribute("width");
         img.removeAttribute("height");
       }
-      count.textContent = count_ > 1 ? state.index + 1 + " / " + count_ : "";
+      title.textContent = state.title || "";
       text.textContent = it.caption || "";
-      cap.hidden = !count.textContent && !text.textContent;
-      var many = count_ > 1;
+      count.textContent = total > 1 ? state.index + 1 + " / " + total : "";
+      title.hidden = !title.textContent;
+      text.hidden = !text.textContent;
+      count.hidden = !count.textContent;
+      cap.hidden = title.hidden && text.hidden && count.hidden;
+      var many = total > 1;
       prev.hidden = !many;
       next.hidden = !many;
+      for (var i = 0; i < thumbEls.length; i++) {
+        if (i === state.index) thumbEls[i].setAttribute("aria-current", "true");
+        else thumbEls[i].removeAttribute("aria-current");
+      }
+      if (thumbEls[state.index] && thumbEls[state.index].scrollIntoView) {
+        thumbEls[state.index].scrollIntoView({ block: "nearest", inline: "center" });
+      }
     }
 
-    function open(items, index, opener) {
+    function open(items, index, opener, opts) {
       if (!items.length) return;
       state.items = items;
       state.opener = opener || null;
+      state.title = (opts && opts.title) || "";
+      state.onClose = (opts && opts.onClose) || null;
+      buildThumbs();
       node.hidden = false;
       document.body.classList.add("is-lightboxed");
       show(index || 0);
@@ -108,14 +159,17 @@
       node.hidden = true;
       document.body.classList.remove("is-lightboxed");
       img.removeAttribute("src");
+      // Hand the card the slide the visitor ended on, so the two agree.
+      if (state.onClose) state.onClose(state.index);
       if (state.opener && document.contains(state.opener)) state.opener.focus();
       state.opener = null;
+      state.onClose = null;
     }
 
     close.addEventListener("click", shut);
     backdrop.addEventListener("click", shut);
     stage.addEventListener("click", function (e) {
-      if (e.target === stage) shut();
+      if (e.target === stage || e.target === fig) shut();
     });
     prev.addEventListener("click", function () {
       show(state.index - 1);
@@ -135,28 +189,27 @@
         e.preventDefault();
         show(state.index + 1);
       } else if (e.key === "Tab") {
-        // Keep focus inside the dialog: three controls, wrap by hand.
-        var focusable = [close, prev, next].filter(function (b) {
-          return !b.hidden;
-        });
-        var at = focusable.indexOf(document.activeElement);
+        // Keep focus inside the dialog: a short, known set of controls.
+        var list = focusables();
+        if (!list.length) return;
+        var at = list.indexOf(document.activeElement);
         e.preventDefault();
         var step = e.shiftKey ? -1 : 1;
-        var to = (((at < 0 ? 0 : at + step) % focusable.length) + focusable.length) % focusable.length;
-        focusable[to].focus();
+        var to = (((at < 0 ? 0 : at + step) % list.length) + list.length) % list.length;
+        list[to].focus();
       }
     });
 
     swipe(stage, function (dir) {
-      show(state.index + dir);
+      if (state.items.length > 1) show(state.index + dir);
     });
 
     return { open: open };
   }
 
-  function enlarge(items, index, opener) {
+  function enlarge(items, index, opener, opts) {
     if (!box) box = buildLightbox();
-    box.open(items, index, opener);
+    box.open(items, index, opener, opts);
   }
 
   /* Horizontal swipe on a node; calls back with +1 (next) or -1 (prev). */
@@ -280,17 +333,24 @@
       });
 
       var index = 0;
+      var goTo = null; // set below when there is more than one slide
       var zoom = el("button", "carousel__zoom", {
         type: "button",
         "aria-label": "Enlarge " + title + (loaded.length > 1 ? ", " + loaded.length + " images" : "")
       });
       host.appendChild(zoom);
       zoom.addEventListener("click", function () {
-        enlarge(loaded, index, zoom);
+        enlarge(loaded, index, zoom, {
+          title: title,
+          onClose: function (n) {
+            // The card follows the viewer, so closing lands on what was seen.
+            if (goTo) goTo(n);
+          }
+        });
       });
 
       if (loaded.length > 1) {
-        enableControls(host, track, loaded.length, altBase, function (n) {
+        goTo = enableControls(host, track, loaded.length, altBase, function (n) {
           index = n;
         });
       }
@@ -363,6 +423,8 @@
     swipe(host, function (dir) {
       go(index + dir);
     });
+
+    return go;
   }
 
   var hosts = document.querySelectorAll("[data-carousel]");
@@ -379,18 +441,20 @@
     (function (img) {
       var figure = img.parentNode;
       function openThis() {
+        var cap = figure.querySelector("figcaption");
         enlarge(
           [
             {
               src: img.getAttribute("src"),
               alt: img.getAttribute("alt") || "",
-              caption: "",
+              caption: cap ? cap.textContent.trim() : "",
               w: img.naturalWidth,
               h: img.naturalHeight
             }
           ],
           0,
-          figure
+          figure,
+          { title: img.getAttribute("alt") || "" }
         );
       }
       // Only a thumbnail that actually loaded becomes a control; the ones

@@ -1360,17 +1360,19 @@ a.ext:hover::after {
   position: relative;
   flex: 0 0 100%;
   height: 100%;
+  /* Clips its own image. Without this a neighbouring slide's image can reach
+     past its slide and show at the edge of the frame. */
+  overflow: hidden;
 }
 .carousel__slide img {
   position: relative;
   z-index: 1;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 500ms var(--ease-out);
-}
-.card:hover .carousel__slide img {
-  transform: scale(1.04);
+  /* Whole image, centred, letterboxed against the frame. Never cropped, and
+     never scaled or moved on hover: the frame is a fixed box. */
+  object-fit: contain;
+  object-position: center;
 }
 .carousel__slide .thumb__ph {
   z-index: 0;
@@ -1394,8 +1396,8 @@ a.ext:hover::after {
   position: absolute;
   z-index: 2;
   top: 50%;
-  width: 2rem;
-  height: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1436,7 +1438,7 @@ a.ext:hover::after {
 }
 .carousel__dot {
   width: 1.4rem;
-  height: 1.1rem;
+  height: 1.4rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1470,7 +1472,7 @@ a.ext:hover::after {
   background: none;
   border: 0;
   padding: 0;
-  cursor: zoom-in;
+  cursor: pointer;
 }
 .carousel__btn,
 .carousel__dots,
@@ -1505,9 +1507,19 @@ a.ext:hover::after {
   }
 }
 
+/* Hover and focus read as a still outline drawn inside the frame. */
+.carousel__zoom:hover,
+.carousel__zoom:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(var(--ink) / 0.35);
+}
+.thumb--zoomable:hover,
+.thumb--zoomable:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(var(--ink) / 0.35);
+}
+
 /* Certificate thumbnails become buttons once their file loads. */
 .thumb--zoomable {
-  cursor: zoom-in;
+  cursor: pointer;
 }
 
 /* --------------------------------------------------------------------------
@@ -1517,22 +1529,37 @@ a.ext:hover::after {
   position: fixed;
   z-index: 60;
   inset: 0;
+  animation: lightbox-in 160ms var(--ease-out);
 }
 .lightbox[hidden] {
   display: none;
 }
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 .lightbox__backdrop {
   position: absolute;
   inset: 0;
-  background: rgb(6 6 8 / 0.88);
+  background: rgb(6 6 8 / 0.86);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .lightbox__stage {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 5vw, 3.5rem);
+  gap: 0.9rem;
+  padding: clamp(3.5rem, 7vw, 4.5rem) clamp(1rem, 5vw, 4.5rem);
+  /* The figure may shrink; the rail keeps its height. */
+  overflow: hidden;
   touch-action: pan-y;
 }
 .lightbox__figure {
@@ -1541,30 +1568,82 @@ a.ext:hover::after {
   flex-direction: column;
   align-items: center;
   gap: 0.7rem;
-  max-width: min(100%, 78rem);
+  /* Shrinks so the caption and the rail below always have their own room. */
+  min-height: 0;
+  min-width: 0;
+  max-width: 90vw;
 }
 .lightbox__img {
   display: block;
   width: auto;
   height: auto;
-  max-width: 100%;
-  max-height: 78vh;
+  min-height: 0;
+  max-width: 90vw;
+  max-height: min(85vh, 100%);
   object-fit: contain;
   border: 1px solid rgb(255 255 255 / 0.14);
   background: rgb(20 20 22);
 }
 .lightbox__cap {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.6rem;
+  justify-content: center;
+  gap: 0.2rem 0.75rem;
+  max-width: 90vw;
+  text-align: center;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
   color: rgb(238 238 238 / 0.72);
 }
+.lightbox__title {
+  color: rgb(244 244 245);
+}
 .lightbox__count {
   color: rgb(238 238 238 / 0.5);
 }
+.lightbox__cap [hidden] {
+  display: none;
+}
+
+/* Thumbnail rail: only built when there are three or more images. */
+.lightbox__thumbs {
+  flex: none;
+  display: flex;
+  gap: 0.4rem;
+  max-width: 90vw;
+  padding-bottom: 0.2rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.lightbox__thumbs[hidden] {
+  display: none;
+}
+.lightbox__thumb {
+  flex: none;
+  width: 4rem;
+  height: 3rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 200ms ease, border-color 200ms ease;
+}
+.lightbox__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lightbox__thumb:hover,
+.lightbox__thumb:focus-visible {
+  opacity: 1;
+}
+.lightbox__thumb[aria-current="true"] {
+  opacity: 1;
+  border-color: rgb(255 255 255 / 0.85);
+}
+
 .lightbox__close,
 .lightbox__btn {
   position: absolute;
@@ -1572,8 +1651,8 @@ a.ext:hover::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 999px;
   border: 1px solid rgb(255 255 255 / 0.22);
   background: rgb(18 18 20 / 0.72);
@@ -1617,7 +1696,11 @@ body.is-lightboxed {
     transform: none;
   }
   .lightbox__img {
-    max-height: 68vh;
+    max-height: 62vh;
+  }
+  .lightbox__thumb {
+    width: 3.25rem;
+    height: 2.5rem;
   }
 }
 
@@ -1660,6 +1743,8 @@ body.is-lightboxed {
     align-items: stretch;
   }
   .project .carousel {
+    /* Fills the card's image column, a fixed box per card: the frame never
+       resizes with the picture, so heights never jump between slides. */
     aspect-ratio: auto;
     min-height: 16rem;
     height: 100%;
@@ -2143,5 +2228,9 @@ html.js .fade-up {
   }
   .tl__body::after {
     display: none;
+  }
+  /* The viewer still fades: opacity is not motion. */
+  .lightbox {
+    animation-duration: 140ms !important;
   }
 }
