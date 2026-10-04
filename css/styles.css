@@ -1584,18 +1584,10 @@ a.ext:hover::after {
   position: fixed;
   z-index: 60;
   inset: 0;
-  animation: lightbox-in 160ms var(--ease-out);
+  isolation: isolate;
 }
 .lightbox[hidden] {
   display: none;
-}
-@keyframes lightbox-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 .lightbox__backdrop {
   position: absolute;
@@ -1603,6 +1595,7 @@ a.ext:hover::after {
   background: rgb(6 6 8 / 0.86);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  transform: translateZ(0);
 }
 .lightbox__stage {
   position: absolute;
@@ -1627,6 +1620,17 @@ a.ext:hover::after {
   min-height: 0;
   min-width: 0;
   max-width: 90vw;
+  animation: lightbox-fig-in 100ms var(--ease-out);
+}
+@keyframes lightbox-fig-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .lightbox__img {
   display: block;
@@ -2304,8 +2308,7 @@ html.js .fade-up {
   .tl__body::after {
     display: none;
   }
-  /* The viewer still fades: opacity is not motion. */
-  .lightbox {
-    animation-duration: 140ms !important;
+  .lightbox__figure {
+    animation: none !important;
   }
 }

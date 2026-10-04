@@ -32,10 +32,9 @@
   }
 
   /* -------------------------------------------------------------- lightbox
-     One viewer, reused by every gallery and every certificate thumbnail.
-     Built on first use so a visitor who never enlarges anything never pays
-     for it. */
-  var box = null;
+  /* Built eagerly on load so DOM nodes, styles, and the backdrop-filter
+     pipeline are fully primed with zero click latency. */
+  var box = buildLightbox();
 
   function buildLightbox() {
     var node = el("div", "lightbox", {
@@ -215,7 +214,6 @@
   }
 
   function enlarge(items, index, opener, opts) {
-    if (!box) box = buildLightbox();
     box.open(items, index, opener, opts);
   }
 
