@@ -61,7 +61,7 @@ Ollopa Corporation, Programming Intern, Fairview, Quezon City (Remote), August 2
 Applied advanced OOP concepts in a real enterprise setting: object-oriented analysis, design, and Java application development under industry supervision.
 Designed and storyboarded game concepts, mechanics, and digital assets as part of a Game Design and Development track.
 Met industry-level quality standards while strengthening critical thinking and professional communication in a fast-paced environment.
-Knowles Training Institute x SSGC Group, IT Intern, Singapore (Remote), April 2026 to June 2026
+Knowles Training Institute x SSGC Group, IT Intern, Singapore (Remote), May 2026 to July 2026
 Led the field monitoring team as Team Leader: supervised fellow interns, oversaw documentation and reporting, coordinated cross-departmental issue resolution.
 Built and maintained company websites using WordPress: content updates, layout improvements, digital asset integration.
 Designed social media visuals and multimedia content for international branding, collaborating with interns across departments and schools in a remote, multicultural environment.

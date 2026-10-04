@@ -96,7 +96,7 @@ images referenced directly in `index.html`:
 |---|---|
 | NRG Info-Tech / TESDA (Programming NC III) | `assets/images/internships/tesda.jpg` |
 | Ollopa Corporation | `assets/images/internships/ollopa.jpg` |
-| Knowles Training Institute | `assets/images/internships/knowles.jpg` (not supplied yet) |
+| Knowles Training Institute | `assets/images/internships/KnowlesCert.png` |
 
 **Certificates** are single images referenced directly in `index.html`:
 
