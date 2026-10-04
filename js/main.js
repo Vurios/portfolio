@@ -177,6 +177,12 @@
     stage.addEventListener("click", function (e) {
       if (e.target === stage || e.target === fig) shut();
     });
+    img.addEventListener("mousedown", function (e) {
+      if (e.detail > 1) e.preventDefault();
+    });
+    node.addEventListener("dblclick", function (e) {
+      e.preventDefault();
+    });
     prev.addEventListener("click", function () {
       show(state.index - 1);
     });
@@ -496,6 +502,12 @@
         });
         img.addEventListener("blur", function () {
           byPointer = false;
+        });
+        img.addEventListener("mousedown", function (e) {
+          if (e.detail > 1) e.preventDefault();
+        });
+        img.addEventListener("dblclick", function (e) {
+          e.preventDefault();
         });
         img.addEventListener("click", openThis);
         img.addEventListener("keydown", function (e) {

@@ -132,6 +132,9 @@ html.theme-transition .kuro-bubble {
   background: rgb(var(--ink));
   color: rgb(var(--bg));
 }
+img::selection {
+  background: transparent;
+}
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -177,6 +180,9 @@ ol {
 img {
   display: block;
   max-width: 100%;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 a {
@@ -1585,6 +1591,8 @@ a.ext:hover::after {
   z-index: 60;
   inset: 0;
   isolation: isolate;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .lightbox[hidden] {
   display: none;
@@ -1642,6 +1650,9 @@ a.ext:hover::after {
   object-fit: contain;
   border: 1px solid rgb(255 255 255 / 0.14);
   background: rgb(20 20 22);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 .lightbox__cap {
   display: flex;
