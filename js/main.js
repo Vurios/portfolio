@@ -150,6 +150,10 @@
       state.onClose = (opts && opts.onClose) || null;
       buildThumbs();
       node.hidden = false;
+      var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0 && typeof CSS !== "undefined" && CSS.supports && !CSS.supports("scrollbar-gutter", "stable")) {
+        document.body.style.paddingRight = scrollbarWidth + "px";
+      }
       document.body.classList.add("is-lightboxed");
       show(index || 0);
       close.focus();
@@ -158,6 +162,9 @@
     function shut() {
       node.hidden = true;
       document.body.classList.remove("is-lightboxed");
+      if (document.body.style.paddingRight) {
+        document.body.style.paddingRight = "";
+      }
       img.removeAttribute("src");
       // Hand the card the slide the visitor ended on, so the two agree.
       if (state.onClose) state.onClose(state.index);

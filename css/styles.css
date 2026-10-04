@@ -145,6 +145,7 @@ html.theme-transition .kuro-bubble {
   border-radius: 999px;
 }
 html {
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--gray-300)) transparent;
 }
@@ -1899,6 +1900,7 @@ body.is-lightboxed {
 /* A certificate is a document: show all of it, never a crop. */
 .thumb--cert img {
   object-fit: contain;
+  background: rgb(var(--gray-100));
 }
 .thumb--cert .thumb__ph::after {
   font-size: 0.75rem;
