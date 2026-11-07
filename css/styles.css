@@ -2370,9 +2370,15 @@ html.js .fade-up {
 .organization__link {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   font: inherit;
+  font-weight: 500;
+  color: rgb(var(--ink));
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(var(--gray-400));
 }
+.organization__link .icon { width: 0.75em; height: 0.75em; }
+.organization__link:hover { text-decoration-color: currentColor; }
 @media (min-width: 760px) {
   .organizations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .organization__role { min-height: 2.8em; }

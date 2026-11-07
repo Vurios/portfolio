@@ -110,7 +110,7 @@ var IMAGES = {
           src: "assets/images/projects/argusph/06-mobile-app.webp",
           w: 1600,
           h: 1000,
-          alt: "Three refined phone mockups showing the ARGUSPH mobile redesign in Filipino: reporting home, incident map and Law Chat. Screens captured October 25, 2026.",
+          alt: "Three refined phone mockups showing the ARGUSPH app in English: reporting home, incident map and Law Chat. Uses archived English app screenshots.",
           caption: "Mobile app"
         }
       ]
