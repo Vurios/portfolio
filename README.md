@@ -78,7 +78,7 @@ frame opens the lightbox on click, with arrow keys, swipe and Esc.
 | SARO | `projects.saro` | `assets/images/projects/saro/` |
 | ARGUSPH | `projects.argusph` | `assets/images/projects/argusph/` (empty) |
 | SafeTrack | `projects.safetrack` | `assets/images/projects/safetrack/` |
-| Intelligent Library Assistant | `projects["library-assistant"]` | `assets/images/projects/library-assistant/` (empty) |
+| AI-Integrated Book Collection System With Data Analytics | `projects["library-assistant"]` | `assets/images/projects/library-assistant/` |
 | Ibalong Hackathon 2026 | `achievements["ibalong-2026"]` | `assets/images/achievements/ibalong-2026/` |
 | AI4AI Fair 2026 | `achievements["ai4ai-2026"]` | `assets/images/achievements/ai4ai-2026/` |
 

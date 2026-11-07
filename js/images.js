@@ -81,36 +81,36 @@ var IMAGES = {
         {
           src: "assets/images/projects/argusph/02-login.webp",
           w: 1600,
-          h: 785,
-          alt: "ARGUSPH sign-in page headed “Digital Policing. Safer Polangui.”, listing incident reports, crime mapping and audio alerts beside the login form.",
+          h: 1000,
+          alt: "Current ARGUSPH sign-in page with the Digital Policing introduction and officer or administrator login.",
           caption: "Sign in"
         },
         {
           src: "assets/images/projects/argusph/03-station-overview.webp",
           w: 1600,
           h: 1000,
-          alt: "Station overview dashboard for PNP Polangui: 49 total reports, 14 urgent cases, and a table of urgent cases by status and date.",
+          alt: "Current ARGUSPH station overview with the redesigned navigation, case summary, urgent-case queue and barangay report chart. Shown with labeled demo data.",
           caption: "Station overview"
         },
         {
           src: "assets/images/projects/argusph/04-crime-map.webp",
           w: 1600,
           h: 1000,
-          alt: "Interactive crime map of Polangui with colour-coded incident pins across 44 barangays, and a crime-density ranking beside it.",
+          alt: "Current ARGUSPH interactive map of Polangui, with incident filters, colored markers and barangay density. Shown with labeled demo data.",
           caption: "Crime map"
         },
         {
           src: "assets/images/projects/argusph/05-emergency-broadcast.webp",
           w: 1600,
           h: 1000,
-          alt: "Emergency broadcast composer with alert type, message body and target audience, beside quick templates for suspect alerts and disaster advisories.",
+          alt: "Current ARGUSPH emergency broadcast workspace with audience selection, quick templates, active-alert management and broadcast history.",
           caption: "Emergency broadcast"
         },
         {
           src: "assets/images/projects/argusph/06-mobile-app.webp",
           w: 1600,
           h: 1000,
-          alt: "Three phones showing the ARGUSPH responder app: the officer home with a flash-flood alert, the live incident map, and the Law Chat assistant.",
+          alt: "Three refined phone mockups showing the ARGUSPH mobile redesign in Filipino: reporting home, incident map and Law Chat. Screens captured October 25, 2026.",
           caption: "Mobile app"
         }
       ]
@@ -135,7 +135,7 @@ var IMAGES = {
       ]
     },
     "library-assistant": {
-      title: "Intelligent Library Assistant",
+      title: "AI-Integrated Book Collection System With Data Analytics",
       images: [
         {
           src: "assets/images/projects/library-assistant/01-logo.webp",
@@ -147,37 +147,44 @@ var IMAGES = {
         {
           src: "assets/images/projects/library-assistant/02-login.webp",
           w: 1600,
-          h: 786,
-          alt: "Library sign-in page headed “Your library, one search away”, with the librarian assistant character beside the email and Google sign-in form.",
+          h: 1000,
+          alt: "Current BU Library sign-in screen with catalog search, AI cover scanning and collection analysis features.",
           caption: "Sign in"
         },
         {
           src: "assets/images/projects/library-assistant/03-book-collection.webp",
           w: 1600,
-          h: 947,
-          alt: "Book collection table listing catalogued titles by author, department and year, across 11,881 titles and 21,185 physical copies.",
+          h: 1000,
+          alt: "Current book collection workspace with catalog search, program filters, synchronized inventory status and title records in the local demo.",
           caption: "Book collection"
         },
         {
           src: "assets/images/projects/library-assistant/04-ai-cover-scan.webp",
           w: 1600,
           h: 1000,
-          alt: "Add-a-book dialog where an AI smart scan of a book cover has filled in the title, author, program and year for checking before saving.",
+          alt: "Current Add New Book dialog with AI Smart Scan upload, collection category, program assignment and inventory fields.",
           caption: "AI cover scan"
         },
         {
           src: "assets/images/projects/library-assistant/05-library-assistant-chat.webp",
           w: 1600,
           h: 1000,
-          alt: "The library assistant chat answering how many books a degree programme holds, with title and volume counts drawn from the live catalogue.",
+          alt: "Current Library Assistant panel with catalog questions and navigation suggestions beside the book collection.",
           caption: "Library assistant"
         },
         {
           src: "assets/images/projects/library-assistant/06-collection-analysis.webp",
           w: 1600,
           h: 1000,
-          alt: "Collection analysis dashboard showing volumes required against volumes held per degree programme, measured against the CHED and AACCUP standard.",
+          alt: "Current collection analysis dashboard with academic period, enrollment totals, program requirements and the internal book-planning target.",
           caption: "Collection analysis"
+        },
+        {
+          src: "assets/images/projects/library-assistant/07-narrative-report.webp",
+          w: 1600,
+          h: 1000,
+          alt: "Current narrative report workspace with academic-period selection, report sections and collection insights in the local demo.",
+          caption: "Narrative report"
         }
       ]
     }

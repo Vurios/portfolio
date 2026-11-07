@@ -62,14 +62,13 @@ const W = 1600;
 const H = 1000;
 // Middle phone of three, or a lone phone, fills this share of the frame
 // height; the outer two sit a step smaller so the middle reads as in front.
-const LEAD_SHARE = 0.86;
+const LEAD_SHARE = 0.80;
 const SIDE_SHARE = 0.74;
 const PAIR_SHARE = 0.84;
-// How much of an outer phone the one in front covers. Small: each screen has
-// to stay readable at card size, so neighbours only just touch.
-const OVERLAP_PAIR = 0.07;
-const OVERLAP_TRIO = 0.05;
-const GAP = 26; // px between phones that do not overlap
+// Keep each screen fully visible, with space between neighboring frames.
+const OVERLAP_PAIR = 0;
+const OVERLAP_TRIO = 0;
+const GAP = 48; // px between phones that do not overlap
 
 function parseArgs(argv) {
   const out = { shots: [], quality: 82 };
@@ -125,7 +124,7 @@ function phoneHtml(shots, bg) {
   const cards = shots
     .map((s, i) => {
       const { w, h } = imageSize(s.file);
-      const bezel = Math.max(8, Math.round(heights[i] * 0.014));
+      const bezel = 9;
       const screenH = heights[i] - bezel * 2;
       const screenW = Math.round((screenH * w) / h);
       const radius = Math.round(heights[i] * 0.055);
@@ -141,7 +140,7 @@ function phoneHtml(shots, bg) {
         border-radius:${radius}px;
       ">
         <img src="${s.url}" width="${screenW}" height="${screenH}"
-             style="width:${screenW}px;height:${screenH}px;border-radius:${Math.round(radius * 0.62)}px" />
+             style="width:${screenW}px;height:${screenH}px;border-radius:${radius - bezel}px" />
       </div>`;
     })
     .join("");
@@ -159,20 +158,29 @@ function phoneHtml(shots, bg) {
   .vignette {
     position: fixed; inset: 0;
     background:
-      radial-gradient(ellipse 70% 62% at 50% 46%, rgba(255,255,255,0.13), rgba(255,255,255,0) 68%),
+      radial-gradient(ellipse 70% 62% at 50% 46%, rgba(255,255,255,0.09), rgba(255,255,255,0) 68%),
       radial-gradient(ellipse 120% 100% at 50% 120%, rgba(0,0,0,0.34), rgba(0,0,0,0) 62%);
   }
   .row { position: relative; display: flex; align-items: center; }
-  /* Generic handset: near-black bezel, even on all sides, no notch, no brand. */
+  /* Generic handset: metallic rim, even bezel, no notch, no brand. */
   .phone {
     position: relative;
-    background: #0b0b0d;
+    background: linear-gradient(120deg, #a5a9af, #444951 18%, #15181e 45%, #737981 82%, #b0b4ba);
+    border: 1px solid rgba(255,255,255,0.38);
     box-shadow:
       0 2px 0 rgba(255,255,255,0.10) inset,
       0 28px 60px -18px rgba(0,0,0,0.62),
       0 8px 20px -10px rgba(0,0,0,0.45);
   }
-  .phone img { display: block; object-fit: fill; }
+  .phone::before, .phone::after {
+    content: ""; position: absolute; width: 4px;
+    background: linear-gradient(90deg, #242830, #8d939d, #30343a);
+    border-radius: 3px;
+  }
+  .phone::before { right: -4px; top: 180px; height: 68px; }
+  .phone::after { left: -4px; top: 130px; height: 100px; }
+  .phone img { display: block; object-fit: contain; box-shadow: 0 0 0 2px #080a0e; }
+
 </style></head>
 <body><div class="vignette"></div><div class="row">${cards}</div></body></html>`;
 }
@@ -195,6 +203,7 @@ const chromium = await loadChromium();
 const browser = await chromium.launch(args.browser ? { executablePath: args.browser } : {});
 const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
 await page.setContent(phoneHtml(shots, args.bg), { waitUntil: "load" });
+await page.evaluate(() => Promise.all([...document.images].map(image => image.decode())));
 await page.waitForTimeout(200);
 await page.screenshot({ path: pngPath });
 await browser.close();
