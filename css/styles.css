@@ -2323,3 +2323,58 @@ html.js .fade-up {
     animation: none !important;
   }
 }
+
+/* Leadership cards inherit the monochrome palette; official marks stay in color. */
+.organizations {
+  display: grid;
+  gap: 1.25rem;
+}
+.organization {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid rgb(var(--gray-200));
+  border-radius: 16px;
+  background: rgb(var(--bg));
+}
+.organization__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.organization__logo {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  border: 1px solid rgb(var(--gray-200));
+  border-radius: 12px;
+}
+.organization__logo img { object-fit: contain; }
+.organization__logo .thumb__ph::after { font-size: 0.75rem; padding: 0.25rem; }
+.organization__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+.organization__school {
+  margin-top: 0.25rem;
+  font-size: 13px;
+  color: rgb(var(--gray-500));
+}
+.organization__role {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 14px;
+  font-weight: 500;
+}
+.organization .bullets { margin-top: 1.25rem; gap: 0.75rem; }
+.organization__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+@media (min-width: 760px) {
+  .organizations { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
